@@ -14,8 +14,10 @@ a better understanding of the problems you encountered during the developmemnt o
 | scr | Source code - create as many subdirectories as needed |
 
 ## Project Team
+
 - *Alberto Cano* - *Department of Computer Science* - Faculty Advisor Mentor Technical Advisor
 - *Yunus Bidav* - *Computer Science & Mathematics* - Student Team Member
 - *Steven Holcombe* - *Computer Science* - Student Team Member
 - *James Jenkins* - *Computer Science* - Student Team Member
 - *Amaka Odidika* - *Computer Science* - Student Team Member
+
