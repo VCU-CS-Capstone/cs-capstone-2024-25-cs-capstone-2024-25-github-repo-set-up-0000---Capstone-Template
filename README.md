@@ -1,5 +1,5 @@
-# *Your Project Description*
-## *Sponsoring Company or Organization*
+# *CS 25-327 XState Builder*
+## *Capital One*
 ## *Short Project Description*
 The directory structure in this GitHub is to allow the project to have all its resources self-contained.
 Open Source software should not just be a repository of code.  There are a number of directories to help you and others that will 
@@ -15,9 +15,9 @@ a better understanding of the problems you encountered during the developmemnt o
 
 ## Project Team
 - *Mentor's Name*  - *Company Affliation* - Mentor
-- *Technical Advisor Name* - *Company Affliation* - Technical Advisor
-- *Faculty Advisor's Name* - *Department* - Faculty Advisor
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
+- *Mahesh Nair* - *Capital One* - Technical Advisor
+- *Irfan Ahmed* - *Computer Science/Cybersecurity Department* - Faculty Advisor
+- *Sohum Dharamsi* - *Computer Science w/ Cybersecurity* - Student Team Member
+- *Neil Randeri* - *Computer Science* - Student Team Member
+- *Thien Dang* - *Computer Science* - Student Team Member
+- *Bryan Wheeler* - *Computer Science* - Student Team Member
