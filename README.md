@@ -19,5 +19,5 @@ a better understanding of the problems you encountered during the developmemnt o
 - *Robert Dahlberg* - *Computer Science* - Faculty Advisor
 - *Student's Name* - *major* - Student Team Member
 - *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
+- *Nick Arthur* - *Computer Science & Applied Mathematics* - Student Team Member
 - *Sage Walker* - *Computer Science* - Student Team Member
