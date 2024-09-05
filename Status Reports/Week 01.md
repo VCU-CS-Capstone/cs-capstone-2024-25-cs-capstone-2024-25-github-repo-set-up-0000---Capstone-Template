@@ -1,4 +1,4 @@
-# *CS 25-338 Project Name*
+# *CS 25-338*
 
 **Students' Names: Kyle Jones, Daniel Polen, Alex Kem, Erick Zheng**
 
