@@ -16,4 +16,4 @@
 - *Kyle Jones* - *Computer Science* - Student Team Member
 - *Daniel Polen* - *Computer Science* - Student Team Member
 - *Alex Kim* - *Computer Science* - Student Team Member
-- *Student's Name* - *Computer Science* - Student Team Member
+- *Erick Zheng* - *Computer Science* - Student Team Member
