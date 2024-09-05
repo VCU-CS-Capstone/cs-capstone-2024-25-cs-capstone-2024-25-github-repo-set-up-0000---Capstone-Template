@@ -15,5 +15,5 @@
 - *Changqing Luo* - *Department of Computer Science* - Faculty Advisor
 - *Kyle Jones* - *Computer Science* - Student Team Member
 - *Daniel Polen* - *Computer Science* - Student Team Member
-- *Alex Kim* - *Computer Science* - Student Team Member
+- *Alex Kem* - *Computer Science* - Student Team Member
 - *Erick Zheng* - *Computer Science* - Student Team Member
