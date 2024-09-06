@@ -1,16 +1,17 @@
 # Status Reports Folder
-Weekly/bi-weekly status reports go into this folder
+Weekly status reports go into this folder
 
-Project Plan Template: https://github.com/VCU-CS-Capstone/0000---Capstone-Template/blob/master/Status%20Reports/Project%20Plan.md
+This Readme.md serves as the front page of this folder - update the table with very succinct weekly reports.
 
-Status Report Template: https://github.com/VCU-CS-Capstone/0000---Capstone-Template/blob/master/Status%20Reports/Status%20Reports.dotx
+Project Plan.md is a document that should be updated accordingly as the project develops through the year.
 
-## 1st Semester
+Status Report Fall Week XX.md is a template for to copy-paste into new Status reports you generate every week.
+
+## Fall Semester
 
 | Document | Tasks | Accomplishments | Issues |
 |---|---|---|---|
-| Project Plan | Overall week by week plan of milestones | | |
-| Week 1 Status Report | | | |
+| Week 1 Status Report | We've accomplished a lot | We'll accomplish even more | No problems to report! |
 | Week 2 Status Report | | | |
 | Week 3 Status Report | | | |
 | Week 4 Status Report | | | |
@@ -27,7 +28,7 @@ Status Report Template: https://github.com/VCU-CS-Capstone/0000---Capstone-Templ
 | Week 15 Status Report | | | |
 | Week 16 Status Report | | | |
 
-## 2nd Semester
+## Spring Semester
 
 | Document | Tasks | Accomplishments| Issues |
 |---|---|---|---|
