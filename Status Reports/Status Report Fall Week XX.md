@@ -2,9 +2,18 @@
 
 **Students' Names:**
 
+* Edson Decker - CS - Student Team Member
+* Alex Davidkov - CS - Student Team Member
+* Haley Vivian - CS - Student Team Member
+* William Meredith - CS - Student Team Member
+
 **Mentor:**
 
+* Lana Sargent - VCU School Of Nursing - Sponsor  
+
 **Faculty Advisor:**
+
+* John Leonard - CS - Faculty Advisor 
 
 ## 1) Accomplishments this week ##
    - investigate databases done by student A
