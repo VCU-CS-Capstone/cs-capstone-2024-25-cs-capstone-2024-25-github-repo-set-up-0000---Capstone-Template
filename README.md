@@ -14,8 +14,7 @@ This project aims to enhance data extraction from free-text clinical notes in El
 **Note:** Commits behind this fork could be automatically synced, meaning that changes made in the template are pushed into your repo. Please do not discard commits ahead (these are the updates you make to this repository).
 
 ## Project Team
-- *Mentor's Name*  - *Company Affliation* - Mentor
-- *Technical Advisor Name* - *Company Affliation* - Technical Advisor
+- Rishabh Kapoor  - VCU Health - Sponsor
 - Preetam Ghosh - Department of Computer Science - Faculty Advisor
 - Shashank Sinha - Computer Science - Student Team Member
 - Connor Holden - Computer Science - Student Team Member
