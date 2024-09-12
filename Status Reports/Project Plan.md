@@ -12,7 +12,7 @@ Shashank Sinha, Connor Holden, August Moses, & Sawiya Aidarus
 
 **Project Description:** This project aims to enhance data extraction from free-text clinical notes in Electronic Medical Records (EMRs) using Large Language Models (LLMs) and synthetic note generation. The goal is to improve data sharing between healthcare facilities while safeguarding patient privacy.
 
-**Problem Definition:** 
+**Problem Definition:** Creating a data set for synthetic notes to train LLMs in order to create more comprehensive notes for providers. 
 
 **Deliverables**
 
