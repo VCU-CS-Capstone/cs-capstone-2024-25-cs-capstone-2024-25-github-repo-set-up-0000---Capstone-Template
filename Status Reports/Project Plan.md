@@ -4,11 +4,11 @@
 **Students' Names:**
 Shashank Sinha, Connor Holden, August Moses, & Sawiya Aidarus
 
-**Mentor:**
+**Sponsor:** Rishabh Kapoor
 
-**Faculty Advisor:**
+**Faculty Advisor:** Preetam Ghosh
 
-**Project:**
+**Project:** 
 
 **Project Description:**
 
