@@ -1,10 +1,10 @@
 # CS 25-334 LLMs for clinical Notes
 
-**Students' Names: Shashank Sinha, Connor Holden, Sawiya Aidarus, August Moses:**
+**Students' Names: Shashank Sinha, Connor Holden, Sawiya Aidarus, August Moses**
 
-**Sponsor: Rishabh Kapoor:**
+**Sponsor: Rishabh Kapoor**
 
-**Faculty Advisor: Preetam Ghosh:**
+**Faculty Advisor: Preetam Ghosh**
 
 ## 1) Accomplishments this week ##
    - Met with group members
