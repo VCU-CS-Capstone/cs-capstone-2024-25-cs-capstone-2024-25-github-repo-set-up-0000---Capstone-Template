@@ -1,10 +1,7 @@
-# *Your Project Description*
-## *Sponsoring Company or Organization*
-## *Short Project Description*
-The directory structure in this GitHub is to allow the project to have all its resources self-contained.
-Open Source software should not just be a repository of code.  There are a number of directories to help you and others who will 
-follow in your footsteps.  It'll also allow the Linux Foundation OMP Mentorship program to keep track of your project and get
-a better understanding of the problems you encountered during the development of this project. 
+# Tablet-based Application For Clinicians
+## VCU School of Nursing
+## Description
+Design, implement, and document a prototype for a tablet-based application that can be used by clinicians prior to their meeting with patients that can summarize past survey responses and better prepare the clinician for their meeting with the patient.
 
 | Folder | Description |
 |---|---|
@@ -17,10 +14,12 @@ a better understanding of the problems you encountered during the development of
 **Note:** Commits behind this fork could be automatically synced, meaning that changes made in the template are pushed into your repo. Please do not discard commits ahead (these are the updates you make to this repository).
 
 ## Project Team
+- Dr. Lana Sargent - VCU School of Nursing - Primary point of contact
+- Jered Wendte - VCU School of Nursing - Sponsor
 - *Mentor's Name*  - *Company Affliation* - Mentor
 - *Technical Advisor Name* - *Company Affliation* - Technical Advisor
-- *Faculty Advisor's Name* - *Department* - Faculty Advisor
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
+- John Leonard - Computer Science - Faculty Advisor
+- Tyree Carpenter - Computer Science - Student Team Member
+- Shikriti Ghosh - Computer Science - Student Team Member
+- Ebenezer Hailu - Computer Science - Student Team Member
+- Wyatt Herkamp - Computer Science - Student Team Member
