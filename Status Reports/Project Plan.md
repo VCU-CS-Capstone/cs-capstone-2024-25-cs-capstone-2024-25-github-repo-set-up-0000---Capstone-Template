@@ -1,5 +1,5 @@
 # *25-334: Large Language Models (LLM) for data extraction from clinical notes*
-## **Sponsor:**
+## **Sponsor:** Rishabh Kapoor
 
 **Students' Names:**
 Shashank Sinha, Connor Holden, August Moses, & Sawiya Aidarus
@@ -8,11 +8,11 @@ Shashank Sinha, Connor Holden, August Moses, & Sawiya Aidarus
 
 **Faculty Advisor:** Preetam Ghosh
 
-**Project:** 
+**Project:** Large Language Models (LLM) for data extraction from clinical notes 
 
-**Project Description:**
+**Project Description:** This project aims to enhance data extraction from free-text clinical notes in Electronic Medical Records (EMRs) using Large Language Models (LLMs) and synthetic note generation. The goal is to improve data sharing between healthcare facilities while safeguarding patient privacy.
 
-**Problem Definition:**
+**Problem Definition:** 
 
 **Deliverables**
 
