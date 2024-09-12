@@ -2,9 +2,9 @@
 
 **Shashank Sinha, Connor Holden, Sawiya Aidarus, August Moses:**
 
-**Rishabh Kapoor:**
+**Sponsor:** Rishabh Kapoor
 
-**Preetam Ghosh:**
+**Faculty Advisor:** Preetam Ghosh
 
 ## 1) Accomplishments this week ##
    - Met with faculty advisor and sponsors
