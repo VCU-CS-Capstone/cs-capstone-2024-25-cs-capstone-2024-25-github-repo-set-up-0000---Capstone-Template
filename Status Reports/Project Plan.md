@@ -2,6 +2,7 @@
 ## **Sponsor:**
 
 **Students' Names:**
+Shashank Sinha, Connor Holden, August Moses, & Sawiya Aidarus
 
 **Mentor:**
 
