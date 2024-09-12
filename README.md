@@ -1,6 +1,5 @@
 # Large Language Models (LLM) for data extraction from clinical notes
-## *Sponsoring Company or Organization*
-## *Short Project Description*
+## About the project
 This project aims to enhance data extraction from free-text clinical notes in Electronic Medical Records (EMRs) using Large Language Models (LLMs) and synthetic note generation. The goal is to improve data sharing between healthcare facilities while safeguarding patient privacy.
 
 
