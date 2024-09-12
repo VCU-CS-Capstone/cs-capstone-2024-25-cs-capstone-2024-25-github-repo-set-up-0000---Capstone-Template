@@ -1,4 +1,4 @@
-# *CSnnn Project Name*
+# *25-334: Large Language Models (LLM) for data extraction from clinical notes*
 ## **Sponsor:**
 
 **Students' Names:**
