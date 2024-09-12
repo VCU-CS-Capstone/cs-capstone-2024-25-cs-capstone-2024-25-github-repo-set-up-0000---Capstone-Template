@@ -12,7 +12,7 @@ Status Report Fall Week XX.md is a template for to copy-paste into new Status re
 | Document | Tasks | Accomplishments | Issues |
 |---|---|---|---|
 | Week 1 Status Report | Meet with Advisor to outline the project parameters | Completed and turned in Team Contract and had initial contact with Advisor | Having direction from our Advisor and point of contact |
-| Week 2 Status Report | | | |
+| Week 2 Status Report | Work with AutoCAD and pytorch for designated people to gain familiarity | Meet with Advisor and established workflow and meeting times | the steep hill that is learning pytorch and AutoCAD along wiht implimenting circuit diagrams |
 | Week 3 Status Report | | | |
 | Week 4 Status Report | | | |
 | Week 5 Status Report | | | |
