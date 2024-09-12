@@ -1,10 +1,10 @@
-# *CS 25-XXX Project Name*
+# *CS 25-334 LLMs for clinical Notes
 
-**Students' Names:**
+**Shashank Sinha, Connor Holden, Sawiya Aidarus, August Moses:**
 
-**Mentor:**
+**Rishabh Kapoor:**
 
-**Faculty Advisor:**
+**Preetam Ghosh:**
 
 ## 1) Accomplishments this week ##
    - investigate databases done by student A
