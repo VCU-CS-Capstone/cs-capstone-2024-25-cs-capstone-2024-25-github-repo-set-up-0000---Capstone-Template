@@ -9,9 +9,9 @@ Alan Dorn - CS - Student Team Member
 
 Mentors:
 
-Mahesh Nair - Capital One - [Role]\
-Balakrishnam Muthusamy - Capital One - [Role]\
-Ashish Kulkarni - Capital One - [Role]
+Mahesh Nair - Capital One - Sponsor\
+Balakrishnam Muthusamy - Capital One - Technical Advisor\
+Ashish Kulkarni - Capital One - Technical Advisor
 
 Faculty Advisor: 
 
