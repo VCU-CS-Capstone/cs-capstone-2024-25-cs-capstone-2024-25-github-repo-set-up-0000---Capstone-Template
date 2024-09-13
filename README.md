@@ -14,7 +14,6 @@ a better understanding of the problems you encountered during the developmemnt o
 | scr | Source code - create as many subdirectories as needed |
 
 ## Project Team
-- *Mentor's Name*  - *Company Affliation* - Mentor
 - *Mahesh Nair* - *Capital One* - Technical Advisor
 - *Irfan Ahmed* - *Computer Science/Cybersecurity Department* - Faculty Advisor
 - *Sohum Dharamsi* - *Computer Science w/ Cybersecurity* - Student Team Member
