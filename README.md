@@ -6,7 +6,7 @@
  2. Storage and usage of the configuration data.\
  a. This will give students the opportunity to create some POCs and decide which architecture and which software is best. Students will have the opportunity to architect and design a full stack application while researching UI Stacks, AWS, OpenSearch, DynamoDB, Postgres and many more.
  3. Research how to create visualizations on batch process progress, document lifecycle etc.\
- a. Students will have the opportunity to explore data visualization tools in the platform they chose as a data store as well as on other platforms to determine the best solution.\
+ a. Students will have the opportunity to explore data visualization tools in the platform they chose as a data store as well as on other platforms to determine the best solution.
 
  Assumptions:
  1. Students have access to capital one UI stack and open source UI stacks
