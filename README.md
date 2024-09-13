@@ -1,6 +1,6 @@
 # *CS 25-327 XState Builder*
 ## *Capital One*
-## *Short Project Description*
+## *Building a web application to collect input from customers and output an XState file for specific workflow use-cases.*
 The directory structure in this GitHub is to allow the project to have all its resources self-contained.
 Open Source software should not just be a repository of code.  There are a number of directories to help you and others that will 
 follow in your foot steps.  It'll also allow the Linux Foundation OMP Mentorship program to keep track of your project and get
@@ -14,7 +14,8 @@ a better understanding of the problems you encountered during the developmemnt o
 | src | Source code - Used to manage project code and subdirectories |
 
 ## Project Team
-- *Mahesh Nair* - *Capital One* - Technical Advisor
+- *Mahesh Nair* - *Capital One* - Lead Technical Advisor
+- *Jacquelyn Dellinger* - *Capital One* - Project Sponsor
 - *Irfan Ahmed* - *Computer Science/Cybersecurity Department* - Faculty Advisor
 - *Sohum Dharamsi* - *Computer Science w/ Cybersecurity* - Student Team Member
 - *Neil Randeri* - *Computer Science* - Student Team Member
