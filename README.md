@@ -2,11 +2,12 @@
 ## *Capital One*
 ## *Problem statement - “As a platform tenant, I need to be able to use a web portal to selfservice my needs like use case registration, data mapping creation and updation, batch process tracking, document lifecycle tracking without needing to go to a platform engineer”*
  1. Students have created a website with self-service capabilities.\
- a. This will give students the opportunity to build a website based on a suggested tech stack and learn about multi-tenant platform management and various intricacies that go into an enterprise platform.\
+ a. This will give students the opportunity to build a website based on a suggested tech stack and learn about multi-tenant platform management and various intricacies that go into an enterprise platform.
  2. Storage and usage of the configuration data.\
- a. This will give students the opportunity to create some POCs and decide which architecture and which software is best. Students will have the opportunity to architect and design a full stack application while researching UI Stacks, AWS, OpenSearch, DynamoDB, Postgres and many more.\
+ a. This will give students the opportunity to create some POCs and decide which architecture and which software is best. Students will have the opportunity to architect and design a full stack application while researching UI Stacks, AWS, OpenSearch, DynamoDB, Postgres and many more.
  3. Research how to create visualizations on batch process progress, document lifecycle etc.\
  a. Students will have the opportunity to explore data visualization tools in the platform they chose as a data store as well as on other platforms to determine the best solution.\
+
  Assumptions:
  1. Students have access to capital one UI stack and open source UI stacks
  2. Should have access to standard AWS tools to implement.
