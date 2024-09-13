@@ -17,10 +17,10 @@ a better understanding of the problems you encountered during the development of
 **Note:** Commits behind this fork could be automatically synced, meaning that changes made in the template are pushed into your repo. Please do not discard commits ahead (these are the updates you make to this repository).
 
 ## Project Team
-- *Mentor's Name*  - *Company Affliation* - Mentor
-- *Technical Advisor Name* - *Company Affliation* - Technical Advisor
-- *Faculty Advisor's Name* - *Department* - Faculty Advisor
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
+- *Mentor's Name*  - Capital One - Mentor
+- *Technical Advisor Name* - Capital One - Technical Advisor
+- Preetam Ghosh - CS - Faculty Advisor
+- Austin Glass - CS - Student Team Member
+- Prakhar Mathur - CS - Student Team Member
+- Krish Patel - CS - Student Team Member
+- Alan Dorn - CS - Student Team Member
