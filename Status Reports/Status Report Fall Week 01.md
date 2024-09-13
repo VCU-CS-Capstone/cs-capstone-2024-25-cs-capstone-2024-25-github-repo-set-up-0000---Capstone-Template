@@ -1,21 +1,25 @@
-# *CS 25-XXX Project Name*
+# *CS 25-328 Tenant Self-service-portal*
 
 **Students' Names:**
-
+Austin Glass
+Prakhar Mathur
+Krish Patel
+Alan Dorn
 **Mentor:**
-
+Mahesh Nair
+Balakrishnam Muthusamy
+Ashish Kulkarni
 **Faculty Advisor:**
+Preetam Ghosh
 
 ## 1) Accomplishments this week ##
-   - investigate databases done by student A
-   - make flowcharts done by students A and B
-
+   - Set Meeting times and roles
+   - Complete team contract and github repo setup
 ## 2) Milestones to be completed next week ##
-   - debug the code to be performed by student C
-
+   - Obtain tchnical detail needed for project. Will be done in meeting with sponsors
 ## 3) Issues, problems or concerns ##
-   - student C needs to learn java
-   - database repository costs big $$$
+   - Need more information about project
+
    
 
 
