@@ -1,4 +1,4 @@
-# *CS 25-338*
+# *CS 25-338 Identifying and Locating Electronic Components*
 
 **Students' Names: Kyle Jones, Daniel Polen, Alex Kem, Erick Zheng**
 
