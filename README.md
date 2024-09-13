@@ -1,10 +1,6 @@
-# *Your Project Description*
-## *Sponsoring Company or Organization*
-## *Short Project Description*
-The directory structure in this GitHub is to allow the project to have all its resources self-contained.
-Open Source software should not just be a repository of code.  There are a number of directories to help you and others who will 
-follow in your footsteps.  It'll also allow the Linux Foundation OMP Mentorship program to keep track of your project and get
-a better understanding of the problems you encountered during the development of this project. 
+## CS-25-339-Publicly-Detectable-Watermarking-for-Large-Language-Models
+## VCU College of Engineering
+## Watermarking techniques have been used to safeguard AI-generated content. In this project, we study publicly detectable watermarking schemes. We investigate how to reconcile two important security properties, soundness and robustness in watermarking for large language models.
 
 | Folder | Description |
 |---|---|
@@ -17,10 +13,8 @@ a better understanding of the problems you encountered during the development of
 **Note:** Commits behind this fork could be automatically synced, meaning that changes made in the template are pushed into your repo. Please do not discard commits ahead (these are the updates you make to this repository).
 
 ## Project Team
-- *Mentor's Name*  - *Company Affliation* - Mentor
-- *Technical Advisor Name* - *Company Affliation* - Technical Advisor
-- *Faculty Advisor's Name* - *Department* - Faculty Advisor
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
+- Hongsheng Zhou - VCU College of Engineering - Faculty Advisor
+- Ronit Sharma - CS - Test Engineer
+- Neil Inge - CS - Logistics Manager
+- Joseph Hughes - CS - Project Manager/Financial Manager
+- Waleed Elbanna - CS - Systems Engineer
