@@ -1,4 +1,4 @@
-# *CS-25-338*
+# *CS-25-338 Identifying and Locating Electronic Components*
 ## *VCU College of Engineering*
 ## *Project Description*
 *Intelligently Identifying and Locating Electronic Components in Power System Circuit Diagrams* is a project aimed at developing an AI-based solution to automate the identification and localization of electronic components within power system circuit diagrams. Given the large volume of diagrams handled by power companies, manual analysis is often inefficient and error-prone. By leveraging artificial intelligence and image processing techniques, this project seeks to detect various components and accurately determine their positions within these diagrams. This approach will enhance efficiency in power system design, planning, analysis, and troubleshooting.
