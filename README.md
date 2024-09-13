@@ -1,6 +1,6 @@
 # *Tenant Self-Service Portal*
 ## *Capital One*
-## *"Problem statement - “As a platform tenant, I need to be able to use a web portal to selfservice my needs like use case registration, data mapping creation and updation, batch process tracking, document lifecycle tracking without needing to go to a platform engineer”*
+## *Problem statement - “As a platform tenant, I need to be able to use a web portal to selfservice my needs like use case registration, data mapping creation and updation, batch process tracking, document lifecycle tracking without needing to go to a platform engineer”*
  1. Students have created a website with self-service capabilities.
  a. This will give students the opportunity to build a website based on a suggested tech stack and learn about multi-tenant platform management and various intricacies that go into an enterprise platform.
  2. Storage and usage of the configuration data.
@@ -10,7 +10,7 @@
  Assumptions:
  1. Students have access to capital one UI stack and open source UI stacks
  2. Should have access to standard AWS tools to implement.
- 3. Lightframe access*
+ 3. Lightframe access
 
 The directory structure in this GitHub is to allow the project to have all its resources self-contained.
 Open Source software should not just be a repository of code.  There are a number of directories to help you and others who will 
