@@ -10,7 +10,7 @@ Status Report Template: https://github.com/VCU-CS-Capstone/0000---Capstone-Templ
 | Document | Tasks | Accomplishments | Issues |
 |---|---|---|---|
 | Project Plan | Overall week by week plan of milestones | | |
-| Week 1 Status Report | | | |
+| Week 1 Status Report |Meet with mentor and faculty member, begin looking at Xstate examples |Met with mentor and faculty advisor, discussed goals over the next few weeks, semester plan |N/A |
 | Week 2 Status Report | | | |
 | Week 3 Status Report | | | |
 | Week 4 Status Report | | | |
