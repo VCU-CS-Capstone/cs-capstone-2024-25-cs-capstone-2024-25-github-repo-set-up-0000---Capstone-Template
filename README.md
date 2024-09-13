@@ -11,7 +11,7 @@ a better understanding of the problems you encountered during the developmemnt o
 | Documentation |  All documentation the project team has created to describe the architecture, design, installation and configuration of the project |
 | Notes and Research | Relevant information useful to understand the tools and techniques used in the project |
 | Status Reports | Project management documentation - weekly reports, milestones, etc. |
-| scr | Source code - Used to manage project code and subdirectories |
+| src | Source code - Used to manage project code and subdirectories |
 
 ## Project Team
 - *Mahesh Nair* - *Capital One* - Technical Advisor
