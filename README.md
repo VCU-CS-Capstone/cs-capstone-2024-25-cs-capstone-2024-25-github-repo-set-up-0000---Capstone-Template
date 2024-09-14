@@ -1,10 +1,11 @@
-# *Your Project Description*
-## *Sponsoring Company or Organization*
-## *Short Project Description*
-The directory structure in this GitHub is to allow the project to have all its resources self-contained.
-Open Source software should not just be a repository of code.  There are a number of directories to help you and others who will 
-follow in your footsteps.  It'll also allow the Linux Foundation OMP Mentorship program to keep track of your project and get
-a better understanding of the problems you encountered during the development of this project. 
+# **ML for RF Spectrum Sensing**
+## **V2X - Vectrus**
+
+### Short Project Description:
+The directory structure in this GitHub is to allow the project to have all its resources self-contained. Open Source software should not just be a repository of code. There are a number of directories to help you and others who will follow in your footsteps. It'll also allow the Linux Foundation OMP Mentorship program to keep track of your project and get a better understanding of the problems you encountered during the development of this project.
+
+### Directory Structure:
+This repository has been organized to follow the Linux Foundation OMP Mentorship program guidelines, with separate folders for:
 
 | Folder | Description |
 |---|---|
@@ -12,15 +13,14 @@ a better understanding of the problems you encountered during the development of
 | Notes and Research | Relevant helpful information to understand the tools and techniques used in the project |
 | Project Deliverables | Folder that contains final pdf versions of all Fall and Spring Major Deliverables |
 | Status Reports | Project management documentation - weekly reports, milestones, etc. |
-| scr | Source code - create as many subdirectories as needed |
-
-**Note:** Commits behind this fork could be automatically synced, meaning that changes made in the template are pushed into your repo. Please do not discard commits ahead (these are the updates you make to this repository).
+| src | Source code - create as many subdirectories as needed |
 
 ## Project Team
-- *Mentor's Name*  - *Company Affliation* - Mentor
-- *Technical Advisor Name* - *Company Affliation* - Technical Advisor
-- *Faculty Advisor's Name* - *Department* - Faculty Advisor
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
+- *Riley Stuart*  - *V2X Vectrus* - Mentor
+- *John Robie*  - *V2X Vectrus* - Mentor
+- *Tamer Nadeem* - *Computer Science* - Faculty Advisor
+- *Yanxiao Zhao* - *Electrical Engineering* - Faculty Advisor
+- *Kush Patel* - *Computer Science* - Student Team Member
+- *Shane Simes* - *Computer Science* - Student Team Member
+- *Daniel Hartman* - *Electrical Engineering* - Student Team Member
+- *Baaba Jeffrey* - *Computer Engineering* - Student Team Member
