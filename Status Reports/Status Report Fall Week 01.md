@@ -6,7 +6,7 @@
   * Daniel Hartman
   * Baaba Jeffrey
 
-**Mentor:**
+**Mentors:**
   
   * Riley Stuart (V2X Vectrus)
   * John Robie (V2X Vectrus)
