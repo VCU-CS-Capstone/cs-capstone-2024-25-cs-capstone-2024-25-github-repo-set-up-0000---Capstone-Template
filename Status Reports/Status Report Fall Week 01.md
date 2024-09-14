@@ -1,13 +1,16 @@
 # V2X Vectrus Project
 **Students' Names:**
+
 * Kush Patel
 * Shane Simes
 * Daniel Hartman
 * Baaba Jeffrey
 **Mentor:**
+  
 * Riley Stuart (V2X Vectrus)
 * John Robie (V2X Vectrus)
 **Faculty Advisor:**
+  
 * Tamer Nadeem (Computer Science)
 * Yanxiao Zhao (Electrical Engineering)
 
