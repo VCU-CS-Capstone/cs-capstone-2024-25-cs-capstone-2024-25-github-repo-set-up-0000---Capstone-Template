@@ -1,4 +1,4 @@
-# V2X Vectrus Project
+# MULT-25-607 Machine Learning for RF Spectrum Sensing
 **Students' Names:**
 
   * Kush Patel
