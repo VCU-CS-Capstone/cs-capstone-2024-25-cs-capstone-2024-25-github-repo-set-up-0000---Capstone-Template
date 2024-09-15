@@ -1,7 +1,6 @@
 # CS-25-334 Large Language Models (LLM) for data extraction from clinical notes
 ## About the project
-This project aims to enhance data extraction from free-text clinical notes in Electronic Medical Records (EMRs) using Large Language Models (LLMs) and synthetic note generation. The goal is to improve data sharing between healthcare facilities while safeguarding patient privacy.
-
+This project aims to improve the extraction of structured data from free-text clinical notes in Electronic Medical Records (EMRs) using Large Language Models (LLMs). It focuses on generating synthetic clinical notes to facilitate data extraction and sharing while maintaining patient privacy. By using curated templates and LLMs, the project creates synthetic notes that mimic real ones without exposing Protected Health Information (PHI). It also involves fine-tuning LLMs to enhance data extraction accuracy and plans to validate synthetic notes through a Turing Test-style experiment. Future developments include expanding the tool to support various clinical note types and disease sites, and creating a web-based tool for customization.
 
 | Folder | Description |
 |---|---|
@@ -10,8 +9,6 @@ This project aims to enhance data extraction from free-text clinical notes in El
 | Project Deliverables | Folder that contains final pdf versions of all Fall and Spring Major Deliverables |
 | Status Reports | Project management documentation - weekly reports, milestones, etc. |
 | scr | Source code - create as many subdirectories as needed |
-
-**Note:** Commits behind this fork could be automatically synced, meaning that changes made in the template are pushed into your repo. Please do not discard commits ahead (these are the updates you make to this repository).
 
 ## Project Team
 - Rishabh Kapoor  - iHealth Solutions - Sponsor
