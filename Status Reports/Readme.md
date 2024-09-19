@@ -15,7 +15,7 @@ Status Report Fall Week XX.md is a template for to copy-paste into new Status re
 | Week 2 Status Report | Meet with project members | Assigned our projects | No problems to report! |
 | Week 3 Status Report | Set up GitHib Repo | Set up team Contract | No problems to report! |
 | Week 4 Status Report | Distribute Initial tasks between each team member. Look through initial synthetic note generation code in provided repo. | Meet with faculty advisor and sponsors. Set up GitHub repo | Time conflict for first faculty/Sponsor meeting(Resolved). |
-| Week 5 Status Report | Familiarize with Python Code. Come up more explicit questions for next meeting. | Issue task assignments. Looking into ChatGPT and Llama. | No problems to report! |
+| Week 5 Status Report | Familiarize with Python Code. Come up more explicit questions for next meeting. | Issue task assignments. Looking into ChatGPT and Llama. | Github Repo access issues. (Resolved) |
 | Week 6 Status Report | | | |
 | Week 7 Status Report | | | |
 | Week 8 Status Report | | | |
