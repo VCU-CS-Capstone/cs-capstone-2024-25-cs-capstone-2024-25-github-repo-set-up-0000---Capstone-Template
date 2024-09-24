@@ -1,3 +1,7 @@
+# LLM Objective
+
+*"One limitation of the static template system is that it will still lack the level of variability likely found across a large number of clinical notes. To address this issue, we propose using existing pre-trained models (GPT-4/Llama 2) to rephrase sections of synthetic note. However, this rephrasing must still contain the original meaning and keep all of the inserted discrete feature values. These pre-trained models can be prompted to generate custom styled tuning to mimic the note-writing styles of specific medical provider or institution, ensuring that rephrasing looks consistent with how clinical notes are structured across various healthcare settings. We can work on building of control parameters that can provide the users with the ability to control the degree of rephrasing, allowing for slight or significant changes based on their preference for variability."*
+
 # GPT-4
 ## Getting started
 ```
