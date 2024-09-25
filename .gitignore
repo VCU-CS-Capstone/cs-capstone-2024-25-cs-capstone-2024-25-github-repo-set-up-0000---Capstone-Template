@@ -1,0 +1,2 @@
+# Ignore Groq api key. Do not publish key
+.env
