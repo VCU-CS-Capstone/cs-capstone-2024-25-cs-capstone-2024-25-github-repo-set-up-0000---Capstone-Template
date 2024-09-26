@@ -12,9 +12,9 @@ Status Report Fall Week XX.md is a template for to copy-paste into new Status re
 | Document | Tasks | Accomplishments | Issues |
 |---|---|---|---|
 | Week 1 Status Report | Meet with Advisor to outline the project parameters | Completed and turned in Team Contract and had initial contact with Advisor | Having direction from our Advisor and point of contact |
-| Week 2 Status Report | Work with AutoCAD and pytorch for designated people to gain familiarity | Meet with Advisor and established workflow and meeting times | the steep hill that is learning pytorch and AutoCAD along wiht implimenting circuit diagrams |
+| Week 2 Status Report | Work with AutoCAD and pytorch for designated people to gain familiarity | Meet with Advisor and established workflow and meeting times | the steep hill that is learning pytorch and AutoCAD along with implementing circuit diagrams |
 | Week 3 Status Report | Continue familiarization and research into Pytorch and the surrounding aspects of our project | set outlines for project scope, aspiration, and goals | coming to a concensus on the scope of our project what will be put into the proposal |
-| Week 4 Status Report | | | |
+| Week 4 Status Report | Work on proposal and continue working with Pytorch and AutoCAD | Presented to advisor our work over 2 weeks, made progress on creating diagrams and a sample model in Pytorch | Understanding the proposal in detail |
 | Week 5 Status Report | | | |
 | Week 6 Status Report | | | |
 | Week 7 Status Report | | | |
