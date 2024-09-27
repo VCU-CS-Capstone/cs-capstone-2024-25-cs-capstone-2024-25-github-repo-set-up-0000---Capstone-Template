@@ -1,7 +1,6 @@
 # CS 25-303
 
 **Students' Names:**
-- Tyree Carpenter
 - Shikriti Ghosh
 - Ebenezer Hailu
 - Wyatt Herkamp
