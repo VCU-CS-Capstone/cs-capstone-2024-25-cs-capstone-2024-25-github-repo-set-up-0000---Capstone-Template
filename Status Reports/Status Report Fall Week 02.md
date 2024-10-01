@@ -17,10 +17,11 @@
   * Yanxiao Zhao (Electrical Engineering)
 
 ## 1) Accomplishments this week ##
-
+   - 2nd week meeting.
 
 ## 2) Milestones to be completed next week ##
-
+   - Research on RF and ML topics for the repspective students.
+   - Learn how to use the given SDR radios.
 
 ## 3) Issues, problems or concerns ##
    

@@ -17,8 +17,8 @@
   * Yanxiao Zhao (Electrical Engineering)
 
 ## 1) Accomplishments this week ##
-   - Start research of last year's project done by previous team. ✅
-   - Meet with mentors, faculty, and team members. ✅
+   - Start research of last year's project done by previous team.
+   - Meet with mentors, faculty, and team members.
 
 ## 2) Milestones to be completed next week ##
    - CS Side needs to research and learn about ML and other topics about the project such as RF.

@@ -17,10 +17,10 @@
   * Yanxiao Zhao (Electrical Engineering)
 
 ## 1) Accomplishments this week ##
-
+   - 3rd week meeting.
 
 ## 2) Milestones to be completed next week ##
-
+   - Research on RF and ML topics for the repspective students.
 
 ## 3) Issues, problems or concerns ##
    
