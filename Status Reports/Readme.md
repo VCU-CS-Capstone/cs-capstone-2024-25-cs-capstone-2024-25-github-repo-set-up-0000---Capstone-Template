@@ -11,10 +11,10 @@ Status Report Fall Week XX.md is a template for to copy-paste into new Status re
 
 | Document | Tasks | Accomplishments | Issues |
 |---|---|---|---|
-| Week 1 Status Report | Organize roles and meetings | Meetings and roles set | Need more technical details about project. Will be done next meeting |
-| Week 2 Status Report | | | |
-| Week 3 Status Report | | | |
-| Week 4 Status Report | | | |
+| Week 1 Status Report | Organize roles and meetings & complete team contract | Meetings and roles set | Need more technical details about project. Will be done next meeting |
+| Week 2 Status Report | Meeting with faculty advisor and sponsor to get additional information about project | Complete team contract | |
+| Week 3 Status Report | Set-up GitHub repository, schedule weekly meeting with sponsor & advisor | Created repository and updated teams sections accordingly | Assigning roles for different aspects of the project |
+| Week 4 Status Report | Get additional information about technicals and start development | Received technical information & requirements from sponsor | Repository about section not updated, along with visibility permissions and team users |
 | Week 5 Status Report | | | |
 | Week 6 Status Report | | | |
 | Week 7 Status Report | | | |
