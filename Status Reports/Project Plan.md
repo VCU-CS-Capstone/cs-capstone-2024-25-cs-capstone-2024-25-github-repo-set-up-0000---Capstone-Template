@@ -15,7 +15,7 @@
 
 **Deliverables:** Self-Service Portal application that accommodates the requirements requested by Capital One including a dashboard landing page, gallery capabilities, client-admin user cases, and admin approval process
 
-**Coding Plan:** Utilize the tech stack of Vue.js, Node.js, and MongoDB to develop the application. 
+**Coding Plan:** Utilize the tech stack of Vue.js, Node.js, and MongoDB to develop the application. Working on finalizing requirements and permissions for data to be handled accordingly. Tech-stack allows us to efficiently and seamlessly integrate each component for software.
 
 | Week | Tasks | Goals |
 |------|-------|-------|
