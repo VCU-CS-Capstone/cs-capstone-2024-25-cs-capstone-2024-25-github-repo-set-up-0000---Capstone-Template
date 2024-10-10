@@ -16,7 +16,7 @@ Status Report Fall Week XX.md is a template for to copy-paste into new Status re
 | Week 3 Status Report | Continue familiarization and research into Pytorch and the surrounding aspects of our project | set outlines for project scope, aspiration, and goals | coming to a concensus on the scope of our project what will be put into the proposal |
 | Week 4 Status Report | Work on proposal and continue working with Pytorch and AutoCAD | Presented to advisor our work over 2 weeks, made progress on creating diagrams and a sample model in Pytorch | Understanding the proposal in detail |
 | Week 5 Status Report | Ask professor for clarification on proposal and continue working on Pytorch and designing more diagrams in AutoCAD | Finish with most of the proposal | Confusion on some parts of the proposal |
-| Week 6 Status Report | | | |
+| Week 6 Status Report | Met with professor reguarding the team proposal to make sure we are following the requirements of it correctly before final submission | Completed the Team Proposal document required by thie friday | Finding the way for us to achieve the 1000+ images for the model to train on |
 | Week 7 Status Report | | | |
 | Week 8 Status Report | | | |
 | Week 9 Status Report | | | |
