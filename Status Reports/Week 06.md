@@ -7,15 +7,14 @@
 **Faculty Advisor: Dr. Changquing Luo**
 
 ## 1) Accomplishments this week ##
-   - investigate databases done by student A
-   - make flowcharts done by students A and B
+   - requested any information the advisor could give on the project proposal shown
+   - finalized all data reguarding the project proposal
 
 ## 2) Milestones to be completed next week ##
-   - debug the code to be performed by student C
+   - work on advancing the catelogue of circuits images for use in model training
 
 ## 3) Issues, problems or concerns ##
-   - student C needs to learn java
-   - database repository costs big $$$
+   - The feeling of lack of direction with a big milestone being passed
    
 
 
