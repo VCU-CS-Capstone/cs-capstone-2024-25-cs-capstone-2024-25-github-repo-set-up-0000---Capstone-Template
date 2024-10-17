@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+
+# Build output
+/dist
+/build
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Vue.js specific
+/client/dist
+/client/node_modules
+
+# Server specific
+/server/node_modules
+
+# Temporary files
+*.log
+*.tmp
+
+# Testing
+/coverage
+
+# Miscellaneous
+*.bak
+*.cache
