@@ -1,10 +1,10 @@
-# *CS 25-XXX Project Name*
+# *CS 25-338 Identifying and Locating Electronic Components*
 
-**Students' Names:**
+**Students' Names: Kyle Jones, Daniel Polen, Alex Kem, Erick Zheng**
 
-**Mentor:**
+**Mentor: Dr. Changquing Luo**
 
-**Faculty Advisor:**
+**Faculty Advisor: Dr. Changquing Luo**
 
 ## 1) Accomplishments this week ##
    - investigate databases done by student A

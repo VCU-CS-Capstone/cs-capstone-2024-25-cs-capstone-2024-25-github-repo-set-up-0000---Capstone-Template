@@ -1,10 +1,7 @@
-# *Your Project Description*
-## *Sponsoring Company or Organization*
-## *Short Project Description*
-The directory structure in this GitHub is to allow the project to have all its resources self-contained.
-Open Source software should not just be a repository of code.  There are a number of directories to help you and others who will 
-follow in your footsteps.  It'll also allow the Linux Foundation OMP Mentorship program to keep track of your project and get
-a better understanding of the problems you encountered during the development of this project. 
+# *CS-25-338 Identifying and Locating Electronic Components*
+## *VCU College of Engineering*
+## *Project Description*
+*Intelligently Identifying and Locating Electronic Components in Power System Circuit Diagrams* is a project aimed at developing an AI-based solution to automate the identification and localization of electronic components within power system circuit diagrams. Given the large volume of diagrams handled by power companies, manual analysis is often inefficient and error-prone. By leveraging artificial intelligence and image processing techniques, this project seeks to detect various components and accurately determine their positions within these diagrams. This approach will enhance efficiency in power system design, planning, analysis, and troubleshooting.
 
 | Folder | Description |
 |---|---|
@@ -14,13 +11,9 @@ a better understanding of the problems you encountered during the development of
 | Status Reports | Project management documentation - weekly reports, milestones, etc. |
 | scr | Source code - create as many subdirectories as needed |
 
-**Note:** Commits behind this fork could be automatically synced, meaning that changes made in the template are pushed into your repo. Please do not discard commits ahead (these are the updates you make to this repository).
-
 ## Project Team
-- *Mentor's Name*  - *Company Affliation* - Mentor
-- *Technical Advisor Name* - *Company Affliation* - Technical Advisor
-- *Faculty Advisor's Name* - *Department* - Faculty Advisor
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
+- *Changqing Luo* - *Department of Computer Science* - Faculty Advisor
+- *Kyle Jones* - *Computer Science* - Student Team Member
+- *Daniel Polen* - *Computer Science* - Student Team Member
+- *Alex Kem* - *Computer Science* - Student Team Member
+- *Erick Zheng* - *Computer Science* - Student Team Member
