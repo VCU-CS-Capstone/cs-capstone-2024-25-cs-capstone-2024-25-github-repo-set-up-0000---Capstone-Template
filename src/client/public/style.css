@@ -1,43 +1,9 @@
-/* #player{
-    width: 20px;
-    height: 20px;
-    background-color:blueviolet;
-    
-}
-.wall{
-    width: 200px;
-    height: 20px;
-    background-color:black;
-}
-#WalkablePath{
-    width: 200px;
-    height: 20px;
-    background-color:whitesmoke;
-}
-#wrapper{
-    /* display: flex; */
-    /* width: 500px; */
-    /* height: 500px;
-    overflow: hidden;  https://stackoverflow.com/questions/5803023/how-to-place-two-divs-next-to-each-other 
-    background-color:seagreen;
-}
-#goal{
-    width: 20px;
-    height: 20px;
-    background-color:darkorange;
-    
-}
- */ 
- * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+
 
 body {
     font-family: Arial, sans-serif;
     background-color: #31708f;
-    color: #fff;
+    color: #000000;
 }
 
 .container {
@@ -47,27 +13,40 @@ body {
 }
 
 header {
+    background-color:#ffffff;
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 40px;
+
 }
 
 .logo h1 {
     font-size: 2rem;
+    display: left;
+    color: #31708f;
 }
 
-nav ul {
-    list-style-type: none;
-    display: flex;
-    gap: 20px;
-}
-
-nav ul li a {
-    color: #fff;
+.logo a {
+    font-size: 1rem;
+    display: right;    
     text-decoration: none;
     font-weight: bold;
+    color: #31708f;
+    margin-inline: 10px;
+
+    
 }
+
+.logo a:hover:after {
+    content: "";
+    display: block;
+    width: 5px;
+    border-bottom: 1px solid;
+    margin: 0 auto;
+}
+
+
 
 main {
     display: flex;
@@ -80,7 +59,7 @@ main {
 }
 
 .card {
-    background-color: #206375;
+    background-color: #ffffff;
     padding: 20px;
     border-radius: 8px;
     width: 300px;
@@ -103,12 +82,14 @@ main {
 
 .card-actions {
     margin-top: 20px;
+    gap: 20px;
 }
 
 .card-actions a {
-    color: #fff;
+    color: #31708f;
     text-decoration: none;
     font-weight: bold;
+    margin-inline: 5px;
 }
 
 .actions {
@@ -118,9 +99,11 @@ main {
 .actions h2 {
     font-size: 2rem;
     margin-bottom: 20px;
+    color: #ffffff;
 }
 
 .actions p {
+    color: #ffffff;
     margin-bottom: 20px;
 }
 
