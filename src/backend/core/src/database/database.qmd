@@ -233,10 +233,10 @@ erDiagram
     users ||--o| user_authentication_saml : "has one or none"
     users ||--o{ appointments :"has zero or more"
     users ||--o{ user_api_tokens :"has zero or more"
-
+    user_authentication_saml }o--||saml_providers : "Saml Provider can provide many logins"
     users ||--o{ user_roles : "User has many roles"
     user_roles ||--|| roles : "1:1"
-    appointments }o--o| participants :"Has One or none."
+    appointments }o--o| participants : "Has One or none."
 
     users{
         i64 id PK
@@ -276,6 +276,12 @@ erDiagram
     user_authentication_saml {
         i64 id PK
         i64 user_id FK
+        i32 provider FK
+    }
+    saml_providers {
+        i32 id PK
+        string name
+        bool is_default "If true only one can exist in the table"
     }
     appointments{
         i64 id
@@ -287,6 +293,7 @@ erDiagram
         string contact_number
         bool missed_appointment "Null until scheduled time is past"
         i64 seen_by FK "Null until appointment happened"
+        DateTime created_at
     }
 
 ```

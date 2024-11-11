@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use sqlx::prelude::{FromRow, Type};
+use sqlx::prelude::FromRow;
 
 /// Red Cap ID: health_ed
 ///

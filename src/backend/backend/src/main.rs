@@ -3,11 +3,14 @@ pub mod config;
 pub mod logging;
 pub mod utils;
 use std::{
+    fs::write,
     path::PathBuf,
     sync::atomic::{self, AtomicUsize},
 };
 
+use anyhow::Context;
 use clap::{Parser, Subcommand, ValueEnum};
+use config::{LoggingConfig, TracingConfig};
 #[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
 pub enum ExportOptions {
     OpenAPI,
@@ -30,6 +33,10 @@ enum SubCommands {
         export: ExportOptions,
         location: PathBuf,
     },
+    SaveDefaultConfig {
+        #[clap(short, long, default_value = "cs25-303.toml")]
+        location: PathBuf,
+    },
     Info,
 }
 fn info() {
@@ -40,6 +47,7 @@ fn main() -> anyhow::Result<()> {
     let command = Command::parse();
 
     match command.sub_command {
+        SubCommands::SaveDefaultConfig { location } => return save_default_config_file(location),
         SubCommands::Start { config } => return start_app(config),
         SubCommands::Export { .. } => {
             eprintln!("Not implemented yet");
@@ -72,4 +80,34 @@ fn thread_name() -> String {
     static ATOMIC_ID: AtomicUsize = AtomicUsize::new(0);
     let id = ATOMIC_ID.fetch_add(1, atomic::Ordering::SeqCst);
     format!("cs-25-303-{}", id)
+}
+
+fn save_default_config_file(location: PathBuf) -> anyhow::Result<()> {
+    use crate::config::{FullConfig, Mode, WebServerConfig};
+    if location.is_dir() {
+        eprintln!("The location provided is a directory. Please provide a file path");
+        return Ok(());
+    }
+    println!("Saving example config to: {}", location.display());
+    let config = FullConfig {
+        mode: Mode::Debug,
+        web_server: WebServerConfig::default(),
+        database: Default::default(),
+        log: LoggingConfig {
+            tracing: Some(TracingConfig {
+                tracing_enabled: false,
+                ..Default::default()
+            }),
+            ..Default::default()
+        },
+        tls: None,
+        auth: Default::default(),
+    };
+
+    let toml = toml::to_string_pretty(&config)
+        .context("Failed to serialize example config. This is a bug")?;
+
+    write(&location, toml).context("Failed to write example config")?;
+
+    Ok(())
 }

@@ -12,7 +12,7 @@ pub struct ParticipantMedications {
     pub frequency: MedicationFrequency,
     pub date_prescribed: Option<chrono::NaiveDate>,
     pub date_entered_into_system: chrono::NaiveDateTime,
-    pub is_current: bool,
+    pub is_current: Option<bool>,
     pub date_discontinued: Option<chrono::NaiveDate>,
     pub comments: Option<String>,
 }

@@ -9,7 +9,7 @@ pub struct HealthOverviw {
     /// 1:1 with [super::Participants]
     pub participant_id: i64,
     /// Red Cap: height
-    pub height: Option<f32>,
+    pub height: Option<i32>,
     /// Red Cap: health_conditions
     pub reported_health_conditions: Option<String>,
     /// Red Cap: allergies

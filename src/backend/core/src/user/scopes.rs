@@ -1,6 +1,5 @@
 use strum::EnumIs;
 
-
 #[derive(
     Debug,
     PartialEq,

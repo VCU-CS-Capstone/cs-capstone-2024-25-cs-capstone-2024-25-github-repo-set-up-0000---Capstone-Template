@@ -34,7 +34,7 @@ pub struct ReadConfigType {
     pub auth: Option<AuthenticationProvidersConfig>,
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize)]
 
 pub struct FullConfig {
     pub mode: Mode,
@@ -90,8 +90,19 @@ impl Default for LoggingConfig {
     }
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum TracingType {
+    GRPC,
+    /// Not Implemented Yet
+    HTTP,
+}
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct TracingConfig {
+    pub tracing_enabled: bool,
+    pub tracing_type: TracingType,
+    /// Endpoint for the tracing collector.
+    ///
+    ///
     pub endpoint: String,
     /// Tracing Config Resource Values.
     ///
@@ -121,6 +132,8 @@ impl Default for TracingConfig {
         );
         trace_config.insert("service.environment".to_string(), "development".to_string());
         Self {
+            tracing_enabled: false,
+            tracing_type: TracingType::GRPC,
             endpoint: "127.0.0.1:5959".to_owned(),
             trace_config,
             log_levels: None,

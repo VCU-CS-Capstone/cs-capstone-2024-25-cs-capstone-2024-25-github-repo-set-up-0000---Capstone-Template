@@ -117,6 +117,7 @@ pub enum MobilityDevice {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, EnumWithOther)]
+
 pub enum MedicationFrequency {
     #[my_attr("Daily")]
     Daily,
