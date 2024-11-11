@@ -1,0 +1,292 @@
+---
+title: Capstone Database Design
+author:
+    - name: Wyatt Herkamp
+      email: herkampwj@vcu.edu
+date: last-modified
+format:
+    html:
+        theme: cosmo
+        toc: true
+        embed-resources: true
+        code-copy: true
+---
+## Document Info
+This database has two separate diagrams. This is because the redcap info might be shared with other groups.
+
+## Notes
+
+Almost all case note related columns are nullable. This is because the data is not exackly perfect in red cap.
+I am trying to make it work. When pulling from red cap if all entries in a case_note related table are null it will just not create an entry in that case.
+
+## Participants
+```{mermaid}
+erDiagram
+    participants ||--o| health_overview : "has one or none"
+    participants ||--|| locations : "has one"
+    participants ||--|| participants_demographics : "has one"
+    participants ||--o{ medications : "has many"
+    participants ||--o{ goals : "has many"
+    participants ||--o{ goal_steps : "has many"
+    goals ||--o{ goal_steps : "has many"
+
+    participants ||--o{ case_notes : "has many"
+
+    case_notes ||--|| locations : "has one"
+    case_notes ||--o| case_notes_medication : "has one"
+    case_notes ||--o{ case_notes_students : "has one"
+    case_notes ||--o| case_note_faculty_and_staff : "has one"
+    case_notes ||--o| case_notes_opioid_screening : "has one"
+    case_notes ||--o| case_notes_fall_screening : "has one"
+    case_notes ||--o| case_notes_other_screening : "has one"
+    case_notes ||--o| case_notes_education_and_resources : "has one"
+    case_notes ||--o| case_notes_health_measures : "has one"
+    case_notes ||--o| case_notes_health_visits : "has one"
+
+    participants{
+        i64 participant_id PK "C_RC"
+        string first_name
+        string last_name
+        string phone_number
+        string program
+        string status
+    }
+    medications{
+        i64 id PK
+        i64 participant_id FK
+        String medication_name
+        String dosage
+        enum frequency
+        date date_presribed
+        date date_entered_into_system
+        bool is_current
+        date date_discontinued "Nullable"
+        string comments
+    }
+    goals{
+        i64 id PK
+        i64 participant_id FK
+        string goal
+        bool is_active "Nullable"
+    }
+    goal_steps{
+        i64 id PK
+        i64 related_goal_id FK "Nullable"
+        i64 participant_id FK
+        string step
+        i16 confidence_in_achieving "1-10, Nullable"
+        date date_set "Nullable"
+        date date_to_be_achieved "Nullable"
+        bool action_step "Nullable"
+    }
+    locations {
+        i32 id PK
+        string name
+        string program
+        i32 parent_location "Petersburg has multiple locations"
+    }
+    health_overview {
+        i64 id PK "Will not correlate with Redcap"
+        i64 participant_id FK
+        f32 height "in inches"
+        string reported_health_conditions "Nullable"
+        string allergies "Nullable"
+        Array mobility_devices "Nullable"
+        bool has_blood_pressure_cuff "Nullable"
+        bool takes_more_than_5_medications "Nullable"
+    }
+    participants_demographics {
+        i64 participant_id
+        i16 age
+        string gender
+        string Race
+        string race_other
+        string race_multiple
+        string ethnicity
+        string language
+        bool is_veteran
+        Array health_insurance
+        string highest_education_level
+    }
+    case_notes {
+        i64 id PK "Will not correlate with Redcap"
+        i64 participant_id FK
+        i64 location FK
+        i16 age
+        enum visit_type
+        string note_by_care_giver
+        date date_of_visit
+    }
+    case_notes_medication{
+        i64 id PK
+        i64 case_note_id FK
+
+        bool has_medications_changed_since_last_visit "Nullable"
+        bool new_medication_is_opioid "Nullable"
+        bool confirmed_medication_list "Nullable"
+
+        bool has_discrepancies "Nullable"
+        string disrepancies "Nullable"
+
+        string medication_adherence "Nullable"
+
+        bool did_provide_medication_education
+        string provided_medication_education "Nullable"
+
+        bool provided_medication_list
+
+        bool did_provide_medication_adherence_assistance "Nullable"
+        string provided_medication_education "Nullable"
+
+        bool was_pharmacy_contacted "Nullable"
+        string pharmacy_contacted "Nullable"
+
+        bool was_pcp_contacted "Nullable"
+        string pcp_contacted "Nullable"
+    }
+    case_note_faculty_and_staff{
+        i64 id PK
+        i64 case_note_id FK
+        i64 faculity_type_id FK "Nullable"
+        string custom_faculity_type "Nullable"
+        i32 faculity_with_participants "Nullable"
+        i32 faculity_with_students "Nullable"
+        string faculity_name "Nullable"
+        string faculty_note "Nullable"
+        i32 screening_tools "Nullable"
+        i32 pdsa_to_address_gaps "Nullable"
+        i32 total_student_time "Nullable"
+    }
+    case_notes_students{
+        i64 id PK
+        i64 case_note_id FK
+        i32 student_type_id "Nullable. student_type_id or custom_student_type must not be null"
+        string custom_student_type "Nullable. student_type_id or custom_student_type must not be null "
+        i32 number_of_students
+    }
+
+    case_notes_opioid_screening{
+        i64 id PK
+        i64 case_note_id FK
+        array more_to_come "// TODO Finish Mapping from redcap"
+    }
+    case_notes_fall_screening{
+        i64 id PK
+        i64 case_note_id FK
+        array more_to_come "// TODO Finish Mapping from redcap"
+
+    }
+    case_notes_other_screening{
+        i64 id PK
+        i64 case_note_id FK
+        i32 screening_id FK "Nullable  Either screening_id or custom_screening_name must not be null"
+        string custom_screening_name "Nullable Either screening_id or custom_screening_name must not be null"
+        string screening_notes "Nullable"
+    }
+    case_notes_education_and_resources{
+        i64 id PK
+        i64 case_note_id FK
+
+        Array generic_education "Nullable"
+        string generic_education_other "Nullable"
+
+        Array service_coordinated "Nullable"
+        string service_coordinated_other "Nullable"
+
+        Array disease_and_medication_education "Nullable"
+        string disease_and_medication_education_other "Nullable"
+
+        Array health_behavior_education "Nullable"
+        string health_behavior_education_other "Nullable"
+    }
+    case_notes_health_visits{
+        i64 id PK
+        i64 case_note_id FK
+        bool emergency_number_called
+        bool refused_ambulance
+        string reason_for_call "Nullable. Null if `emergency_number_called` is false"
+        string last_see_pcp "Nullable"
+        bool did_visit_hospital  "Nullable"
+        string hospital_visit "Nullable"
+        bool did_visit_ed  "Nullable"
+        string ed_visit "Nullable"
+    }
+    case_notes_health_measures{
+        i64 id
+        i64 case_note_id FK
+        i16 blood_pressure_sit_systolic "Nullable."
+        i16 blood_pressure_sit_diastolic "Nullable"
+        i16 blood_pressure_stand_systolic "Nullable"
+        i16 blood_pressure_stand_diastolic "Nullable"
+        bool glucose_taken
+        i16 glucose "Nullable"
+        bool gluce_taken_fasting "Nullable"
+    }
+
+```
+
+## Non Red Cap Data
+
+```{mermaid}
+erDiagram
+    users ||--o| user_authentication_password : "has one or none"
+    users ||--o| user_authentication_saml : "has one or none"
+    users ||--o{ appointments :"has zero or more"
+    users ||--o{ user_api_tokens :"has zero or more"
+
+    users ||--o{ user_roles : "User has many roles"
+    user_roles ||--|| roles : "1:1"
+    appointments }o--o| participants :"Has One or none."
+
+    users{
+        i64 id PK
+        string first_name
+        string last_name
+        string email
+        DateTime created_at
+    }
+    user_api_tokens{
+        i64 id PK
+        i64 user_id FK
+        string token
+        string created_with "Device Info App Info"
+        bool revoked "Default false"
+        DateTime expires_at "Nullable"
+        DateTime created_at
+    }
+    roles{
+        i32 id PK
+        string name
+        bool admin_access
+        bool patient_access
+    }
+    user_roles{
+        i64 id PK
+        i64 user FK
+        i32 role FK
+    }
+    user_authentication_password {
+        i64 id PK
+        i64 user_id FK
+        String password "Nullable"
+        DataTime password_last_updated
+        bool requires_password_reset
+        DateTime created_at
+    }
+    user_authentication_saml {
+        i64 id PK
+        i64 user_id FK
+    }
+    appointments{
+        i64 id
+        DateTime scheduled_at
+        i64 preferred_clinician FK "Nullable"
+        i64 participant FK "Nullable. Null if new patient"
+        string first_name "Null if participant is set"
+        string last_name "Null if participant is set"
+        string contact_number
+        bool missed_appointment "Null until scheduled time is past"
+        i64 seen_by FK "Null until appointment happened"
+    }
+
+```

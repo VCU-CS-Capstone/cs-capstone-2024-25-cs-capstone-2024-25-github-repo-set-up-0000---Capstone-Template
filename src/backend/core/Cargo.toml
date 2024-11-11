@@ -1,0 +1,17 @@
+[package]
+name = "cs25-303-core"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+repository.workspace = true
+description = "Core Shared Code between the backend and database"
+[dependencies]
+
+strum.workspace = true
+serde.workspace = true
+sqlx.workspace = true
+tracing.workspace = true
+chrono.workspace = true
+thiserror.workspace = true
+utoipa.workspace = true
+cs25-303-macros.workspace = true

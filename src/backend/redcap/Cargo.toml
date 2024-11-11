@@ -1,0 +1,9 @@
+[package]
+name = "vcu-red-cap"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[dependencies]
+reqwest = { version = "*", features = ["json"] }
