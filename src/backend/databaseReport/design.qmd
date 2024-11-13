@@ -44,7 +44,7 @@ erDiagram
     case_notes ||--o| case_notes_health_visits : "has one"
 
     participants{
-        i64 participant_id PK "C_RC"
+        i32 participant_id PK "C_RC"
         string first_name
         string last_name
         string phone_number
@@ -52,8 +52,8 @@ erDiagram
         string status
     }
     medications{
-        i64 id PK
-        i64 participant_id FK
+        i32 id PK
+        i32 participant_id FK
         String medication_name
         String dosage
         enum frequency
@@ -64,15 +64,15 @@ erDiagram
         string comments
     }
     goals{
-        i64 id PK
-        i64 participant_id FK
+        i32 id PK
+        i32 participant_id FK
         string goal
         bool is_active "Nullable"
     }
     goal_steps{
-        i64 id PK
-        i64 related_goal_id FK "Nullable"
-        i64 participant_id FK
+        i32 id PK
+        i32 related_goal_id FK "Nullable"
+        i32 participant_id FK
         string step
         i16 confidence_in_achieving "1-10, Nullable"
         date date_set "Nullable"
@@ -86,8 +86,8 @@ erDiagram
         i32 parent_location "Petersburg has multiple locations"
     }
     health_overview {
-        i64 id PK "Will not correlate with Redcap"
-        i64 participant_id FK
+        i32 id PK "Will not correlate with Redcap"
+        i32 participant_id FK
         f32 height "in inches"
         string reported_health_conditions "Nullable"
         string allergies "Nullable"
@@ -96,7 +96,7 @@ erDiagram
         bool takes_more_than_5_medications "Nullable"
     }
     participants_demographics {
-        i64 participant_id
+        i32 participant_id
         i16 age
         string gender
         string Race
@@ -109,17 +109,17 @@ erDiagram
         string highest_education_level
     }
     case_notes {
-        i64 id PK "Will not correlate with Redcap"
-        i64 participant_id FK
-        i64 location FK
+        i32 id PK "Will not correlate with Redcap"
+        i32 participant_id FK
+        i32 location FK
         i16 age
         enum visit_type
         string note_by_care_giver
         date date_of_visit
     }
     case_notes_medication{
-        i64 id PK
-        i64 case_note_id FK
+        i32 id PK
+        i32 case_note_id FK
 
         bool has_medications_changed_since_last_visit "Nullable"
         bool new_medication_is_opioid "Nullable"
@@ -145,9 +145,9 @@ erDiagram
         string pcp_contacted "Nullable"
     }
     case_note_faculty_and_staff{
-        i64 id PK
-        i64 case_note_id FK
-        i64 faculity_type_id FK "Nullable"
+        i32 id PK
+        i32 case_note_id FK
+        i32 faculity_type_id FK "Nullable"
         string custom_faculity_type "Nullable"
         i32 faculity_with_participants "Nullable"
         i32 faculity_with_students "Nullable"
@@ -158,34 +158,34 @@ erDiagram
         i32 total_student_time "Nullable"
     }
     case_notes_students{
-        i64 id PK
-        i64 case_note_id FK
+        i32 id PK
+        i32 case_note_id FK
         i32 student_type_id "Nullable. student_type_id or custom_student_type must not be null"
         string custom_student_type "Nullable. student_type_id or custom_student_type must not be null "
         i32 number_of_students
     }
 
     case_notes_opioid_screening{
-        i64 id PK
-        i64 case_note_id FK
+        i32 id PK
+        i32 case_note_id FK
         array more_to_come "// TODO Finish Mapping from redcap"
     }
     case_notes_fall_screening{
-        i64 id PK
-        i64 case_note_id FK
+        i32 id PK
+        i32 case_note_id FK
         array more_to_come "// TODO Finish Mapping from redcap"
 
     }
     case_notes_other_screening{
-        i64 id PK
-        i64 case_note_id FK
+        i32 id PK
+        i32 case_note_id FK
         i32 screening_id FK "Nullable  Either screening_id or custom_screening_name must not be null"
         string custom_screening_name "Nullable Either screening_id or custom_screening_name must not be null"
         string screening_notes "Nullable"
     }
     case_notes_education_and_resources{
-        i64 id PK
-        i64 case_note_id FK
+        i32 id PK
+        i32 case_note_id FK
 
         Array generic_education "Nullable"
         string generic_education_other "Nullable"
@@ -200,8 +200,8 @@ erDiagram
         string health_behavior_education_other "Nullable"
     }
     case_notes_health_visits{
-        i64 id PK
-        i64 case_note_id FK
+        i32 id PK
+        i32 case_note_id FK
         bool emergency_number_called
         bool refused_ambulance
         string reason_for_call "Nullable. Null if `emergency_number_called` is false"
@@ -212,8 +212,8 @@ erDiagram
         string ed_visit "Nullable"
     }
     case_notes_health_measures{
-        i64 id
-        i64 case_note_id FK
+        i32 id
+        i32 case_note_id FK
         i16 blood_pressure_sit_systolic "Nullable."
         i16 blood_pressure_sit_diastolic "Nullable"
         i16 blood_pressure_stand_systolic "Nullable"
@@ -233,49 +233,63 @@ erDiagram
     users ||--o| user_authentication_saml : "has one or none"
     users ||--o{ appointments :"has zero or more"
     users ||--o{ user_api_tokens :"has zero or more"
-    user_authentication_saml }o--||saml_providers : "Saml Provider can provide many logins"
+    users ||--o{ user_permissions :"has zero or more"
     users ||--o{ user_roles : "User has many roles"
+    user_authentication_saml }o--||saml_providers : "Saml Provider can provide many logins"
     user_roles ||--|| roles : "1:1"
+    roles ||--o{ role_permissions : "1 to many"
+
     appointments }o--o| participants : "Has One or none."
 
     users{
-        i64 id PK
+        i32 id PK
         string first_name
         string last_name
         string email
         DateTime created_at
     }
     user_api_tokens{
-        i64 id PK
-        i64 user_id FK
+        i32 id PK
+        i32 user_id FK
         string token
         string created_with "Device Info App Info"
         bool revoked "Default false"
         DateTime expires_at "Nullable"
         DateTime created_at
     }
+    user_permissions{
+        i32 id PK
+        i32 user_id FK
+        string permission
+        DateTime created_at
+    }
     roles{
         i32 id PK
         string name
-        bool admin_access
-        bool patient_access
+        string description "Nullable"
+    }
+    role_permissions{
+        i32 id PK
+        i32 role_id FK
+        string scope
+        DateTime created_at
     }
     user_roles{
-        i64 id PK
-        i64 user FK
+        i32 id PK
+        i32 user FK
         i32 role FK
     }
     user_authentication_password {
-        i64 id PK
-        i64 user_id FK
+        i32 id PK
+        i32 user_id FK
         String password "Nullable"
         DataTime password_last_updated
         bool requires_password_reset
         DateTime created_at
     }
     user_authentication_saml {
-        i64 id PK
-        i64 user_id FK
+        i32 id PK
+        i32 user_id FK
         i32 provider FK
     }
     saml_providers {
@@ -284,15 +298,15 @@ erDiagram
         bool is_default "If true only one can exist in the table"
     }
     appointments{
-        i64 id
+        i32 id
         DateTime scheduled_at
-        i64 preferred_clinician FK "Nullable"
-        i64 participant FK "Nullable. Null if new patient"
+        i32 preferred_clinician FK "Nullable"
+        i32 participant FK "Nullable. Null if new patient"
         string first_name "Null if participant is set"
         string last_name "Null if participant is set"
         string contact_number
         bool missed_appointment "Null until scheduled time is past"
-        i64 seen_by FK "Null until appointment happened"
+        i32 seen_by FK "Null until appointment happened"
         DateTime created_at
     }
 

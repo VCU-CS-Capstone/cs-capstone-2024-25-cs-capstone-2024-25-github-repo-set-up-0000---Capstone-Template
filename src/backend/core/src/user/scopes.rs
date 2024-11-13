@@ -1,8 +1,10 @@
 use strum::EnumIs;
+use utoipa::ToSchema;
 
 #[derive(
     Debug,
     PartialEq,
+    Eq,
     Clone,
     Copy,
     EnumIs,
@@ -10,8 +12,9 @@ use strum::EnumIs;
     serde::Deserialize,
     sqlx::Type,
     strum::Display,
+    ToSchema,
 )]
-#[sqlx(type_name = "Text")]
+#[sqlx(type_name = "VARCHAR(255)")]
 pub enum Scopes {
     /// An Admin has unrestricted access to the system.
     Admin,
@@ -31,4 +34,8 @@ pub enum Scopes {
     AddParticipants,
     /// A user who can add, update, remove users
     ManageUsers,
+    /// A user who can add, update, remove appointments
+    ManageSchedule,
+    /// A user who can view appointments
+    ViewSchedule,
 }

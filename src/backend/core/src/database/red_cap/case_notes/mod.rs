@@ -4,29 +4,31 @@ use sqlx::prelude::FromRow;
 pub mod screenings;
 use crate::red_cap_data::VisitType;
 pub mod predefined_enum;
+pub mod resources_and_education;
 pub mod staff;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow)]
 pub struct CaseNote {
-    pub id: i64,
+    pub id: i32,
     /// Relates to #[crate::database::red_cap::participants::Participants]
-    pub participant_id: i64,
+    pub participant_id: i32,
     /// Relates to #[crate::database::red_cap::Locations]
     ///
     /// RWHP Red Cap ID: `rhwp_location_visit`
     /// MHWP Red Cap ID: `mhwp_location_visit`
     ///
     /// Petersburg Sub Red Cap ID: `mhwp_location_visit_petersburg`
-    pub location: i32,
+    pub location: Option<i32>,
     /// Red Cap ID: `visit_type`
-    pub visit_type: VisitType,
+    pub visit_type: Option<VisitType>,
     /// Redcap ID: exit_age
-    pub age: i8,
+    pub age: i16,
     /// Red Cap ID: `reason`
     pub reason_for_visit: Option<String>,
     /// Red Cap ID: subjective_info
     pub info_provided_by_caregiver: Option<String>,
     /// Red Cap ID: visit_date
     pub date_of_visit: NaiveDate,
+
     /// DATABASE ONLY
     pub pushed_to_redcap: bool,
     /// Instance Number of the case note
@@ -37,9 +39,9 @@ pub struct CaseNote {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow)]
 pub struct CaseNoteHealthMeasures {
-    pub id: i64,
+    pub id: i32,
     /// 1:1 with [CaseNote]
-    pub case_note_id: i64,
+    pub case_note_id: i32,
     /// Red Cap ID bp_sit_syst
     ///
     /// Must Exist if blood_pressure_sit_diastolic exists
@@ -70,43 +72,12 @@ pub struct CaseNoteHealthMeasures {
     pub other: Option<String>,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow)]
-
-pub struct CaseNoteEducationAndResources {
-    pub id: i64,
-    /// 1:1 with [CaseNote]
-    pub case_note_id: i64,
-    /// Refers to [predefined_enum::EducationRelatedTo]
-    /// Red Cap ID: visit_sdh_edu
-    pub generic_education: Option<Vec<i32>>,
-    /// When `generic_education` is `None` this field is used
-    /// Red Cap ID: other_sdh
-    pub generic_education_other: Option<String>,
-    /// Refers to [predefined_enum::ServiceCoordination]
-    /// Red Cap ID: visit_sdh_referral
-    pub service_coordinated: Option<Vec<i32>>,
-    /// When `service_coordinated` is `None` this field is used
-    /// Red Cap ID: fin_ref
-    pub service_coordinated_other: Option<String>,
-    /// Refers to [predefined_enum::DiseaseAndMedicationEducation]
-    /// Red Cap ID: health_ed
-    pub disease_and_medication_education: Option<Vec<i32>>,
-    /// When `disease_and_medication_education` is `None` this field is used
-    /// Red Cap ID: health_other_ed
-    pub disease_and_medication_education_other: Option<String>,
-    /// Refers to [predefined_enum::HealthBehaviorEducation]
-    /// RED Cap: health_beh
-    pub health_behavior_education: Option<Vec<i32>>,
-    /// When `health_behavior_education` is `None` this field is used
-    /// Red Cap ID: health_other_bed
-    pub health_behavior_education_other: Option<String>,
-}
 /// Case Note Questions Related to a patient call to 911 or their PCP
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow)]
 pub struct CaseNoteOtherHealthVisits {
-    pub id: i64,
+    pub id: i32,
     /// 1:1 with [CaseNote]
-    pub case_note_id: i64,
+    pub case_note_id: i32,
     /// Red Cap ID: `ercall`
     ///
     /// The two fields are derived from
@@ -115,7 +86,7 @@ pub struct CaseNoteOtherHealthVisits {
     /// - Yes, but refused ambulance
     pub emergency_number_called: bool,
 
-    pub refused_ambulance: bool,
+    pub refused_ambulance: Option<bool>,
     /// Red Cap ID: `erreason`
     pub reason_for_call: Option<String>,
     ///Red Cap ID: exit_pcp_visit

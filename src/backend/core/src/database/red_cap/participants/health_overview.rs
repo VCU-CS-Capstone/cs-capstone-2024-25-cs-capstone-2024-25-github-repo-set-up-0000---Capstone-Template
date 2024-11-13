@@ -5,9 +5,9 @@ use crate::red_cap_data::MobilityDevice;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow)]
 pub struct HealthOverviw {
-    pub id: i64,
+    pub id: i32,
     /// 1:1 with [super::Participants]
-    pub participant_id: i64,
+    pub participant_id: i32,
     /// Red Cap: height
     pub height: Option<i32>,
     /// Red Cap: health_conditions

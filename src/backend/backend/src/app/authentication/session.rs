@@ -232,7 +232,7 @@ impl SessionManager {
     #[instrument]
     pub fn create_session(
         &self,
-        user_id: i64,
+        user_id: i32,
         user_agent: String,
         ip_address: String,
         life: Duration,
@@ -252,7 +252,7 @@ impl SessionManager {
     #[instrument]
     pub fn create_session_default_lifespan(
         &self,
-        user_id: i64,
+        user_id: i32,
         user_agent: String,
         ip_address: String,
     ) -> Result<Session, SessionError> {
@@ -286,7 +286,7 @@ impl SessionManager {
         sessions.commit()?;
         Ok(session)
     }
-    pub fn delete_all_for_user(&self, user_id: i64) -> Result<(), SessionError> {
+    pub fn delete_all_for_user(&self, user_id: i32) -> Result<(), SessionError> {
         let to_remove = self.filter_table(true, |session| session.user_id == user_id)?;
         let sessions = self.sessions.begin_write()?;
         {

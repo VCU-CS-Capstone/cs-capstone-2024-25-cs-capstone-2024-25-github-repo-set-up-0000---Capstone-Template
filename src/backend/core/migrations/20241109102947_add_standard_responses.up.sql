@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS locations(
     id serial PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    program VARCHAR(255) NOT NULL
+    program VARCHAR(255) NOT NULL,
     parent_location INTEGER,
         CONSTRAINT FK_locations_parent_location
             FOREIGN KEY (parent_location)
@@ -16,8 +16,8 @@ INSERT INTO locations(name, program) VALUES
     ('Highland Park', 'RHWP'),
     ('4th Ave', 'RHWP'),
     ('Health Hub', 'RHWP'),
-    ('The Rosa', 'RHWP')
-    ('Petersburg', 'MHWP')
+    ('The Rosa', 'RHWP'),
+    ('Petersburg', 'MHWP'),
     ('Lawrenceville','MHWP'),
     ('Tappahannock', 'MHWP'),
     ('Southwood', 'MHWP');
@@ -28,10 +28,10 @@ INSERT INTO locations(name, program) VALUES
 -- Gilhaven
 -- VSU Van
 INSERT INTO locations(name, program, parent_location) VALUES
-    ('VCRC', 'MHWP', SELECT id FROM locations WHERE name = 'Petersburg'),
-    ('Police substation', 'MHWP', SELECT id FROM locations WHERE name = 'Petersburg'),
-    ('Gilhaven', 'MHWP', SELECT id FROM locations WHERE name = 'Petersburg'),
-    ('VSU Van', 'MHWP', SELECT id FROM locations WHERE name = 'Petersburg');
+    ('VCRC', 'MHWP', (SELECT id FROM locations WHERE name = 'Petersburg' LIMIT 1)),
+    ('Police substation', 'MHWP', (SELECT id FROM locations WHERE name = 'Petersburg' LIMIT 1)),
+    ('Gilhaven', 'MHWP', (SELECT id FROM locations WHERE name = 'Petersburg' LIMIT 1)),
+    ('VSU Van', 'MHWP', (SELECT id FROM locations WHERE name = 'Petersburg' LIMIT 1));
 
 
 

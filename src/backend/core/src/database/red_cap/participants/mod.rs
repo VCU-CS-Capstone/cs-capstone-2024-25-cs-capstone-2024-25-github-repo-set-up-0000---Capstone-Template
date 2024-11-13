@@ -7,15 +7,17 @@ mod extra;
 pub mod goals;
 pub mod health_overview;
 pub mod medications;
+mod new;
 pub mod overview;
+pub use new::*;
 use sqlx::prelude::FromRow;
 /// Database Table: `participants`
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, FromRow)]
 pub struct Participants {
-    pub id: i64,
+    pub id: i32,
     /// The ID within Red Cap. This is separate so if we added creating a new participant
     /// We know what users have been added to redcap or not
-    pub red_cap_id: i64,
+    pub red_cap_id: Option<i32>,
     /// Redcap: first_name
     pub first_name: String,
     /// Red Cap last_name
@@ -39,7 +41,7 @@ pub struct Participants {
     /// Red Cap: consent_home
     pub date_home_visit_consent_signed: Option<chrono::NaiveDate>,
     /// Red CAp: date_intake
-    pub signed_up_on: chrono::NaiveDateTime,
+    pub signed_up_on: chrono::NaiveDate,
     /// For Database Only
     pub added_to_db_at: DateTime<FixedOffset>,
     /// For Database Only
@@ -48,9 +50,9 @@ pub struct Participants {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, FromRow)]
 pub struct ParticipantDemograhics {
-    pub id: i64,
+    pub id: i32,
     /// 1:1 with [Participants]
-    pub participant_id: i64,
+    pub participant_id: i32,
     /// Redcap: age
     pub age: Option<i16>,
     /// Redcap Gender

@@ -1,14 +1,14 @@
 -- Participants Table.
 CREATE TABLE IF NOT EXISTS participants(
-    -- bigserial 64 auto incrementing
-    id bigserial PRIMARY KEY,
-    red_cap_id bigint,
+    -- serial 64 auto incrementing
+    id serial PRIMARY KEY,
+    red_cap_id INTEGER,
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
     -- Contact Info
-    phone_number_one VARCHAR(255) NOT NULL,
-    phone_number_two VARCHAR(255) NOT NULL,
-    other_contact TEXT NOT NULL,
+    phone_number_one VARCHAR(255) ,
+    phone_number_two VARCHAR(255) ,
+    other_contact TEXT,
     -- Other Info
     program VARCHAR(255) NOT NULL,
     -- Relates to location table
@@ -17,19 +17,19 @@ CREATE TABLE IF NOT EXISTS participants(
             FOREIGN KEY (location)
             REFERENCES locations(id)
             ON DELETE SET NULL,
-    status VARCHAR(255) NOT NULL,
+    status VARCHAR(255),
     behavioral_risks_identified TEXT,
     date_care_coordination_consent_signed DATE,
     date_home_visit_consent_signed DATE,
-    date_signed_up DATE,
+    signed_up_on DATE DEFAULT CURRENT_DATE,
     added_to_db_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     last_synced_with_redcap TIMESTAMP WITH TIME ZONE
 );
 
 CREATE TABLE IF NOT EXISTS participant_demographics(
-    -- bigserial 64 auto incrementing
-    id bigserial PRIMARY KEY,
-    participant_id bigint NOT NULL,
+    -- serial 64 auto incrementing
+    id serial PRIMARY KEY,
+    participant_id integer NOT NULL,
     -- Relates to participants table
         CONSTRAINT FK_participant_demographics_participant_id
             FOREIGN KEY (participant_id)
@@ -48,9 +48,9 @@ CREATE TABLE IF NOT EXISTS participant_demographics(
 );
 
 CREATE TABLE IF NOT EXISTS participant_health_overview(
-    -- bigserial 64 auto incrementing
-    id bigserial PRIMARY KEY,
-    participant_id bigint NOT NULL,
+    -- serial 64 auto incrementing
+    id serial PRIMARY KEY,
+    participant_id INTEGER NOT NULL,
     -- Relates to participants table
         CONSTRAINT FK_participant_health_overview_participant_id
             FOREIGN KEY (participant_id)
@@ -65,43 +65,44 @@ CREATE TABLE IF NOT EXISTS participant_health_overview(
 );
 
 CREATE TABLE IF NOT EXISTS participant_medications(
-    id bigserial PRIMARY KEY,
-    participant_id bigint NOT NULL,
+    id serial PRIMARY KEY,
+    participant_id INTEGER NOT NULL,
     -- Relates to participants table
         CONSTRAINT FK_participant_medications_participant_id
             FOREIGN KEY (participant_id)
             REFERENCES participants(id)
             ON DELETE CASCADE,
-    medication_name VARCHAR(255),
-    medication_dosage VARCHAR(255),
+    name VARCHAR(255),
+    dosage VARCHAR(255),
+    frequency TEXT,
     date_prescribed DATE,
-    date_entered_into_system DATE,
+    date_entered_into_system DATE NOT NULL DEFAULT CURRENT_DATE,
     is_current BOOLEAN,
     date_discontinued DATE,
     comments TEXT
 );
 
 CREATE TABLE IF NOT EXISTS participant_goals(
-    id bigserial PRIMARY KEY,
-    participant_id bigint NOT NULL,
+    id serial PRIMARY KEY,
+    participant_id INTEGER NOT NULL,
     -- Relates to participants table
         CONSTRAINT FK_participant_medical_history_participant_id
             FOREIGN KEY (participant_id)
             REFERENCES participants(id)
             ON DELETE CASCADE,
     goal TEXT NOT NULL,
-    is_active BOOLEAN,
+    is_active BOOLEAN
 );
 
 CREATE TABLE IF NOT EXISTS participant_goal_steps(
-    id bigserial PRIMARY KEY,
-    participant_id bigint NOT NULL,
+    id serial PRIMARY KEY,
+    participant_id INTEGER NOT NULL,
     -- Relates to participants table
         CONSTRAINT FK_participant_medical_history_participant_id
             FOREIGN KEY (participant_id)
             REFERENCES participants(id)
             ON DELETE CASCADE,
-    goal_id bigint,
+    goal_id INTEGER,
     -- Relates to participant_goals table
         CONSTRAINT FK_participant_goal_steps_goal_id
             FOREIGN KEY (goal_id)

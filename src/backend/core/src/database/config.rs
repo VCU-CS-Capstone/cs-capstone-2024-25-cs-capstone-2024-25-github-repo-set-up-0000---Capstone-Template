@@ -9,14 +9,19 @@ pub enum DBConfigError {
 /// The configuration for the database.
 ///
 /// Currently only supports PostgreSQL.
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, clap::Args)]
 pub struct DatabaseConfig {
+    #[clap(long = "database-user", default_value = "postgres")]
     pub user: String,
+    #[clap(long = "database-password", default_value = "password")]
     pub password: String,
+    #[clap(long = "database-name", default_value = "cs25_303")]
     pub database: String,
     // The host can be in the format host:port or just host.
+    #[clap(long = "database-host", default_value = "localhost:5432")]
     pub host: String,
     // The port is optional. If not specified the default port is used. or will be extracted from the host.
+    #[clap(long = "database-port")]
     pub port: Option<u16>,
 }
 

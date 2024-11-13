@@ -5,6 +5,9 @@ authors.workspace = true
 edition.workspace = true
 repository.workspace = true
 description = "Core Shared Code between the backend and database"
+[lib]
+path = "src/lib.rs"
+
 [dependencies]
 
 strum.workspace = true
@@ -15,3 +18,13 @@ chrono.workspace = true
 thiserror.workspace = true
 utoipa.workspace = true
 cs25-303-macros.workspace = true
+tokio.workspace = true
+anyhow.workspace = true
+ahash.workspace = true
+clap = { version = "4", features = ["derive"] }
+
+[dev-dependencies]
+serde-env = "0.2.0"
+
+[lints]
+workspace = true

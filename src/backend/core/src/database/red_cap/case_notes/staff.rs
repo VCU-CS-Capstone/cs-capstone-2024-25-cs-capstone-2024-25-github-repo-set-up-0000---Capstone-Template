@@ -4,9 +4,9 @@ use sqlx::prelude::FromRow;
 /// Faculty, Staff, and Student Related Data
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow)]
 pub struct CaseNoteFacultyAndStaff {
-    pub id: i64,
+    pub id: i32,
     /// 1:1 with [super::CaseNote]
-    pub case_note_id: i64,
+    pub case_note_id: i32,
     /// Refers to [predefined_enum::StaffType]
     /// Red Cap ID: visit_faculty
     pub faculity_type_id: Option<Vec<i32>>,
@@ -37,9 +37,9 @@ pub struct CaseNoteFacultyAndStaff {
 /// Constraint: Either `student_type_id` or `custom_student_type` is not null
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow)]
 pub struct CaseNoteStudents {
-    pub id: i64,
+    pub id: i32,
     /// 1:many relationship with [super::CaseNote]
-    pub case_note_id: i64,
+    pub case_note_id: i32,
     /// Refers to [predefined_enum::StudentType]
     /// Red Cap ID: student_type
     pub student_type_id: Option<i32>,

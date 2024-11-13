@@ -2,9 +2,9 @@ use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, FromRow)]
 pub struct CaseNoteMedications {
-    pub id: i64,
+    pub id: i32,
     /// 1:1 with [super::CaseNote]
-    pub case_note_id: i64,
+    pub case_note_id: i32,
     /// Red Cap ID: changemeds
     pub has_medications_changed_since_last_visit: Option<bool>,
     /// Red Cap ID: opiod

@@ -5,9 +5,9 @@ use crate::red_cap_data::MedicationFrequency;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow)]
 pub struct ParticipantMedications {
-    pub id: i64,
-    pub participant_id: i64,
-    pub medication_name: String,
+    pub id: i32,
+    pub participant_id: i32,
+    pub name: String,
     pub dosage: String,
     pub frequency: MedicationFrequency,
     pub date_prescribed: Option<chrono::NaiveDate>,

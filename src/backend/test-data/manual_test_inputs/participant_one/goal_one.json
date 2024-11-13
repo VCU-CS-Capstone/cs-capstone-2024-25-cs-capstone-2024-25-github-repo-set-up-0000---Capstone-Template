@@ -1,0 +1,14 @@
+{
+    "goal": {
+        "goal": "I want to lose 10 pounds",
+        "is_active": true
+    },
+    "steps": [
+        {
+            "step": "Take a 15 minute walk every day",
+            "confidence_in_achieving": 5,
+            "date_set": "2024-09-01",
+            "date_to_be_achieved": "2024-09-30"
+        }
+    ]
+}

@@ -6,9 +6,9 @@ use crate::database::DBTime;
 /// Redcap Entry: TODO
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct HealthOverview {
-    pub id: i64,
+    pub id: i32,
     pub height: f32,
-    pub participant_id: i64,
+    pub participant_id: i32,
 
     pub pulled_from_redcap_last: Option<DBTime>,
 

@@ -10,7 +10,7 @@ pub type SessionTime = DateTime<FixedOffset>;
 /// Stored in the session manager.
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq, ToSchema)]
 pub struct Session {
-    pub user_id: i64,
+    pub user_id: i32,
     pub session_id: String,
     pub user_agent: String,
     pub ip_address: String,
@@ -19,7 +19,7 @@ pub struct Session {
 }
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq, ToSchema)]
 pub struct SmallSession {
-    pub user_id: i64,
+    pub user_id: i32,
     pub session_id: String,
 }
 impl From<SessionTuple<'_>> for SmallSession {
@@ -43,10 +43,10 @@ impl Session {
     }
 }
 /// A tuple of (user_id, session_id, expires, created)
-pub type SessionTuple<'value> = (i64, &'value str, &'value str, &'value str, String, String);
+pub type SessionTuple<'value> = (i32, &'value str, &'value str, &'value str, String, String);
 impl Session {
     pub fn new(
-        user_id: i64,
+        user_id: i32,
         session_id: String,
         user_agent: String,
         ip_address: String,

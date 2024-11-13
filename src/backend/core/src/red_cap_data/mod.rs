@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::prelude::Type;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Type)]
-#[sqlx(type_name = "VARCHAR(255)")]
+#[sqlx(type_name = "VARCHAR")]
 pub enum Programs {
     /// Richmond Health And Wellness Program
     RHWP,
@@ -12,7 +12,7 @@ pub enum Programs {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Type)]
-#[sqlx(type_name = "VARCHAR(255)")]
+#[sqlx(type_name = "VARCHAR")]
 pub enum Status {
     Active,
     Inactive,
@@ -21,7 +21,7 @@ pub enum Status {
     Withdrew,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Type)]
-#[sqlx(type_name = "VARCHAR(255)")]
+#[sqlx(type_name = "VARCHAR")]
 pub enum SeenAtVCUHS {
     Yes,
     No,
@@ -48,7 +48,7 @@ pub enum Gender {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Type)]
-#[sqlx(type_name = "VARCHAR(255)")]
+#[sqlx(type_name = "VARCHAR")]
 pub enum Race {
     NativeAmerican,
     Asian,
@@ -65,7 +65,7 @@ pub enum Race {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Type)]
-#[sqlx(type_name = "VARCHAR(255)")]
+#[sqlx(type_name = "VARCHAR")]
 pub enum Ethnicity {
     HispanicOrLatino,
     NotHispanicOrLatino,
@@ -84,6 +84,7 @@ pub enum PreferredLanguage {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Type)]
+#[sqlx(type_name = "TEXT")]
 pub enum HealthInsurance {
     Medicaid,
     Medicare,
@@ -92,7 +93,7 @@ pub enum HealthInsurance {
     None,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Type)]
-#[sqlx(type_name = "VARCHAR(255)")]
+#[sqlx(type_name = "VARCHAR")]
 pub enum DegreeLevel {
     None,
     Nursery,
@@ -105,7 +106,7 @@ pub enum DegreeLevel {
     Graduates,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Type)]
-#[sqlx(type_name = "VARCHAR(255)")]
+#[sqlx(type_name = "VARCHAR")]
 pub enum MobilityDevice {
     None,
     Cane,
@@ -134,7 +135,7 @@ pub enum MedicationFrequency {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Type)]
-#[sqlx(type_name = "TEXT")]
+#[sqlx(type_name = "VARCHAR")]
 pub enum VisitType {
     Onsite,
     HomeVisit,
