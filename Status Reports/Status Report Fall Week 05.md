@@ -18,12 +18,13 @@
   * Yanxiao Zhao (Electrical Engineering)
 
 ## 1) Accomplishments This Week ##
-   - Held the second weekly meeting to discuss project progress and clarify next steps.
-   - Reviewed initial research focus areas and assigned specific RF and ML topics for each student to explore further.
+   - Held the fifth weekly meeting to review project progress, including updates on research and testing.
+   - Each student discussed their ongoing research findings and potential improvements to SDR data collection.
+   - Finished working on the project proposal and submitted.
 
 ## 2) Milestones to Be Completed Next Week ##
-   - Continue individual research on assigned RF and machine learning topics to build foundational knowledge.
-   - Begin hands-on practice with Software-Defined Radio (SDR) devices to familiarize team members with their functionality and setup.
+   - Continue working on refining the SDR data collection process.
+   - Start exploring machine learning algorithms for RF signal classification.
 
 ## 3) Issues, Problems, or Concerns ##
    - None reported
