@@ -1,0 +1,9 @@
+[project]
+name = "ML-RF-Spectrum-Sensing-Backend"
+version = "0.0.1"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "flask>=3.0.3",
+]
