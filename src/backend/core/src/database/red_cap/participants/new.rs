@@ -5,8 +5,8 @@ use sqlx::Executor;
 use crate::{
     database::DBResult,
     red_cap_data::{
-        DegreeLevel, Ethnicity, Gender, HealthInsurance, MedicationFrequency, MobilityDevice,
-        PreferredLanguage, Programs, Race, Status,
+        DegreeLevel, Ethnicity, Gender, HealthInsurance, MedicationFrequency, PreferredLanguage,
+        Programs, Race, Status,
     },
 };
 
@@ -93,7 +93,7 @@ impl NewParticipant {
         Ok(result)
     }
 }
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Default)]
 pub struct NewDemographics {
     /// Redcap: age
     pub age: Option<i16>,
@@ -168,15 +168,14 @@ impl NewDemographics {
         Ok(())
     }
 }
-#[derive(Debug, Clone, Deserialize)]
+
+#[derive(Debug, Clone, Deserialize, Default)]
 pub struct NewHealthOverview {
     pub height: Option<i32>,
     /// Red Cap: health_conditions
     pub reported_health_conditions: Option<String>,
     /// Red Cap: allergies
     pub allergies: Option<String>,
-    /// Red Cap: info_mobility
-    pub mobility_devices: Option<Vec<MobilityDevice>>,
     /// Red Cap: personal_cuff
     pub has_blood_pressure_cuff: Option<bool>,
     /// Red Cap: num_meds
@@ -192,9 +191,9 @@ impl NewHealthOverview {
             height,
             reported_health_conditions,
             allergies,
-            mobility_devices,
             has_blood_pressure_cuff,
             takes_more_than_5_medications,
+            ..
         } = self;
 
         sqlx::query(
@@ -204,17 +203,15 @@ impl NewHealthOverview {
                     height,
                     reported_health_conditions,
                     allergies,
-                    mobility_devices,
                     has_blood_pressure_cuff,
                     takes_more_than_5_medications
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+                ) VALUES ($1, $2, $3, $4, $5, $6);
                     ",
         )
         .bind(participant_id)
         .bind(height)
         .bind(reported_health_conditions)
         .bind(allergies)
-        .bind(mobility_devices)
         .bind(has_blood_pressure_cuff)
         .bind(takes_more_than_5_medications)
         .execute(database)

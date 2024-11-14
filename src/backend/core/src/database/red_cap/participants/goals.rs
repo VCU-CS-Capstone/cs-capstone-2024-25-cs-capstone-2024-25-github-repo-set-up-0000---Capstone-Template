@@ -40,8 +40,9 @@ pub struct ParticipantGoals {
     pub goal: String,
     pub is_active: Option<bool>,
 }
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
 pub struct NewParticipantGoalsSteps {
+    pub goal_id: Option<i32>,
     pub step: String,
     pub confidence_level: Option<i16>,
     pub date_set: Option<NaiveDate>,
@@ -53,20 +54,21 @@ pub struct NewParticipantGoalsSteps {
     pub action_step: bool,
 }
 impl NewParticipantGoalsSteps {
-    pub async fn insert_return_goal(
+    pub async fn insert_with_goal_return_none(
         self,
         participant_id: i32,
         related_goal_id: i32,
         database: impl Executor<'_, Database = sqlx::Postgres>,
-    ) -> sqlx::Result<ParticipantGoalsSteps> {
+    ) -> sqlx::Result<()> {
         let Self {
             step,
             confidence_level,
             date_set,
             date_to_be_completed,
             action_step,
+            ..
         } = self;
-        sqlx::query_as(
+        sqlx::query(
             r#"
             INSERT INTO participant_goal_steps (
             participant_id,
@@ -77,7 +79,6 @@ impl NewParticipantGoalsSteps {
              action_step
             )
             VALUES ($1, $2, $3, $4, $5, $6, $7)
-            RETURNING *
             "#,
         )
         .bind(participant_id)
@@ -87,8 +88,9 @@ impl NewParticipantGoalsSteps {
         .bind(date_set)
         .bind(date_to_be_completed)
         .bind(action_step)
-        .fetch_one(database)
-        .await
+        .execute(database)
+        .await?;
+        Ok(())
     }
 }
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow)]
@@ -104,5 +106,5 @@ pub struct ParticipantGoalsSteps {
     /// True == Yes
     /// False == No
     /// Select No until goal is achieved
-    pub action_step: bool,
+    pub action_step: Option<bool>,
 }

@@ -5,6 +5,7 @@ use sqlx::PgPool;
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::{filter, layer::SubscriberExt, util::SubscriberInitExt, Layer};
 pub mod manual_test;
+pub mod random;
 use std::path::{Path, PathBuf};
 #[derive(Debug, Clone, Parser)]
 pub struct CLI {
@@ -16,6 +17,7 @@ pub struct CLI {
 #[derive(Debug, Clone, clap::Subcommand)]
 pub enum Commands {
     RunManualTests { path: PathBuf },
+    Random { count: usize },
 }
 
 #[tokio::main]
@@ -27,6 +29,10 @@ async fn main() -> anyhow::Result<()> {
         Commands::RunManualTests { path } => {
             println!("Running manual tests from path: {:?}", path);
             run_manual_dir(path, database).await?;
+        }
+        Commands::Random { count } => {
+            println!("Generating {} random participants", count);
+            random::generate_participants(count, database).await?;
         }
     }
     Ok(())

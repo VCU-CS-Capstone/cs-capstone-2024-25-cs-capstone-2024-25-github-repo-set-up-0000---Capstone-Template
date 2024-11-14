@@ -59,9 +59,18 @@ CREATE TABLE IF NOT EXISTS participant_health_overview(
     height integer,
     reported_health_conditions TEXT,
     allergies TEXT,
-    mobility_devices TEXT[],
     has_blood_pressure_cuff BOOLEAN,
     takes_more_than_5_medications BOOLEAN
+);
+CREATE TABLE IF NOT EXISTS health_overview_mobility_devices(
+    id serial PRIMARY KEY,
+    health_overview_id INTEGER NOT NULL,
+    -- Relates to participants table
+        CONSTRAINT FK_health_overview_mobility_devices_participant_id
+            FOREIGN KEY (health_overview_id)
+            REFERENCES participant_health_overview(id)
+            ON DELETE CASCADE,
+    device VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS participant_medications(

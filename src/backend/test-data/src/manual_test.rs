@@ -82,7 +82,7 @@ async fn find_and_add_goals(
                 .insert_return_goal(participant, database.as_mut())
                 .await?;
             for step in steps {
-                step.insert_return_goal(participant, goal.id, database.as_mut())
+                step.insert_with_goal_return_none(participant, goal.id, database.as_mut())
                     .await?;
             }
         }

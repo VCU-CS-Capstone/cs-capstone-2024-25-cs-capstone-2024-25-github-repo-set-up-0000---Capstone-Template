@@ -16,19 +16,21 @@ This database has two separate diagrams. This is because the redcap info might b
 
 ## Notes
 
-Almost all case note related columns are nullable. This is because the data is not exackly perfect in red cap.
+Almost all case note related columns are nullable. This is because the data is not exackly perfect in red cap. If all attributes are null. That set of data wont be imported from Red Cap. However, I am not sure what things will be filled and what No
 I am trying to make it work. When pulling from red cap if all entries in a case_note related table are null it will just not create an entry in that case.
 
 ## Participants
 ```{mermaid}
 erDiagram
-    participants ||--o| health_overview : "has one or none"
+    participants ||--o| participant_health_overview : "has one or none"
+    participant_health_overview ||--o{ health_overview_mobility_devices :  "Might have many"
     participants ||--|| locations : "has one"
     participants ||--|| participants_demographics : "has one"
-    participants ||--o{ medications : "has many"
-    participants ||--o{ goals : "has many"
-    participants ||--o{ goal_steps : "has many"
-    goals ||--o{ goal_steps : "has many"
+    participants ||--o{ participant_medications : "has many"
+
+    participants ||--o{ participant_goals : "has many"
+    participants ||--o{ participant_goal_steps : "has many"
+    participant_goals ||--o{ participant_goal_steps : "has many"
 
     participants ||--o{ case_notes : "has many"
 
@@ -39,74 +41,87 @@ erDiagram
     case_notes ||--o| case_notes_opioid_screening : "has one"
     case_notes ||--o| case_notes_fall_screening : "has one"
     case_notes ||--o| case_notes_other_screening : "has one"
-    case_notes ||--o| case_notes_education_and_resources : "has one"
     case_notes ||--o| case_notes_health_measures : "has one"
     case_notes ||--o| case_notes_health_visits : "has one"
 
     participants{
-        i32 participant_id PK "C_RC"
+        i32 participant_id PK
+        i32 red_cap_id
         string first_name
         string last_name
-        string phone_number
+        string phone_number_one
+        string phone_number_one
+        string other_contact
         string program
+        location i32
         string status
+        string behavioral_risks_identified
+        date date_care_coordination_consent_signed
+        date date_home_visit_consent_signed
+        date signed_up_on
+        datetime added_to_db_at
+        datetime last_synced_with_redcap
     }
-    medications{
+    participant_medications{
         i32 id PK
         i32 participant_id FK
-        String medication_name
+        String name
         String dosage
-        enum frequency
-        date date_presribed
+        String frequency
+        date date_presribed "Nullable"
         date date_entered_into_system
-        bool is_current
+        bool is_current "Nullable"
         date date_discontinued "Nullable"
-        string comments
+        string comments "Nullable"
     }
-    goals{
+    participant_goals{
         i32 id PK
         i32 participant_id FK
         string goal
         bool is_active "Nullable"
     }
-    goal_steps{
+    participant_goal_steps{
         i32 id PK
-        i32 related_goal_id FK "Nullable"
+        i32 goal_id FK "Nullable"
         i32 participant_id FK
         string step
         i16 confidence_in_achieving "1-10, Nullable"
         date date_set "Nullable"
-        date date_to_be_achieved "Nullable"
+        date date_to_be_completed "Nullable"
         bool action_step "Nullable"
     }
     locations {
         i32 id PK
         string name
         string program
-        i32 parent_location "Petersburg has multiple locations"
+        i32 parent_location "Petersburg has multiple locations. The rest dont"
     }
-    health_overview {
-        i32 id PK "Will not correlate with Redcap"
+    participant_health_overview {
+        i32 id PK
         i32 participant_id FK
         f32 height "in inches"
         string reported_health_conditions "Nullable"
         string allergies "Nullable"
-        Array mobility_devices "Nullable"
         bool has_blood_pressure_cuff "Nullable"
         bool takes_more_than_5_medications "Nullable"
     }
+    health_overview_mobility_devices {
+        i32 id PK
+        i32 health_overview_id FK
+        String mobility_device
+    }
     participants_demographics {
         i32 participant_id
-        i16 age
-        string gender
-        string Race
-        string race_other
-        string race_multiple
-        string ethnicity
-        string language
-        bool is_veteran
-        Array health_insurance
-        string highest_education_level
+        i16 age "Nullable"
+        string gender "Nullable"
+        string Race "Nullable"
+        string race_other "Nullable"
+        string race_multiple "Nullable"
+        string ethnicity "Nullable"
+        string language "Nullable"
+        bool is_veteran "Nullable"
+        Array health_insurance "Nullable"
+        string highest_education_level "Nullable"
     }
     case_notes {
         i32 id PK "Will not correlate with Redcap"
@@ -183,22 +198,7 @@ erDiagram
         string custom_screening_name "Nullable Either screening_id or custom_screening_name must not be null"
         string screening_notes "Nullable"
     }
-    case_notes_education_and_resources{
-        i32 id PK
-        i32 case_note_id FK
 
-        Array generic_education "Nullable"
-        string generic_education_other "Nullable"
-
-        Array service_coordinated "Nullable"
-        string service_coordinated_other "Nullable"
-
-        Array disease_and_medication_education "Nullable"
-        string disease_and_medication_education_other "Nullable"
-
-        Array health_behavior_education "Nullable"
-        string health_behavior_education_other "Nullable"
-    }
     case_notes_health_visits{
         i32 id PK
         i32 case_note_id FK
@@ -222,7 +222,6 @@ erDiagram
         i16 glucose "Nullable"
         bool gluce_taken_fasting "Nullable"
     }
-
 ```
 
 ## Non Red Cap Data

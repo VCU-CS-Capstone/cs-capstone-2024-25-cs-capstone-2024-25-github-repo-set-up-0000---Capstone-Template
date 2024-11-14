@@ -1,0 +1,77 @@
+[
+    {
+        "name": "Lisinopril",
+        "dosage": {
+            "random": "Array",
+            "options": [
+                "10mg",
+                "20mg",
+                "30mg"
+            ]
+        },
+        "frequency": "Daily"
+    },
+    {
+        "name": "Vitamin D",
+        "dosage": {
+            "random": "Array",
+            "options": [
+                "10mg",
+                "20mg",
+                "30mg"
+            ]
+        },
+        "frequency": "Daily"
+    },
+    {
+        "name": "Amoxicillin",
+        "dosage": {
+            "random": "Array",
+            "options": [
+                "10mg",
+                "20mg",
+                "30mg"
+            ]
+        },
+        "frequency": "Daily"
+    },
+    {
+        "name": "Levothyroxine ",
+        "dosage": {
+            "random": "Array",
+            "options": [
+                "10mg",
+                "20mg",
+                "30mg"
+            ]
+        },
+        "start_date": {
+            "random": "Date"
+        },
+        "frequency": "Daily"
+    },
+    {
+        "name": "Amphetamine Salts ER",
+        "dosage": {
+            "random": "Array",
+            "options": [
+                "10mg",
+                "20mg",
+                "30mg"
+            ]
+        },
+        "frequency": "Daily"
+    },
+    {
+        "name": "Trazodone",
+        "dosage": {
+            "random": "Array",
+            "options": [
+                "10mg",
+                "20mg",
+                "30mg"
+            ]
+        },
+        "frequency": "Daily"
+    }
+]
