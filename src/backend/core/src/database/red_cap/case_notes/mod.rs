@@ -1,3 +1,4 @@
+pub mod new;
 use chrono::{DateTime, FixedOffset, NaiveDate};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;

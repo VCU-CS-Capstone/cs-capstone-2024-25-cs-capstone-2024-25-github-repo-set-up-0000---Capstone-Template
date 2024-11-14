@@ -1,22 +1,30 @@
-use std::path::Path;
+use std::{collections::HashMap, path::Path};
 
 use chrono::Local;
 use cs25_303_core::{
     database::red_cap::{
+        case_notes::new::{NewBloodPressure, NewCaseNote, NewCaseNoteHealthMeasures},
         locations::Locations,
         participants::{
             goals::{NewParticipantGoal, NewParticipantGoalsSteps},
-            NewDemographics, NewHealthOverview, NewMedication, NewParticipant,
+            NewDemographics, NewHealthOverview, NewMedication, NewParticipant, Participants,
         },
     },
-    red_cap_data::{Gender, HealthInsurance, MedicationFrequency, Programs, Race, Status},
+    red_cap_data::{
+        Gender, HealthInsurance, MedicationFrequency, Programs, Race, Status, VisitType,
+    },
 };
-use rand::{seq::SliceRandom, Rng};
+use rand::{seq::SliceRandom, Rng, SeedableRng};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::{types::chrono::NaiveDate, PgPool};
 use tracing::error;
-
+/// Notes we will use for data generation
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct ParticipantExtendedInfo {
+    pub has_high_blood_pressure: bool,
+    pub has_diabetes: bool,
+}
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
 pub struct RandomDateOptions {
     pub min: Option<NaiveDate>,
@@ -124,26 +132,31 @@ where
     }
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone)]
 pub struct RandomSets {
+    pub rand: rand::rngs::StdRng,
+    // TODO: Share a random generator
     pub participants: Vec<RandomParticipant>,
     pub goals: Vec<RandomCompleteGoal>,
     pub medications: Vec<RandomMedication>,
     pub behbehavioral_risks_identified: Vec<String>,
     pub r_locations: Vec<Locations>,
     pub m_locations: Vec<Locations>,
+    pub reasons_for_visit: Vec<String>,
+    pub info_provided_by_caregiver: Vec<String>,
+    pub extended_patient_info: HashMap<i32, ParticipantExtendedInfo>,
 }
 impl RandomSets {
-    pub fn randon_behavioral_risks_identified(&self) -> Option<String> {
+    pub fn randon_behavioral_risks_identified(&mut self) -> Option<String> {
         Some(
             self.behbehavioral_risks_identified
-                .choose(&mut rand::thread_rng())
+                .choose(&mut self.rand)
                 .unwrap()
                 .clone(),
         )
     }
-    pub fn random_health_overview(&self) -> NewHealthOverview {
-        let height = match rand::thread_rng().gen_range(0..100) {
+    pub fn random_health_overview(&mut self) -> NewHealthOverview {
+        let height = match self.rand.gen_range(0..100) {
             0..50 => None,
             50..75 => Some(rand::thread_rng().gen_range(50..100)),
             _ => Some(rand::thread_rng().gen_range(100..300)),
@@ -153,8 +166,8 @@ impl RandomSets {
             ..Default::default()
         }
     }
-    pub fn random_demographics(&self, gender: Gender) -> NewDemographics {
-        let is_veteran = !matches!(rand::thread_rng().gen_range(0..100), 0..90);
+    pub fn random_demographics(&mut self, gender: Gender) -> NewDemographics {
+        let is_veteran = !matches!(self.rand.gen_range(0..100), 0..90);
         let (race, race_other, race_multiple) = match rand::thread_rng().gen_range(0..100) {
             0..50 => (Some(Race::White), None, None),
             50..65 => (Some(Race::Black), None, None),
@@ -173,7 +186,7 @@ impl RandomSets {
             _ => vec![],
         };
         NewDemographics {
-            age: Some(rand::thread_rng().gen_range(18..85) as i16),
+            age: Some(self.rand.gen_range(18..85) as i16),
             gender: Some(gender),
             is_veteran: Some(is_veteran),
             race,
@@ -183,35 +196,35 @@ impl RandomSets {
             ..Default::default()
         }
     }
-    pub fn random_medications(&self) -> Vec<NewMedication> {
-        let number_of_meds = rand::thread_rng().gen_range(0..10);
+    pub fn random_medications(&mut self) -> Vec<NewMedication> {
+        let number_of_meds = self.rand.gen_range(0..10);
 
         let mut meds = Vec::with_capacity(number_of_meds);
 
         for _ in 0..number_of_meds {
-            let random = self.medications.choose(&mut rand::thread_rng()).unwrap();
+            let random = self.medications.choose(&mut self.rand).unwrap();
             // TODO: Prevent duplicates
             meds.push(random.create_new_medication());
         }
         meds
     }
-    pub fn random_goals(&self) -> Vec<(NewParticipantGoal, Vec<NewParticipantGoalsSteps>)> {
-        let number_of_meds = rand::thread_rng().gen_range(0..3);
+    pub fn random_goals(&mut self) -> Vec<(NewParticipantGoal, Vec<NewParticipantGoalsSteps>)> {
+        let number_of_meds = self.rand.gen_range(0..3);
         let mut goals = Vec::with_capacity(number_of_meds);
         for _ in 0..number_of_meds {
-            let random = self.goals.choose(&mut rand::thread_rng()).unwrap();
+            let random = self.goals.choose(&mut self.rand).unwrap();
             goals.push(random.create_new_goal());
         }
         goals
     }
-    pub fn pick_random_program(&self) -> Programs {
-        if rand::thread_rng().gen_bool(1f64 / 3f64) {
+    pub fn pick_random_program(&mut self) -> Programs {
+        if self.rand.gen_bool(1f64 / 3f64) {
             Programs::MHWP
         } else {
             Programs::RHWP
         }
     }
-    pub fn location_for_program(&self, program: Programs) -> Locations {
+    pub fn location_for_program(&mut self, program: Programs) -> Locations {
         if program == Programs::MHWP {
             self.m_locations
                 .choose(&mut rand::thread_rng())
@@ -223,6 +236,76 @@ impl RandomSets {
                 .unwrap()
                 .clone()
         }
+    }
+    pub fn random_info_by_caregiver(&mut self) -> Option<String> {
+        // 50 chance of none
+        if self.rand.gen_bool(0.5) {
+            return None;
+        }
+        Some(
+            self.info_provided_by_caregiver
+                .choose(&mut self.rand)
+                .unwrap()
+                .clone(),
+        )
+    }
+    pub fn random_reason_for_visit(&mut self) -> Option<String> {
+        // 25 chance of none
+        if self.rand_bool(0.25) {
+            return None;
+        }
+        Some(
+            self.reasons_for_visit
+                .choose(&mut self.rand)
+                .unwrap()
+                .clone(),
+        )
+    }
+    pub fn random_visit_type(&self) -> Option<VisitType> {
+        match rand::thread_rng().gen_range(0..100) {
+            0..10 => Some(VisitType::OnsiteAndHome),
+            _ => Some(VisitType::Onsite),
+        }
+    }
+    // TODO: Add Standing blood pressure
+    pub fn random_blood_pressure(
+        &mut self,
+        participant: i32,
+    ) -> (Option<NewBloodPressure>, Option<NewBloodPressure>) {
+        // About 47% chance of having high blood pressure
+
+        if self.extended_patient_info[&participant].has_high_blood_pressure {
+            (
+                Some(NewBloodPressure {
+                    systolic: self.rand.gen_range(130..180) as i16,
+                    diastolic: self.rand.gen_range(80..120) as i16,
+                }),
+                None,
+            )
+        } else {
+            (
+                Some(NewBloodPressure {
+                    systolic: self.rand.gen_range(90..120) as i16,
+                    diastolic: self.rand.gen_range(60..80) as i16,
+                }),
+                None,
+            )
+        }
+    }
+    fn rand_bool(&mut self, chance: f64) -> bool {
+        self.rand.gen_bool(chance)
+    }
+    pub fn create_extended_profile_for_partiicpant(&mut self, participant: i32) {
+        let has_high_blood_pressure = self.rand_bool(0.47);
+        let has_diabetes = self.rand_bool(0.1);
+
+        self.extended_patient_info.insert(
+            participant,
+            ParticipantExtendedInfo {
+                has_high_blood_pressure,
+                has_diabetes,
+            },
+        );
     }
 }
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -359,6 +442,8 @@ pub async fn load_random_sets(database: Option<&PgPool>) -> anyhow::Result<Rando
     let random_goals: Vec<RandomCompleteGoal> = load_random_set("goals")?;
     let random_behavioral_risks_identified: Vec<String> =
         load_random_set("behavioral_risks_identified")?;
+    let reasons_for_visit: Vec<String> = load_random_set("reason_for_visit")?;
+    let info_provided_by_caregiver: Vec<String> = load_random_set("info_by_caregiver")?;
     let (r_locations, m_locations) = if let Some(database) = database {
         (
             Locations::find_all_in_program(Programs::RHWP, database).await?,
@@ -369,17 +454,21 @@ pub async fn load_random_sets(database: Option<&PgPool>) -> anyhow::Result<Rando
     };
 
     Ok(RandomSets {
+        rand: rand::rngs::StdRng::from_entropy(),
         participants: random_participants,
         goals: random_goals,
         medications: random_medication,
         behbehavioral_risks_identified: random_behavioral_risks_identified,
         r_locations,
         m_locations,
+        reasons_for_visit,
+        info_provided_by_caregiver,
+        extended_patient_info: HashMap::new(),
     })
 }
 
 pub async fn generate_participants(count: usize, database: PgPool) -> anyhow::Result<()> {
-    let random_sets = load_random_sets(Some(&database)).await?;
+    let mut random_sets = load_random_sets(Some(&database)).await?;
 
     for _ in 0..count {
         let RandomParticipant {
@@ -411,7 +500,7 @@ pub async fn generate_participants(count: usize, database: PgPool) -> anyhow::Re
             last_synced_with_redcap: None,
         };
         let part = new_participant.insert_return_participant(&database).await?;
-
+        random_sets.create_extended_profile_for_partiicpant(part.id);
         let health_overview = random_sets.random_health_overview();
         health_overview.insert_none(part.id, &database).await?;
 
@@ -434,7 +523,50 @@ pub async fn generate_participants(count: usize, database: PgPool) -> anyhow::Re
                     .await?;
             }
         }
+        let number_of_case_notes = rand::thread_rng().gen_range(0..10);
+        let current_date = Local::now().date_naive();
+        for _ in 0..number_of_case_notes {
+            let date_of_visit = current_date - chrono::Duration::weeks(1);
+            generate_random_case_note_on(&mut random_sets, part.clone(), date_of_visit, &database)
+                .await?;
+        }
     }
+    Ok(())
+}
+
+async fn generate_random_case_note_on(
+    random: &mut RandomSets,
+    participant: Participants,
+    date_of_visit: NaiveDate,
+    database: &PgPool,
+) -> anyhow::Result<()> {
+    let visit_type = random.random_visit_type();
+    let reason_for_visit = random.random_reason_for_visit();
+    let info_provided_by_caregiver = random.random_info_by_caregiver();
+
+    let new_case_note = NewCaseNote {
+        location: participant.location,
+        visit_type,
+        age: 0, // TODO: Pass Age Into this function
+        reason_for_visit,
+        info_provided_by_caregiver,
+        date_of_visit,
+        ..Default::default()
+    };
+    let case_note = new_case_note
+        .insert_return_case_note(participant.id, database)
+        .await?;
+    let (sit, stand) = random.random_blood_pressure(participant.id);
+    let new_health_measures = NewCaseNoteHealthMeasures {
+        sit,
+        stand,
+        ..Default::default()
+    };
+
+    new_health_measures
+        .insert_return_none(case_note.id, database)
+        .await?;
+
     Ok(())
 }
 #[cfg(test)]

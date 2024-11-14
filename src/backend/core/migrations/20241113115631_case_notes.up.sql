@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS case_notes(
             ON DELETE SET NULL,
     visit_type VARCHAR(255),
     age smallint NOT NULL,
-    reason_for_visit TEXT NOT NULL,
-    info_provided_by_caregiver TEXT NOT NULL,
+    reason_for_visit TEXT,
+    info_provided_by_caregiver TEXT,
     date_of_visit DATE NOT NULL,
     pushed_to_redcap BOOLEAN,
     redcap_instance integer,
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS case_note_health_measures(
             ),
     weight real,
     glucose_tested BOOLEAN NOT NULL DEFAULT FALSE,
-    glucse_reading real,
+    glucose_result real,
     fasted_atleast_2_hours BOOLEAN NOT NULL DEFAULT FALSE,
     other TEXT
 );

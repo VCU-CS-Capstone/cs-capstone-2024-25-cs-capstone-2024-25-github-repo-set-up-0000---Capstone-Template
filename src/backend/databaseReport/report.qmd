@@ -126,7 +126,6 @@ config_map = {
     'user': 'DATABASE_USER',
     'password':'DATABASE_PASSWORD',
     'host':'DATABASE_HOST',
-    'port': 'DATABASE_PORT',
     'database':'DATABASE_NAME'
 }
 # load and store credentials
@@ -235,6 +234,21 @@ sql = f"""
 SELECT participant_goals.*
     from participant_goals
     WHERE participant_goals.participant_id = 1;
+
+"""
+run_sql_and_return_df( sql,cnx )
+
+```
+
+### Finding Participants with High Blood Pressure Signs
+
+```{python}
+#| echo: true
+sql = f"""
+SELECT participants.id, participants.first_name, participants.last_name, case_note_health_measures.blood_pressure_sit_systolic, case_note_health_measures.blood_pressure_sit_diastolic FROM case_note_health_measures
+    INNER JOIN case_notes  on case_notes.id = case_note_health_measures.case_note_id
+    INNER JOIN participants ON case_notes.participant_id = participants.id
+    WHERE case_note_health_measures.blood_pressure_sit_systolic >= 130 AND case_note_health_measures.blood_pressure_sit_diastolic >= 80;
 
 """
 run_sql_and_return_df( sql,cnx )
