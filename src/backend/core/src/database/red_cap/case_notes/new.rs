@@ -1,5 +1,6 @@
 use chrono::{Local, NaiveDate};
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 use crate::{database::DBResult, red_cap_data::VisitType};
 
@@ -79,12 +80,12 @@ impl Default for NewCaseNote {
         }
     }
 }
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct NewBloodPressure {
     pub systolic: i16,
     pub diastolic: i16,
 }
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default, ToSchema)]
 pub struct NewCaseNoteHealthMeasures {
     pub sit: Option<NewBloodPressure>,
     pub stand: Option<NewBloodPressure>,
