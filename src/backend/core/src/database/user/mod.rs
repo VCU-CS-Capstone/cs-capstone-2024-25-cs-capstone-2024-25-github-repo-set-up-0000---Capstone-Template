@@ -1,6 +1,6 @@
+use super::prelude::*;
 use auth::UserAndPasswordAuth;
 use serde::{Deserialize, Serialize};
-use sqlx::prelude::FromRow;
 use utoipa::ToSchema;
 
 use crate::{database::DBResult, user::Scopes};
@@ -9,7 +9,9 @@ pub mod roles;
 
 pub trait UserType {
     fn get_id(&self) -> i32;
-
+    fn columns() -> Vec<UserColumn> {
+        UserColumn::all()
+    }
     async fn does_user_have_scope_or_admin(
         &self,
         scope: Scopes,
@@ -38,7 +40,7 @@ pub trait UserType {
         Ok(result > 0)
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, FromRow, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, FromRow, Serialize, Deserialize, ToSchema, Columns)]
 pub struct User {
     /// The ID of the user.
     pub id: i32,

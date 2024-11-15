@@ -67,3 +67,27 @@ KEY2=value2
         }
     }
 }
+#[cfg(test)]
+pub mod test_utils {
+    use std::sync::Once;
+
+    use tracing::{info, level_filters::LevelFilter};
+    use tracing_subscriber::{filter, layer::SubscriberExt, util::SubscriberInitExt, Layer};
+
+    pub fn init_logger() {
+        static ONCE: Once = std::sync::Once::new();
+        ONCE.call_once(|| {
+            let stdout_log = tracing_subscriber::fmt::layer().pretty().without_time();
+            tracing_subscriber::registry()
+                .with(
+                    stdout_log.with_filter(
+                        filter::Targets::new()
+                            .with_target("cs25_303_core", LevelFilter::TRACE)
+                            .with_target("sqlx", LevelFilter::INFO),
+                    ),
+                )
+                .init();
+        });
+        info!("Logger initialized");
+    }
+}

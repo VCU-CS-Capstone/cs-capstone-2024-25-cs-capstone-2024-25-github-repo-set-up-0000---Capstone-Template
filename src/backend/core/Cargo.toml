@@ -22,9 +22,13 @@ tokio.workspace = true
 anyhow.workspace = true
 ahash.workspace = true
 clap = { version = "4", features = ["derive"] }
+derive_builder = "0.20"
+# This depend is mostly for testing
+tabled = "0.16"
 
 [dev-dependencies]
 serde-env = "0.2.0"
-
+tracing-subscriber.workspace = true
+tracing-appender.workspace = true
 [lints]
 workspace = true

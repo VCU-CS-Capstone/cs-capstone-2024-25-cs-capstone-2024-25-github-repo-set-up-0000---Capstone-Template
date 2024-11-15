@@ -2,9 +2,19 @@ mod config;
 pub mod red_cap;
 pub mod user;
 pub use config::*;
-
+pub mod table_utils;
+pub mod tools;
 use sqlx::{migrate::Migrator, postgres::PgConnectOptions, PgPool};
 use tracing::info;
+/// A bunch of re-exports to make it easier to use the database module.
+pub mod prelude {
+    pub use super::tools::*;
+    pub use super::DBResult;
+    pub use chrono::{DateTime, FixedOffset};
+    pub use cs25_303_macros::Columns;
+
+    pub use sqlx::{postgres::PgRow, prelude::*, PgPool, Postgres, QueryBuilder};
+}
 pub static MIGRATOR: Migrator = sqlx::migrate!();
 /// The type for a DateTime in the database.
 ///
@@ -43,5 +53,14 @@ mod tests {
         MIGRATOR.run(&database).await?;
 
         Ok(())
+    }
+    pub async fn setup_query_test() -> anyhow::Result<PgPool> {
+        crate::test_utils::init_logger();
+
+        let test_env = crate::env_utils::read_env_file_in_core("test.env")?;
+
+        let config: DatabaseConfig = serde_env::from_iter_with_prefix(test_env.iter(), "QUERY")?;
+        let database = PgPool::connect_with(config.try_into()?).await?;
+        Ok(database)
     }
 }

@@ -1,18 +1,41 @@
-use crate::red_cap_data::{
-    DegreeLevel, Ethnicity, Gender, HealthInsurance, PreferredLanguage, Programs, Race, Status,
+use crate::{
+    database::prelude::*,
+    red_cap_data::{
+        DegreeLevel, Ethnicity, Gender, HealthInsurance, PreferredLanguage, Programs, Race, Status,
+    },
 };
 use chrono::{DateTime, FixedOffset};
+use cs25_303_macros::Columns;
 use serde::{Deserialize, Serialize};
 mod extra;
 pub mod goals;
 pub mod health_overview;
+mod lookup;
 pub mod medications;
 mod new;
+pub use lookup::*;
 pub mod overview;
+use crate::database::tools::ColumnType;
 pub use new::*;
-use sqlx::prelude::FromRow;
+use sqlx::{postgres::PgRow, prelude::FromRow};
+pub trait ParticipantType: for<'r> FromRow<'r, PgRow> + Unpin + Send + Sync {
+    fn get_id(&self) -> i32;
+    /// Leaving this to the default implementation is not recommended. As it will return all columns
+    fn columns() -> Vec<ParticipantsColumn> {
+        ParticipantsColumn::all()
+    }
+
+    async fn find_by_id(id: i32, database: &sqlx::PgPool) -> DBResult<Option<Self>> {
+        let columns = concat_columns(&Self::columns(), None);
+        let result = sqlx::query_as(&format!("SELECT {columns} FROM participants WHERE id = $1"))
+            .bind(id)
+            .fetch_optional(database)
+            .await?;
+        Ok(result)
+    }
+}
 /// Database Table: `participants`
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, FromRow, Columns)]
 pub struct Participants {
     pub id: i32,
     /// The ID within Red Cap. This is separate so if we added creating a new participant
@@ -47,8 +70,30 @@ pub struct Participants {
     /// For Database Only
     pub last_synced_with_redcap: Option<DateTime<FixedOffset>>,
 }
+impl ParticipantType for Participants {
+    fn get_id(&self) -> i32 {
+        self.id
+    }
+}
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, FromRow)]
+pub trait ParticipantDemograhicsType: for<'r> FromRow<'r, PgRow> + Unpin + Send + Sync {
+    fn get_id(&self) -> i32;
+    fn columns() -> Vec<ParticipantDemograhicsColumn> {
+        ParticipantDemograhicsColumn::all()
+    }
+
+    async fn find_by_participant(id: i32, database: &sqlx::PgPool) -> DBResult<Option<Self>> {
+        let columns = concat_columns(&Self::columns(), None);
+        let result = sqlx::query_as(&format!(
+            "SELECT {columns} FROM participant_demograhics WHERE id = $1"
+        ))
+        .bind(id)
+        .fetch_optional(database)
+        .await?;
+        Ok(result)
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, FromRow, Columns)]
 pub struct ParticipantDemograhics {
     pub id: i32,
     /// 1:1 with [Participants]
@@ -72,4 +117,10 @@ pub struct ParticipantDemograhics {
     pub health_insurance: Vec<HealthInsurance>,
     /// Red Cap: education
     pub highest_education_level: Option<DegreeLevel>,
+}
+
+impl ParticipantDemograhicsType for ParticipantDemograhics {
+    fn get_id(&self) -> i32 {
+        self.id
+    }
 }

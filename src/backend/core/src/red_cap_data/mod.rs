@@ -1,8 +1,9 @@
 use cs25_303_macros::EnumWithOther;
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::Type;
+use strum::{Display, EnumString};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type, EnumString, Display)]
 #[sqlx(type_name = "VARCHAR")]
 pub enum Programs {
     /// Richmond Health And Wellness Program
