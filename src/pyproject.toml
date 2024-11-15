@@ -1,9 +1,14 @@
 [project]
-name = "ml-rf-spectrum-sensing-model"
+name = "ML-RF-Spectrum-Sensing"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "flask>=3.1.0",
+    "h5py>=3.12.1",
+    "ipykernel>=6.29.5",
+    "plot>=0.6.5",
+    "scipy>=1.14.1",
     "torch>=2.5.1",
 ]
