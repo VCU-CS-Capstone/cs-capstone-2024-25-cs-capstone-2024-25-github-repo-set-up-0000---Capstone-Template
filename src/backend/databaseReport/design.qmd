@@ -35,9 +35,7 @@ erDiagram
     participants ||--o{ case_notes : "has many"
 
     case_notes ||--|| locations : "has one"
-    case_notes ||--o| case_notes_medication : "has one"
     case_notes ||--o| case_notes_health_measures : "has one"
-    case_notes ||--o| case_notes_health_visits : "has one"
     case_notes ||--o{ case_note_question_answers : "Has Many Answers"
 
     question_category |o--o{  questions : "Question Might belong in Category"
@@ -59,7 +57,7 @@ erDiagram
         i32 id
         i32 category_id FK
         string question_type "MultiCheck, RadioOption, or Number"
-        string question 
+        string question
         string description "Nullable"
         string red_cap_id  
         string red_cap_other_id "Nullable"
@@ -173,45 +171,6 @@ erDiagram
         string note_by_care_giver
         date date_of_visit
     }
-    case_notes_medication{
-        i32 id PK
-        i32 case_note_id FK
-
-        bool has_medications_changed_since_last_visit "Nullable"
-        bool new_medication_is_opioid "Nullable"
-        bool confirmed_medication_list "Nullable"
-
-        bool has_discrepancies "Nullable"
-        string disrepancies "Nullable"
-
-        string medication_adherence "Nullable"
-
-        bool did_provide_medication_education
-        string provided_medication_education "Nullable"
-
-        bool provided_medication_list
-
-        bool did_provide_medication_adherence_assistance "Nullable"
-        string provided_medication_education "Nullable"
-
-        bool was_pharmacy_contacted "Nullable"
-        string pharmacy_contacted "Nullable"
-
-        bool was_pcp_contacted "Nullable"
-        string pcp_contacted "Nullable"
-    }
-    case_notes_health_visits{
-        i32 id PK
-        i32 case_note_id FK
-        bool emergency_number_called
-        bool refused_ambulance
-        string reason_for_call "Nullable. Null if `emergency_number_called` is false"
-        string last_see_pcp "Nullable"
-        bool did_visit_hospital  "Nullable"
-        string hospital_visit "Nullable"
-        bool did_visit_ed  "Nullable"
-        string ed_visit "Nullable"
-    }
     case_notes_health_measures{
         i32 id
         i32 case_note_id FK
@@ -239,13 +198,28 @@ erDiagram
         i32 option_id FK
     }
 ```
-## Question and Answers
+# Questions?
 
-```{mermaid}
-erDiagram
+So the redcap system is basically something like Google Forms.
+
+We have a ton of conditional questions we have to be able to ask. Making a table for each set of questions is not feasible. As it will not be maintainable.
+
+It will also create a ton of null values in the database.
+
+So the solution?
+
+Lets make a questions table.
+
+Each question might have a category.
+
+Each question may also be have a set of requirements that must be met for the question to be required.
+
+That is what the goal of the system is to do.
+Then case notes will just an answers table. That references the question and or the answer(In Multi Checksboxes or Radios)
+
+The system is still using a relational database allowing for it to be querried.
 
 
-```
 ## Non Red Cap Data
 
 ```{mermaid}

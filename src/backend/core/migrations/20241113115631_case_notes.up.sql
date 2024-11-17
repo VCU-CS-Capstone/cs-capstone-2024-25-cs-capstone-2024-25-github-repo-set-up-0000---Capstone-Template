@@ -50,49 +50,6 @@ CREATE TABLE IF NOT EXISTS case_note_health_measures(
     other TEXT
 );
 
-CREATE TABLE IF NOT EXISTS case_note_other_health_visits(
-    id serial PRIMARY KEY,
-    case_note_id integer NOT NULL,
-        CONSTRAINT FK_case_note_other_health_visits_case_note_id
-            FOREIGN KEY (case_note_id)
-            REFERENCES case_notes(id)
-            ON UPDATE CASCADE
-            ON DELETE CASCADE,
-    emergency_number_called BOOLEAN NOT NULL DEFAULT FALSE,
-    refused_ambulance BOOLEAN,
-    reason_for_call TEXT,
-    last_see_pcp TEXT,
-    did_visit_hospital BOOLEAN,
-    hositpal_visit TEXT,
-    did_visit_ed BOOLEAN,
-    ed_visit TEXT
-);
-
-CREATE TABLE IF NOT EXISTS case_note_medications(
-    id serial PRIMARY KEY,
-    case_note_id integer NOT NULL,
-        CONSTRAINT FK_case_note_medications_case_note_id
-            FOREIGN KEY (case_note_id)
-            REFERENCES case_notes(id)
-            ON UPDATE CASCADE
-            ON DELETE CASCADE,
-    has_medications_changed_since_last_visit BOOLEAN,
-    new_medication_is_opioid BOOLEAN,
-    confirmed_medication_list BOOLEAN,
-    has_discrepancies BOOLEAN,
-    disrepancies TEXT,
-    medication_adherence TEXT,
-    did_provide_medication_education BOOLEAN,
-    provided_medication_education TEXT,
-    provided_medication_list BOOLEAN,
-    did_provide_medication_adherence_assistance BOOLEAN,
-    provided_medication_adherence_assistance TEXT,
-    was_pharmacy_contacted BOOLEAN,
-    pharmacy_contacted TEXT,
-    was_pcp_contacted BOOLEAN,
-    pcp_contacted TEXT
-);
-
 CREATE TABLE IF NOT EXISTS case_note_question_answers(
     id serial PRIMARY KEY,
     case_note_id integer NOT NULL,

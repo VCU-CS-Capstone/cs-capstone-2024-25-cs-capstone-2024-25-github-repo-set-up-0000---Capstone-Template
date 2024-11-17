@@ -1,5 +1,5 @@
 [workspace]
-members = ["backend", "core", "macros", "redcap", "test-data"]
+members = ["backend", "core", "macros", "test-data"]
 resolver = "2"
 [workspace.package]
 version = "0.1.0-beta"

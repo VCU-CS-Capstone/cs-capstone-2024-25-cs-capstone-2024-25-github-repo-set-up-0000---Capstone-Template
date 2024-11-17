@@ -732,6 +732,7 @@ dependencies = [
  "clap",
  "cs25-303-macros",
  "derive_builder",
+ "reqwest",
  "rust-embed",
  "serde",
  "serde-env",
@@ -3827,14 +3828,6 @@ name = "vcpkg"
 version = "0.2.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "accd4ea62f7bb7a82fe23066fb0957d48ef677f6eeb8215f372f52e48bb32426"
-
-[[package]]
-name = "vcu-red-cap"
-version = "0.1.0-beta"
-dependencies = [
- "reqwest",
- "thiserror 1.0.69",
-]
 
 [[package]]
 name = "version_check"

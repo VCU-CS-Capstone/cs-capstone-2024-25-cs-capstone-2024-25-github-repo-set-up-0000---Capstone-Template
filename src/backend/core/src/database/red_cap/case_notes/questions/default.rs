@@ -1,11 +1,37 @@
+use chrono::{DateTime, FixedOffset};
 use rust_embed::Embed;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
+use sqlx::{prelude::FromRow, PgPool};
 
 use super::{
     new::{NewQuestion, NewQuestionCategory, NewQuestionOptions},
     DBResult,
 };
+/// Table name: _default_questions
+#[derive(Debug, FromRow)]
+pub struct DefaultQuestionsTable {
+    pub id: i32,
+    pub file_name: String,
+    pub added_at: DateTime<FixedOffset>,
+}
+impl DefaultQuestionsTable {
+    pub async fn was_file_added(file_name: &str, conn: &PgPool) -> DBResult<bool> {
+        let count: i64 =
+            sqlx::query_scalar("SELECT COUNT(*) FROM _default_questions WHERE file_name = $1")
+                .bind(file_name)
+                .fetch_one(conn)
+                .await?;
+        Ok(count > 0)
+    }
+
+    pub async fn insert_file(file_name: &str, conn: &PgPool) -> DBResult<()> {
+        sqlx::query("INSERT INTO _default_questions (file_name) VALUES ($1)")
+            .bind(file_name)
+            .execute(conn)
+            .await?;
+        Ok(())
+    }
+}
 #[derive(Embed)]
 #[folder = "$CARGO_MANIFEST_DIR/questions"]
 struct DefaultQuestionsData;
@@ -21,12 +47,16 @@ pub struct DefaultQuestions {
     pub questions: Vec<DefaultQuestionWithOptions>,
 }
 pub async fn add_default_questions(conn: &PgPool) -> DBResult<()> {
-    for question in DefaultQuestionsData::iter() {
-        if question == "README.md" {
+    for question_file in DefaultQuestionsData::iter() {
+        if question_file == "README.md" {
             continue;
         }
-        let question = DefaultQuestionsData::get(&question).unwrap();
-        let question: DefaultQuestions = serde_json::from_slice(&question.data).unwrap();
+        if DefaultQuestionsTable::was_file_added(&question_file, conn).await? {
+            continue;
+        }
+        let question = DefaultQuestionsData::get(&question_file).expect("File Should Exist");
+        let question: DefaultQuestions =
+            serde_json::from_slice(&question.data).expect("This is a bug in the code");
         let DefaultQuestions {
             category,
             questions,
@@ -45,15 +75,8 @@ pub async fn add_default_questions(conn: &PgPool) -> DBResult<()> {
                 }
             }
         }
+        DefaultQuestionsTable::insert_file(&question_file, conn).await?;
     }
 
     Ok(())
-}
-// TODO: IDK How the best way to handle this is. Writing pure sql for all this data will be a pain.
-pub async fn should_add_default_questions(conn: &PgPool) -> DBResult<bool> {
-    let count: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM question_categories")
-        .fetch_one(conn)
-        .await?;
-
-    Ok(count == 0)
 }

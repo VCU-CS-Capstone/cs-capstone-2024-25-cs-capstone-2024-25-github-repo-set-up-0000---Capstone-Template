@@ -4,7 +4,6 @@ pub mod user;
 pub use config::*;
 pub mod table_utils;
 pub mod tools;
-use red_cap::case_notes::questions::default::should_add_default_questions;
 use sqlx::{migrate::Migrator, postgres::PgConnectOptions, PgPool};
 use tracing::info;
 /// A bunch of re-exports to make it easier to use the database module.
@@ -32,11 +31,7 @@ pub async fn connect(
     if run_migrations {
         info!("Running migrations");
         MIGRATOR.run(&database).await?;
-
-        if should_add_default_questions(&database).await? {
-            info!("Adding default questions");
-            red_cap::case_notes::questions::default::add_default_questions(&database).await?;
-        }
+        red_cap::case_notes::questions::default::add_default_questions(&database).await?;
     }
     Ok(database)
 }

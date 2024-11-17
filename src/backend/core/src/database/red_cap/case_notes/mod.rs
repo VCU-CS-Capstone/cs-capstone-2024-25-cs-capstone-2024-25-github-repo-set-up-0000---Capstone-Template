@@ -1,9 +1,8 @@
 pub mod new;
+use crate::red_cap_data::VisitType;
 use chrono::{DateTime, FixedOffset, NaiveDate};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
-pub mod screenings;
-use crate::red_cap_data::VisitType;
 pub mod questions;
 pub mod staff;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow)]

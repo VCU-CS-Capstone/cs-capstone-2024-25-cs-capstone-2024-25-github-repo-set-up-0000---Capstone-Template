@@ -1,0 +1,58 @@
+{
+    "category": {
+        "string_id": "case_note_medications",
+        "name": "Medication Changes"
+    },
+    "questions": [
+        {
+            "question": {
+                "question_type": "Boolean",
+                "question": "Has Medications_changed_since_last_visit",
+                "red_cap_id": "changemeds"
+            }
+        },
+        {
+            "question": {
+                "question_type": "Boolean",
+                "question": "new_medication_is_opioid",
+                "red_cap_id": "opiod"
+            }
+        },
+        {
+            "question": {
+                "question_type": "Boolean",
+                "question": "confirmed_medication_list",
+                "red_cap_id": "med_rec"
+            }
+        },
+        {
+            "question": {
+                "question_type": "Boolean",
+                "question": "has_discrepancies",
+                "red_cap_id": "med_list_discrep"
+            }
+        },
+        {
+            "question": {
+                "question_type": "Text",
+                "question": "disrepancies",
+                "red_cap_id": "med_notes"
+            }
+        },
+        {
+            "question": {
+                "question_type": "Text",
+                "question": "medication_adherence",
+                "red_cap_id": "adherence"
+            }
+        },
+        {
+            "question": {
+                "question_type": "Boolean",
+                "question": "did_provide_medication_education",
+                "red_cap_id": "med_ed",
+                "red_cap_other_id": "medication_other"
+            }
+        }
+    ]
+}
