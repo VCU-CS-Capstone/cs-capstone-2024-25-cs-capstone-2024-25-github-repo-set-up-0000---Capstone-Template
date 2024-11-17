@@ -92,3 +92,44 @@ CREATE TABLE IF NOT EXISTS case_note_medications(
     was_pcp_contacted BOOLEAN,
     pcp_contacted TEXT
 );
+
+CREATE TABLE IF NOT EXISTS case_note_question_answers(
+    id serial PRIMARY KEY,
+    case_note_id integer NOT NULL,
+        CONSTRAINT FK_case_note_question_answers_case_note_id
+            FOREIGN KEY (case_note_id)
+            REFERENCES case_notes(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE,
+    question_id integer NOT NULL,
+        CONSTRAINT FK_case_note_question_answers_question_id
+            FOREIGN KEY (question_id)
+            REFERENCES questions(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE,
+    value_radio INTEGER,
+        CONSTRAINT FK_case_note_question_answers_value_radio
+            FOREIGN KEY (value_radio)
+            REFERENCES question_options(id)
+            ON UPDATE CASCADE
+            ON DELETE SET NULL,
+    value_text TEXT,
+    value_number INTEGER,
+    value_boolean BOOLEAN
+);
+
+CREATE TABLE IF NOT EXISTS question_answer_multi_check_box(
+    id serial PRIMARY KEY,
+    question_answers_id integer NOT NULL,
+        CONSTRAINT FK_question_answer_multi_check_box_question_answers_id
+            FOREIGN KEY (question_answers_id)
+            REFERENCES case_note_question_answers(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE,
+    option_id integer NOT NULL,
+        CONSTRAINT FK_question_answer_multi_check_box_option_id
+            FOREIGN KEY (option_id)
+            REFERENCES question_options(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE
+);

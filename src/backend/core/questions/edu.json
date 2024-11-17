@@ -1,0 +1,219 @@
+{
+    "category": {
+        "string_id": "health_wellness_education_coordination_and_resources",
+        "name": "Health and Wellness - Education & Coordination / Resources"
+    },
+    "questions": [
+        {
+            "question": {
+                "question_type": "MultiCheckBox",
+                "question": "Disease and medication related education",
+                "red_cap_id": "health_ed",
+                "red_cap_other_id": "health_other_ed"
+            },
+            "options": [
+                {
+                    "name": "Diabetes",
+                    "red_cap_option_index": 1
+                },
+                {
+                    "name": "Hypertension",
+                    "red_cap_option_index": 2
+                },
+                {
+                    "name": "Heart failure",
+                    "red_cap_option_index": 9
+                },
+                {
+                    "name": "Mental health",
+                    "red_cap_option_index": 3
+                },
+                {
+                    "name": "Medications",
+                    "red_cap_option_index": 4
+                },
+                {
+                    "name": "Mobility (wheelchair/walker safety)",
+                    "red_cap_option_index": 5
+                },
+                {
+                    "name": "Pain",
+                    "red_cap_option_index": 6
+                },
+                {
+                    "name": "Memory",
+                    "red_cap_option_index": 8
+                }
+            ]
+        },
+        {
+            "question": {
+                "question_type": "MultiCheckBox",
+                "question": "Health behavior education",
+                "red_cap_id": "health_beh",
+                "red_cap_other_id": "beh_ed"
+            },
+            "options": [
+                {
+                    "name": "Diabetes management",
+                    "red_cap_option_index": 1
+                },
+                {
+                    "name": "Hypertension management",
+                    "red_cap_option_index": 2
+                },
+                {
+                    "name": "Managing heart failure",
+                    "red_cap_option_index": 12
+                },
+                {
+                    "name": "Medication adherence",
+                    "red_cap_option_index": 3
+                },
+                {
+                    "name": "Weight",
+                    "red_cap_option_index": 4
+                },
+                {
+                    "name": "Diet",
+                    "red_cap_option_index": 5
+                },
+                {
+                    "name": "Smoking reduction",
+                    "red_cap_option_index": 6
+                },
+                {
+                    "name": "Alcohol use",
+                    "red_cap_option_index": 7
+                },
+                {
+                    "name": "Pain Management",
+                    "red_cap_option_index": 8
+                },
+                {
+                    "name": "Use of blood pressure cuff",
+                    "red_cap_option_index": 10
+                },
+                {
+                    "name": "Goal setting",
+                    "red_cap_option_index": 11
+                },
+                {
+                    "name": "Mental Health",
+                    "red_cap_option_index": 13
+                }
+            ]
+        },
+        {
+            "question": {
+                "question_type": "MultiCheckBox",
+                "question": "Coordinated care with",
+                "red_cap_id": "visit_collab",
+                "red_cap_other_id": "referral_colab"
+            },
+            "options": [
+                {
+                    "name": "PCP",
+                    "red_cap_option_index": 1
+                },
+                {
+                    "name": "CAHN Van",
+                    "red_cap_option_index": 11
+                },
+                {
+                    "name": "Pharmacy",
+                    "red_cap_option_index": 2
+                },
+                {
+                    "name": "Specialist",
+                    "red_cap_option_index": 3
+                },
+                {
+                    "name": "OT/PT/rehab",
+                    "red_cap_option_index": 4
+                },
+                {
+                    "name": "Psych/Mental Health",
+                    "red_cap_option_index": 5
+                },
+                {
+                    "name": "Home Health",
+                    "red_cap_option_index": 6
+                },
+                {
+                    "name": "Dental",
+                    "red_cap_option_index": 7
+                },
+                {
+                    "name": "Health Insurance",
+                    "red_cap_option_index": 10
+                }
+            ]
+        },
+        {
+            "question": {
+                "question_type": "MultiCheckBox",
+                "question": "Resources to/for",
+                "red_cap_id": "visit_referral",
+                "red_cap_other_id": "referral_other"
+            },
+            "options": [
+                {
+                    "name": "PCP",
+                    "red_cap_option_index": 1
+                },
+                {
+                    "name": "CAHN Van",
+                    "red_cap_option_index": 13
+                },
+                {
+                    "name": "Specialist",
+                    "red_cap_option_index": 2
+                },
+                {
+                    "name": "OT/PT/Rehab",
+                    "red_cap_option_index": 3
+                },
+                {
+                    "name": "Psych/Mental Health",
+                    "red_cap_option_index": 4
+                },
+                {
+                    "name": "Home Health",
+                    "red_cap_option_index": 5
+                },
+                {
+                    "name": "Community Agency",
+                    "red_cap_option_index": 6
+                },
+                {
+                    "name": "DME",
+                    "red_cap_option_index": 7
+                },
+                {
+                    "name": "Adult Protective Services",
+                    "red_cap_option_index": 8
+                },
+                {
+                    "name": "Dental",
+                    "red_cap_option_index": 9
+                },
+                {
+                    "name": "Glasses/New Eyes for the Needy",
+                    "red_cap_option_index": 10
+                },
+                {
+                    "name": "Opthamology",
+                    "red_cap_option_index": 12
+                }
+            ]
+        },
+        {
+            "question": {
+                "question_type": "Text",
+                "question": "Other activities/outcomes",
+                "red_cap_id": "visit_other"
+            }
+        }
+    ]
+}

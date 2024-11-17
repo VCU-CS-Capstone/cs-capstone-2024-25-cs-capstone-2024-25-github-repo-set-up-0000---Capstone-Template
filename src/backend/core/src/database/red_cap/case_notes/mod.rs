@@ -4,8 +4,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 pub mod screenings;
 use crate::red_cap_data::VisitType;
-pub mod predefined_enum;
-pub mod resources_and_education;
+pub mod questions;
 pub mod staff;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow)]
 pub struct CaseNote {

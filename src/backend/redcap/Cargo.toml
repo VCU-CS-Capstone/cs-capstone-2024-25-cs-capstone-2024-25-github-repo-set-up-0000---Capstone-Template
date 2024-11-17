@@ -7,3 +7,4 @@ repository.workspace = true
 
 [dependencies]
 reqwest = { version = "*", features = ["json"] }
+thiserror = "1.0"

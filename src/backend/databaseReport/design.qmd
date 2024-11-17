@@ -36,13 +36,54 @@ erDiagram
 
     case_notes ||--|| locations : "has one"
     case_notes ||--o| case_notes_medication : "has one"
-    case_notes ||--o{ case_notes_students : "has one"
-    case_notes ||--o| case_note_faculty_and_staff : "has one"
-    case_notes ||--o| case_notes_opioid_screening : "has one"
-    case_notes ||--o| case_notes_fall_screening : "has one"
-    case_notes ||--o| case_notes_other_screening : "has one"
     case_notes ||--o| case_notes_health_measures : "has one"
     case_notes ||--o| case_notes_health_visits : "has one"
+    case_notes ||--o{ case_note_question_answers : "Has Many Answers"
+
+    question_category |o--o{  questions : "Question Might belong in Category"
+    case_note_question_answers ||--o{ question_answers_multi_check : "Might be connected to many options"
+    case_note_question_answers }o--o| question_options : "Might be connected to single options"
+
+    question_requirements }o--o| questions : "Questions might have many requirements"
+    question_requirements }o--o| question_options : ""
+
+    question_options ||--o{  question_answers_multi_check : ""
+    questions ||--o{ case_note_question_answers :""
+    questions ||--o{ question_options :""
+
+    question_category{
+        i32 id PK
+        string name
+    }
+    questions{
+        i32 id
+        i32 category_id FK
+        string question_type "MultiCheck, RadioOption, or Number"
+        string question 
+        string description "Nullable"
+        string red_cap_id  
+        string red_cap_other_id "Nullable"
+        bool removed "Was Question Removed"
+    }
+    question_requirements{
+        i32 id
+        i32 question_to_check FK
+        i32 question_to_add FK "The question to be added if requirement met"
+        i32 has_option FK "Nullable"
+        i32 equals_radio FK "Nullable"
+        i32 equals_text "Nullable"
+        i32 equals_number  "Nullable"
+        boolean equals_boolean "Nullable"
+    }
+    question_options{
+        i32 id PK
+        i32 question_id FK
+        string name
+        string description "Nullable"
+        i32 red_cap_option_index "Nullable"
+        bool removed "Was Option Removed"
+    }
+
 
     participants{
         i32 participant_id PK
@@ -159,46 +200,6 @@ erDiagram
         bool was_pcp_contacted "Nullable"
         string pcp_contacted "Nullable"
     }
-    case_note_faculty_and_staff{
-        i32 id PK
-        i32 case_note_id FK
-        i32 faculity_type_id FK "Nullable"
-        string custom_faculity_type "Nullable"
-        i32 faculity_with_participants "Nullable"
-        i32 faculity_with_students "Nullable"
-        string faculity_name "Nullable"
-        string faculty_note "Nullable"
-        i32 screening_tools "Nullable"
-        i32 pdsa_to_address_gaps "Nullable"
-        i32 total_student_time "Nullable"
-    }
-    case_notes_students{
-        i32 id PK
-        i32 case_note_id FK
-        i32 student_type_id "Nullable. student_type_id or custom_student_type must not be null"
-        string custom_student_type "Nullable. student_type_id or custom_student_type must not be null "
-        i32 number_of_students
-    }
-
-    case_notes_opioid_screening{
-        i32 id PK
-        i32 case_note_id FK
-        array more_to_come "// TODO Finish Mapping from redcap"
-    }
-    case_notes_fall_screening{
-        i32 id PK
-        i32 case_note_id FK
-        array more_to_come "// TODO Finish Mapping from redcap"
-
-    }
-    case_notes_other_screening{
-        i32 id PK
-        i32 case_note_id FK
-        i32 screening_id FK "Nullable  Either screening_id or custom_screening_name must not be null"
-        string custom_screening_name "Nullable Either screening_id or custom_screening_name must not be null"
-        string screening_notes "Nullable"
-    }
-
     case_notes_health_visits{
         i32 id PK
         i32 case_note_id FK
@@ -222,8 +223,29 @@ erDiagram
         i16 glucose "Nullable"
         bool gluce_taken_fasting "Nullable"
     }
-```
+    case_note_question_answers{
+        i32 id PK
+        i32 case_note_id FK
+        i32 question FK
+        i32 value_radio FK "Nullable"
+        string value_text "Nullable"
+        i32 value_number "Nullable"
+        bool value_boolean "Nullable"
+    }
 
+    question_answers_multi_check{
+        i32 id PK
+        i32 question_answers_id FK
+        i32 option_id FK
+    }
+```
+## Question and Answers
+
+```{mermaid}
+erDiagram
+
+
+```
 ## Non Red Cap Data
 
 ```{mermaid}
