@@ -1,7 +1,13 @@
 digraph CNN {
     rankdir=LR;
-    node [shape=circle, style=filled, fillcolor=lightblue, width=0.5];
+    node [shape=circle, style=filled, fillcolor=lightblue, width=0.2, height=0.2];
+    edge [penwidth=0.5, dir=forward, arrowsize=0.5];  // Thinner arrows with smaller arrowheads
     
+    // Enable straight lines between nodes and allow Graphviz to optimize layout
+    splines=false;
+    nodesep=0.5;
+    ranksep=1.0;
+
     // Input Layer (4 nodes)
     input1 [label=" "];
     input2 [label=" "];
@@ -30,19 +36,22 @@ digraph CNN {
     // Layer labels
     subgraph cluster_input {
         label = "INPUT (2048)";
+        fontname="arial";
         style=dashed;
         input1; input2; input3; input4;
     }
 
     subgraph cluster_hidden {
         label = "Hidden layers";
+        fontname="arial";
         style=dashed;
         conv1_1; conv1_2; conv1_3; conv1_4; conv1_5;
         conv2_1; conv2_2; conv2_3; conv2_4; conv2_5;
     }
 
     subgraph cluster_output {
-        label = "Wifi Bluetooth or None";
+        label = "Wifi, Bluetooth or None";
+        fontname="arial";
         style=dashed;
         output_wifi; output_bluetooth; output_none;
     }
@@ -51,6 +60,7 @@ digraph CNN {
     labeljust = "c";
     labelloc = "t";
     label = "Convolutional Neural Network";
+    fontname="arial";
 
     // Connections between layers (Input -> Conv1)
     input1 -> conv1_1;

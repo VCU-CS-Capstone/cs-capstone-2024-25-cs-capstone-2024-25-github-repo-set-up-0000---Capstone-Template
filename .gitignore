@@ -1,2 +1,3 @@
-src/2_4ghz_indoor.h5:Zone.Identifier
-src/2_4ghz_indoor.h5
+src/model/data/source_data/*
+src/model/data/dataset/data_*.npy
+
