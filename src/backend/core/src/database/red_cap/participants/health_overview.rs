@@ -112,6 +112,11 @@ pub struct HealthOverviewMobilityDevices {
     /// Red Cap: info_mobility
     pub device: MobilityDevice,
 }
+impl From<HealthOverviewMobilityDevices> for MobilityDevice {
+    fn from(value: HealthOverviewMobilityDevices) -> Self {
+        value.device
+    }
+}
 impl TableType for HealthOverviewMobilityDevices {
     type Columns = HealthOverviewMobilityDevicesColumn;
     fn table_name() -> &'static str {

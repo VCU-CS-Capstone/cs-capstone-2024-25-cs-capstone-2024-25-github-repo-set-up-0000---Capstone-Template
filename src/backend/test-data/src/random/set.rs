@@ -81,12 +81,16 @@ impl RandomSets {
     pub fn random_demographics(&mut self, gender: Gender) -> NewDemographics {
         let is_veteran = !matches!(self.rand.gen_range(0..100), 0..90);
         let (race, race_other, race_multiple) = match self.rand.gen_range(0..100) {
-            0..50 => (Some(Race::White), None, None),
-            50..65 => (Some(Race::Black), None, None),
-            65..70 => (Some(Race::Hispanic), None, None),
-            70..90 => (None, Some("Other".to_string()), None),
+            0..50 => (Some(vec![Race::White]), None, None),
+            50..65 => (Some(vec![Race::Black]), None, None),
+            65..70 => (Some(vec![Race::Hispanic]), None, None),
+            70..90 => (
+                Some(vec![Race::IdentifyOther]),
+                Some("Other".to_string()),
+                None,
+            ),
             _ => (
-                Some(Race::Multiracial),
+                Some(vec![Race::Multiracial]),
                 None,
                 Some("White, Black".to_string()),
             ),
@@ -97,6 +101,13 @@ impl RandomSets {
             75..90 => vec![HealthInsurance::Private],
             _ => vec![],
         };
+
+        let highest_education_level = match self.rand.gen_range(0..100) {
+            0..50 => None,
+            50..75 => Some(cs25_303_core::red_cap::DegreeLevel::HighschoolOrGED),
+            75..90 => Some(cs25_303_core::red_cap::DegreeLevel::Associates),
+            _ => Some(cs25_303_core::red_cap::DegreeLevel::Bachelors),
+        };
         NewDemographics {
             age: Some(self.rand.gen_range(18..85) as i16),
             gender: Some(gender),
@@ -105,6 +116,7 @@ impl RandomSets {
             race_other,
             race_multiple,
             health_insurance,
+            highest_education_level,
             ..Default::default()
         }
     }

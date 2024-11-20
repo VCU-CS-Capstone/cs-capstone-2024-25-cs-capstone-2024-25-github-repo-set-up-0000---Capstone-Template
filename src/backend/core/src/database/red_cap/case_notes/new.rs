@@ -10,12 +10,13 @@ use super::CaseNote;
 pub struct NewCaseNote {
     pub location: Option<i32>,
     pub visit_type: Option<VisitType>,
-    pub age: i16,
+    pub age: Option<i16>,
     pub reason_for_visit: Option<String>,
     pub info_provided_by_caregiver: Option<String>,
     pub date_of_visit: NaiveDate,
     pub pushed_to_redcap: bool,
     pub redcap_instance: Option<i32>,
+    pub completed: bool,
 }
 impl NewCaseNote {
     pub async fn insert_return_case_note(
@@ -32,6 +33,7 @@ impl NewCaseNote {
             date_of_visit,
             pushed_to_redcap,
             redcap_instance,
+            completed,
         } = self;
 
         let result: CaseNote = sqlx::query_as(
@@ -45,9 +47,10 @@ impl NewCaseNote {
                     info_provided_by_caregiver,
                     date_of_visit,
                     pushed_to_redcap,
-                    redcap_instance
+                    redcap_instance,
+                    completed
                 )
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                 RETURNING *
                 ",
         )
@@ -60,6 +63,7 @@ impl NewCaseNote {
         .bind(date_of_visit)
         .bind(pushed_to_redcap)
         .bind(redcap_instance)
+        .bind(completed)
         .fetch_one(database)
         .await?;
 
@@ -77,6 +81,7 @@ impl Default for NewCaseNote {
             date_of_visit: Local::now().date_naive(),
             pushed_to_redcap: false,
             redcap_instance: Default::default(),
+            completed: false,
         }
     }
 }

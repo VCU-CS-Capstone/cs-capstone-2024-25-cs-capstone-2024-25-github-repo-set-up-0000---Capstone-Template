@@ -1,7 +1,7 @@
 use crate::utils::InvalidVariant;
 use cs25_303_macros::RedCapEnum;
 use serde::{Deserialize, Serialize};
-use sqlx::prelude::Type;
+use tracing::debug;
 
 use crate::red_cap::{utils::is_all_none, MultiSelectType, RedCapDataSet, RedCapEnum, RedCapType};
 /// Returns none if all the fields are none
@@ -48,8 +48,9 @@ pub struct RedCapGender {
     pub gender: Option<Gender>,
     pub gender_self: Option<String>,
 }
+
 impl RedCapType for RedCapGender {
-    fn read(data: &impl crate::red_cap::RedCapDataSet) -> Option<Self>
+    fn read<D: RedCapDataSet>(data: &D) -> Option<Self>
     where
         Self: Sized,
     {
@@ -60,6 +61,11 @@ impl RedCapType for RedCapGender {
             gender,
             gender_self,
         })
+    }
+
+    fn write<D: RedCapDataSet>(&self, data: &mut D) {
+        data.insert("gender", self.gender.clone().into());
+        data.insert("gender_self", self.gender_self.clone().into());
     }
 }
 impl From<Gender> for RedCapGender {
@@ -72,6 +78,20 @@ impl From<Gender> for RedCapGender {
             gender: Some(value),
             gender_self,
         }
+    }
+}
+impl From<RedCapGender> for Option<Gender> {
+    fn from(value: RedCapGender) -> Self {
+        let RedCapGender {
+            gender,
+            gender_self,
+        } = value;
+        if let Some(string) = gender_self {
+            if string.is_empty() {
+                return gender;
+            }
+        }
+        gender
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, RedCapEnum)]
@@ -90,14 +110,14 @@ pub enum Gender {
     PreferToSelfDescribe(String),
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Default)]
 pub struct RedCapRace {
     pub race: Option<Vec<Race>>,
     pub race_other: Option<String>,
     pub race_multiracial_other: Option<String>,
 }
 impl RedCapType for RedCapRace {
-    fn read(data: &impl RedCapDataSet) -> Option<Self>
+    fn read<D: RedCapDataSet>(data: &D) -> Option<Self>
     where
         Self: Sized,
     {
@@ -110,6 +130,24 @@ impl RedCapType for RedCapRace {
             race_other,
             race_multiracial_other,
         })
+    }
+
+    fn write<D: RedCapDataSet>(&self, data: &mut D) {
+        let multi_select_race = self
+            .race
+            .as_ref()
+            .map(|value| Race::create_multiselect("race", value));
+        debug!(?multi_select_race, "Multi Select Race");
+        if let Some(race) = multi_select_race {
+            data.insert("race", race.into());
+        }
+
+        data.insert("race_other", self.race_other.clone().into());
+
+        data.insert(
+            "race_multiracial_other",
+            self.race_multiracial_other.clone().into(),
+        );
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, RedCapEnum)]
@@ -157,7 +195,56 @@ pub enum PreferredLanguage {
     #[red_cap(other, enum_index = 4)]
     Other(String),
 }
+#[derive(Debug, Clone, Serialize)]
+pub struct RedCapLanguage {
+    pub language: Option<PreferredLanguage>,
+    pub language_other: Option<String>,
+}
+impl From<PreferredLanguage> for RedCapLanguage {
+    fn from(value: PreferredLanguage) -> Self {
+        let language_other = match &value {
+            PreferredLanguage::Other(value) => Some(value.clone()),
+            _ => None,
+        };
+        Self {
+            language: Some(value),
+            language_other,
+        }
+    }
+}
+impl From<RedCapLanguage> for Option<PreferredLanguage> {
+    fn from(value: RedCapLanguage) -> Self {
+        let RedCapLanguage {
+            language,
+            language_other,
+        } = value;
+        if let Some(string) = language_other {
+            if string.is_empty() {
+                return language;
+            }
+        }
+        language
+    }
+}
+impl RedCapType for RedCapLanguage {
+    fn read<D: RedCapDataSet>(data: &D) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        let language = data.get_enum("language");
+        let language_other = data.get_string("language_other");
+        is_all_none!(language, language_other);
+        Some(Self {
+            language,
+            language_other,
+        })
+    }
 
+    fn write<D: RedCapDataSet>(&self, data: &mut D) {
+        data.insert("language", self.language.clone().into());
+        data.insert("language_other", self.language_other.clone().into());
+    }
+}
 #[derive(Debug, Clone, PartialEq, Eq, RedCapEnum)]
 pub enum HealthInsurance {
     #[red_cap(enum_index = 1)]
@@ -234,8 +321,20 @@ pub struct RedCapMedicationFrequency {
     pub frequency: Option<MedicationFrequency>,
     pub frequency_other: Option<String>,
 }
-impl RedCapMedicationFrequency {
-    pub fn read_with_index(data: &impl RedCapDataSet, index: usize) -> Option<Self>
+impl From<MedicationFrequency> for RedCapMedicationFrequency {
+    fn from(value: MedicationFrequency) -> Self {
+        let frequency_other = match &value {
+            MedicationFrequency::Other(value) => Some(value.clone()),
+            _ => None,
+        };
+        Self {
+            frequency: Some(value),
+            frequency_other,
+        }
+    }
+}
+impl RedCapType for RedCapMedicationFrequency {
+    fn read_with_index<D: RedCapDataSet>(data: &D, index: usize) -> Option<Self>
     where
         Self: Sized,
     {
@@ -247,6 +346,25 @@ impl RedCapMedicationFrequency {
             frequency_other,
         })
     }
+
+    fn write_with_index<D: RedCapDataSet>(&self, data: &mut D, index: usize)
+    where
+        Self: Sized,
+    {
+        data.insert(format!("frequency{}", index), self.frequency.clone().into());
+        data.insert(
+            format!("other_med{}", index),
+            self.frequency_other.clone().into(),
+        );
+    }
+    fn read<D: RedCapDataSet>(_: &D) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        None
+    }
+
+    fn write<D: RedCapDataSet>(&self, _: &mut D) {}
 }
 impl From<RedCapMedicationFrequency> for MedicationFrequency {
     fn from(value: RedCapMedicationFrequency) -> Self {
@@ -272,14 +390,28 @@ impl From<MedStatus> for bool {
         }
     }
 }
+impl From<bool> for MedStatus {
+    fn from(value: bool) -> Self {
+        if value {
+            MedStatus::Current
+        } else {
+            MedStatus::Discontinued
+        }
+    }
+}
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Type)]
-#[sqlx(type_name = "VARCHAR")]
+#[derive(Debug, Clone, PartialEq, Eq, RedCapEnum)]
 pub enum VisitType {
+    #[red_cap(enum_index = 1)]
     Onsite,
+    #[red_cap(enum_index = 2)]
     HomeVisit,
+    #[red_cap(enum_index = 3)]
     OnsiteAndHome,
+    #[red_cap(enum_index = 6)]
     Telephone,
+    #[red_cap(enum_index = 8)]
     RBHIAndRHWP,
+    #[red_cap(enum_index = 9)]
     PPPAndRHWP,
 }

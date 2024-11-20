@@ -37,13 +37,13 @@ CREATE TABLE IF NOT EXISTS participant_demographics(
             ON DELETE CASCADE,
     age smallint,
     gender TEXT,
-    race VARCHAR(255),
+    race VARCHAR(255)[],
     race_other TEXT,
     race_multiple TEXT,
     ethnicity VARCHAR(255),
     language TEXT,
     is_veteran BOOLEAN,
-    health_insurance TEXT[],
+    health_insurance VARCHAR(255)[],
     highest_education_level VARCHAR(255)
 );
 

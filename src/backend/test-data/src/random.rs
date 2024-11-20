@@ -7,7 +7,10 @@ use cs25_303_core::{
     database::red_cap::{
         case_notes::new::{NewCaseNote, NewCaseNoteHealthMeasures},
         locations::Locations,
-        participants::{NewParticipant, Participants},
+        participants::{
+            goals::{ParticipantGoals, ParticipantGoalsSteps},
+            NewParticipant, ParticipantMedications, Participants,
+        },
     },
     red_cap::Programs,
 };
@@ -78,7 +81,7 @@ pub async fn generate_participants(count: usize, database: PgPool) -> anyhow::Re
             red_cap_id: None,
             phone_number_one: Some(random_sets.random_phone_number()),
             phone_number_two: None,
-            other_contact: None,
+            other_contact: Some("Randomly Generated Participant. By Wyatt Herkamp".to_string()),
             program: program_and_location,
             location: Some(location.id),
             status: Some(random_sets.random_status()),
@@ -116,11 +119,15 @@ pub async fn generate_participants(count: usize, database: PgPool) -> anyhow::Re
             }
         }
         let current_date = Local::now().date_naive();
-        for _ in 0..number_of_case_notes {
-            let date_of_visit = current_date - chrono::Duration::weeks(1);
+        for i in 0..number_of_case_notes {
+            let date_of_visit = current_date - chrono::Duration::weeks(i);
+            info!("Creating Case Note for {:?} on {:?}", part, date_of_visit);
             generate_random_case_note_on(&mut random_sets, part.clone(), date_of_visit, &database)
                 .await?;
         }
+        ParticipantGoals::process_red_cap_indexes(part.id, &database).await?;
+        ParticipantGoalsSteps::process_red_cap_indexes(part.id, &database).await?;
+        ParticipantMedications::process_medications_indexes(part.id, &database).await?;
     }
     Ok(())
 }
@@ -138,10 +145,11 @@ async fn generate_random_case_note_on(
     let new_case_note = NewCaseNote {
         location: participant.location,
         visit_type,
-        age: 0, // TODO: Pass Age Into this function
+        age: None, // TODO: Pass Age Into this function
         reason_for_visit,
         info_provided_by_caregiver,
         date_of_visit,
+        completed: true,
         ..Default::default()
     };
     let case_note = new_case_note

@@ -1,11 +1,15 @@
 pub mod new;
-use crate::red_cap::VisitType;
+use crate::database::prelude::*;
+use crate::{
+    database::tools::{SimpleSelectQueryBuilder, TableType},
+    red_cap::VisitType,
+};
 use chrono::{DateTime, FixedOffset, NaiveDate};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 pub mod questions;
 pub mod staff;
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow, Columns)]
 pub struct CaseNote {
     pub id: i32,
     /// Relates to #[crate::database::red_cap::participants::Participants]
@@ -20,23 +24,78 @@ pub struct CaseNote {
     /// Red Cap ID: `visit_type`
     pub visit_type: Option<VisitType>,
     /// Redcap ID: exit_age
-    pub age: i16,
+    pub age: Option<i16>,
     /// Red Cap ID: `reason`
     pub reason_for_visit: Option<String>,
     /// Red Cap ID: subjective_info
     pub info_provided_by_caregiver: Option<String>,
     /// Red Cap ID: visit_date
     pub date_of_visit: NaiveDate,
-
     /// DATABASE ONLY
     pub pushed_to_redcap: bool,
+
+    pub completed: bool,
+
     /// Instance Number of the case note
     pub redcap_instance: Option<i32>,
     /// DATABASE ONLY
     pub last_synced_with_redcap: Option<DateTime<FixedOffset>>,
 }
+impl TableType for CaseNote {
+    type Columns = CaseNoteColumn;
+    fn table_name() -> &'static str {
+        "case_notes"
+    }
+}
+impl CaseNote {
+    pub async fn find_by_id(id: i32, database: &sqlx::PgPool) -> sqlx::Result<Option<Self>> {
+        let result = sqlx::query_as(
+            "
+            SELECT * FROM case_notes
+            WHERE id = $1
+            ",
+        )
+        .bind(id)
+        .fetch_optional(database)
+        .await?;
+        Ok(result)
+    }
+    pub async fn find_by_participant_id(
+        participant_id: i32,
+        database: &sqlx::PgPool,
+    ) -> sqlx::Result<Vec<Self>> {
+        let result = sqlx::query_as(
+            "
+            SELECT * FROM case_notes
+            WHERE participant_id = $1
+            ",
+        )
+        .bind(participant_id)
+        .fetch_all(database)
+        .await?;
+        Ok(result)
+    }
+    pub async fn update_instance_id(
+        &self,
+        instance_id: i32,
+        database: &sqlx::PgPool,
+    ) -> sqlx::Result<()> {
+        sqlx::query(
+            "
+            UPDATE case_notes
+            SET redcap_instance = $1
+            WHERE id = $2
+            ",
+        )
+        .bind(instance_id)
+        .bind(self.id)
+        .execute(database)
+        .await?;
+        Ok(())
+    }
+}
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow, Columns)]
 pub struct CaseNoteHealthMeasures {
     pub id: i32,
     /// 1:1 with [CaseNote]
@@ -70,7 +129,36 @@ pub struct CaseNoteHealthMeasures {
     /// Redcap ID: visit_function
     pub other: Option<String>,
 }
-
+impl TableType for CaseNoteHealthMeasures {
+    type Columns = CaseNoteHealthMeasuresColumn;
+    fn table_name() -> &'static str {
+        "case_note_health_measures"
+    }
+}
+impl CaseNoteHealthMeasures {
+    pub async fn find_by_id(id: i32, database: &sqlx::PgPool) -> sqlx::Result<Option<Self>> {
+        let result = sqlx::query_as(
+            "
+            SELECT * FROM case_note_health_measures
+            WHERE id = $1
+            ",
+        )
+        .bind(id)
+        .fetch_optional(database)
+        .await?;
+        Ok(result)
+    }
+    pub async fn find_by_case_note_id(
+        case_note_id: i32,
+        database: &sqlx::PgPool,
+    ) -> sqlx::Result<Option<Self>> {
+        SimpleSelectQueryBuilder::new(Self::table_name(), &CaseNoteHealthMeasuresColumn::all())
+            .where_equals(CaseNoteHealthMeasuresColumn::CaseNoteId, case_note_id)
+            .query_as()
+            .fetch_optional(database)
+            .await
+    }
+}
 /// Case Note Questions Related to a patient call to 911 or their PCP
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow)]
 pub struct CaseNoteOtherHealthVisits {

@@ -1,8 +1,8 @@
 use std::{any::type_name, collections::HashMap, str::FromStr};
-
+pub mod tasks;
 use api::utils::{is_check_box_item, CheckboxValue, FieldNameAndIndex};
 use chrono::NaiveDate;
-use tracing::warn;
+use tracing::{error, warn};
 pub mod converter;
 mod enum_types;
 pub use enum_types::*;
@@ -36,13 +36,50 @@ pub trait MultiSelectType: RedCapEnum {
         }
         Some(result)
     }
+
+    fn create_multiselect(field_base: impl Into<String>, values: &[Self]) -> MultiSelect
+    where
+        Self: Sized,
+    {
+        let mut set_values = HashMap::new();
+        for value in values {
+            set_values.insert(value.to_usize(), CheckboxValue::Checked);
+        }
+        MultiSelect {
+            field_base: field_base.into(),
+            set_values,
+        }
+    }
 }
 pub trait RedCapType {
-    fn read(data: &impl RedCapDataSet) -> Option<Self>
+    /// Reads a Red Cap taking an index to generate the key
+    fn read_with_index<D: RedCapDataSet>(data: &D, _index: usize) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        Self::read(data)
+    }
+    /// Reads a Red Cap
+    fn read<D: RedCapDataSet>(data: &D) -> Option<Self>
     where
         Self: Sized;
+    /// Writes a Red Cap taking an index to generate the key
+    fn write_with_index<D: RedCapDataSet>(&self, data: &mut D, _index: usize)
+    where
+        Self: Sized,
+    {
+        self.write(data)
+    }
+    /// Writes a Red Cap
+    fn write<D: RedCapDataSet>(&self, data: &mut D);
 }
 pub trait RedCapDataSet {
+    fn insert(&mut self, key: impl Into<String>, value: RedCapExportDataType);
+    fn insert_multi_select<T: MultiSelectType>(&mut self, key: impl Into<String>, value: &[T]) {
+        let key = key.into();
+        let multi_select = T::create_multiselect(&key, value);
+        self.insert(key, multi_select.into());
+    }
     fn get(&self, key: &str) -> Option<&RedCapExportDataType>;
 
     fn get_number(&self, key: &str) -> Option<usize> {
@@ -52,7 +89,9 @@ pub trait RedCapDataSet {
     fn get_date(&self, key: &str) -> Option<NaiveDate> {
         self.get(key).and_then(|value| value.to_date())
     }
-
+    fn get_bad_boolean(&self, key: &str) -> Option<bool> {
+        self.get(key).and_then(|value| value.to_bad_boolean())
+    }
     fn get_enum<T>(&self, key: &str) -> Option<T>
     where
         T: RedCapEnum,
@@ -74,6 +113,10 @@ pub trait RedCapDataSet {
     }
 }
 impl RedCapDataSet for RedCapDataMap {
+    fn insert(&mut self, key: impl Into<String>, value: RedCapExportDataType) {
+        self.insert(key.into(), value);
+    }
+
     fn get(&self, key: &str) -> Option<&RedCapExportDataType> {
         self.get(key)
     }
@@ -103,7 +146,13 @@ pub fn find_and_extract_multi_selects(items: &mut HashMap<String, String>) -> Ve
             });
         let index = index.unwrap();
 
-        let checkbox_value = CheckboxValue::from_str(value.as_str()).unwrap();
+        let checkbox_value = match CheckboxValue::from_str(value.as_str()) {
+            Ok(ok) => ok,
+            Err(err) => {
+                error!(?err, "Error parsing checkbox value");
+                CheckboxValue::Unchecked
+            }
+        };
 
         multi_select.set_values.insert(index, checkbox_value);
     }
@@ -114,14 +163,83 @@ pub enum RedCapExportDataType {
     MultiSelect(MultiSelect),
     Text(String),
     Null,
-    Number(usize),
+    Float(f32),
+    Number(isize),
     Date(NaiveDate),
+}
+impl From<f32> for RedCapExportDataType {
+    fn from(value: f32) -> Self {
+        Self::Float(value)
+    }
+}
+
+impl<T> From<Option<T>> for RedCapExportDataType
+where
+    T: Into<RedCapExportDataType>,
+{
+    fn from(value: Option<T>) -> Self {
+        match value {
+            Some(value) => value.into(),
+            None => Self::Null,
+        }
+    }
+}
+impl From<String> for RedCapExportDataType {
+    fn from(value: String) -> Self {
+        Self::Text(value)
+    }
+}
+impl From<bool> for RedCapExportDataType {
+    fn from(value: bool) -> Self {
+        Self::Number(value as isize)
+    }
+}
+impl From<NaiveDate> for RedCapExportDataType {
+    fn from(value: NaiveDate) -> Self {
+        Self::Date(value)
+    }
+}
+macro_rules! from_num {
+    (
+        $(
+            $type:ty
+        ),*
+    ) => {
+        $(
+            impl From<$type> for RedCapExportDataType {
+                fn from(value: $type) -> Self {
+                    Self::Number(value as isize)
+                }
+            }
+        )*
+    };
+}
+
+from_num!(i16, i32, u8, u16, u32, u64, usize);
+impl From<isize> for RedCapExportDataType {
+    fn from(value: isize) -> Self {
+        Self::Number(value)
+    }
+}
+
+impl From<MultiSelect> for RedCapExportDataType {
+    fn from(value: MultiSelect) -> Self {
+        Self::MultiSelect(value)
+    }
+}
+impl<T> From<T> for RedCapExportDataType
+where
+    T: RedCapEnum,
+{
+    fn from(value: T) -> Self {
+        Self::Number(value.to_usize() as isize)
+    }
 }
 impl RedCapExportDataType {
     pub fn process_string(value: String) -> Self {
         if value.is_empty() {
             Self::Null
-        } else if let Ok(number) = value.parse::<usize>() {
+        } else if let Ok(number) = value.parse::<isize>() {
             Self::Number(number)
         } else if let Ok(date) = NaiveDate::parse_from_str(&value, "%Y-%m-%d") {
             Self::Date(date)
@@ -137,9 +255,23 @@ impl RedCapExportDataType {
             _ => None,
         }
     }
+    pub fn to_bad_boolean(&self) -> Option<bool> {
+        match self {
+            Self::Text(value) => Some(value == "2"),
+            Self::Number(value) => Some(*value == 2),
+            _ => None,
+        }
+    }
+    pub fn from_bad_boolean(value: bool) -> Self {
+        if value {
+            Self::Number(2)
+        } else {
+            Self::Number(1)
+        }
+    }
     pub fn to_number(&self) -> Option<usize> {
         match self {
-            Self::Number(value) => Some(*value),
+            Self::Number(value) => Some(*value as usize),
             _ => None,
         }
     }
@@ -154,7 +286,7 @@ impl RedCapExportDataType {
         T: RedCapEnum,
     {
         match self {
-            Self::Number(value) => T::from_usize(*value),
+            Self::Number(value) => T::from_usize(*value as usize),
             _ => None,
         }
     }
@@ -193,6 +325,38 @@ pub fn process_flat_json(
     for (key, value) in input {
         let value = RedCapExportDataType::process_string(value);
         output.insert(key, value);
+    }
+    output
+}
+pub fn flatten_data_to_red_cap_format(
+    input: HashMap<String, RedCapExportDataType>,
+) -> HashMap<String, String> {
+    let mut output = HashMap::new();
+    for (key, value) in input {
+        match value {
+            RedCapExportDataType::MultiSelect(multi_select) => {
+                for (index, value) in multi_select.set_values {
+                    let value: usize = value.into();
+                    let key = format!("{}___{}", multi_select.field_base, index);
+                    output.insert(key, value.to_string());
+                }
+            }
+            RedCapExportDataType::Text(text) => {
+                output.insert(key, text);
+            }
+            RedCapExportDataType::Null => {
+                output.insert(key, String::new());
+            }
+            RedCapExportDataType::Number(number) => {
+                output.insert(key, number.to_string());
+            }
+            RedCapExportDataType::Float(float) => {
+                output.insert(key, float.to_string());
+            }
+            RedCapExportDataType::Date(naive_date) => {
+                output.insert(key, naive_date.format("%Y-%m-%d").to_string());
+            }
+        }
     }
     output
 }

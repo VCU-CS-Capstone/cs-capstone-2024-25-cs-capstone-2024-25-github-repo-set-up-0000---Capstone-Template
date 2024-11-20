@@ -12,14 +12,72 @@ pub struct ParticipantMedications {
     pub id: i32,
     pub participant_id: i32,
     pub name: String,
-    pub dosage: String,
+    pub dosage: Option<String>,
     pub frequency: Option<MedicationFrequency>,
     pub date_prescribed: Option<NaiveDate>,
-    pub date_entered_into_system: NaiveDate,
+    pub date_entered_into_system: Option<NaiveDate>,
     pub is_current: Option<bool>,
     pub date_discontinued: Option<NaiveDate>,
     pub comments: Option<String>,
     pub red_cap_index: Option<i32>,
+}
+impl ParticipantMedications {
+    pub async fn get_all_participant_medications(
+        participant_id: i32,
+        database: &PgPool,
+    ) -> DBResult<Vec<ParticipantMedications>> {
+        let result = SimpleSelectQueryBuilder::new(
+            ParticipantMedications::table_name(),
+            &ParticipantMedicationsColumn::all(),
+        )
+        .where_equals(ParticipantMedicationsColumn::ParticipantId, participant_id)
+        .query_as()
+        .fetch_all(database)
+        .await?;
+        Ok(result)
+    }
+
+    /// Will ensure each medication in has a red_cap_index.
+    ///
+    /// This will also make sure no "gaps" exist in the red_cap_index.
+    pub async fn process_medications_indexes(
+        participant_id: i32,
+        database: &PgPool,
+    ) -> DBResult<()> {
+        let mut medications =
+            Self::get_all_participant_medications(participant_id, database).await?;
+        medications.sort_by(|a, b| {
+            a.red_cap_index
+                .unwrap_or(i32::MAX)
+                .cmp(&b.red_cap_index.unwrap_or(i32::MAX))
+        });
+
+        for (index, medication) in medications.iter_mut().enumerate() {
+            let red_cap_index = index as i32 + 1;
+            medication
+                .set_red_cap_index(red_cap_index, database)
+                .await?;
+        }
+        Ok(())
+    }
+
+    pub async fn set_red_cap_index(
+        &mut self,
+        red_cap_index: i32,
+        database: &PgPool,
+    ) -> DBResult<()> {
+        if self.red_cap_index == Some(red_cap_index) {
+            return Ok(());
+        }
+        self.red_cap_index = Some(red_cap_index);
+
+        sqlx::query("UPDATE participant_medications SET red_cap_index = $1 WHERE id = $2")
+            .bind(red_cap_index)
+            .bind(self.id)
+            .execute(database)
+            .await?;
+        Ok(())
+    }
 }
 impl TableType for ParticipantMedications {
     type Columns = ParticipantMedicationsColumn;

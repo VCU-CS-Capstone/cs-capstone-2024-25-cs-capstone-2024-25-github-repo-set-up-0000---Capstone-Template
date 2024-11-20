@@ -44,6 +44,72 @@ pub struct ParticipantGoals {
     pub is_active: Option<bool>,
     pub red_cap_index: Option<i32>,
 }
+impl ParticipantGoals {
+    pub async fn get_goal_by_id(
+        goal_id: i32,
+        database: impl Executor<'_, Database = sqlx::Postgres>,
+    ) -> sqlx::Result<Option<ParticipantGoals>> {
+        SimpleSelectQueryBuilder::new(
+            ParticipantGoals::table_name(),
+            &ParticipantGoalsColumn::all(),
+        )
+        .where_equals(ParticipantGoalsColumn::Id, goal_id)
+        .query_as()
+        .fetch_optional(database)
+        .await
+    }
+    pub async fn set_red_cap_index(
+        &mut self,
+        red_cap_index: i32,
+        database: impl Executor<'_, Database = sqlx::Postgres>,
+    ) -> sqlx::Result<()> {
+        if self.red_cap_index == Some(red_cap_index) {
+            return Ok(());
+        }
+        self.red_cap_index = Some(red_cap_index);
+        sqlx::query("UPDATE participant_goals SET red_cap_index = $1 WHERE id = $2")
+            .bind(red_cap_index)
+            .bind(self.id)
+            .execute(database)
+            .await?;
+        Ok(())
+    }
+    pub async fn get_all_participant_goals(
+        participant_id: i32,
+        database: impl Executor<'_, Database = sqlx::Postgres>,
+    ) -> sqlx::Result<Vec<ParticipantGoals>> {
+        SimpleSelectQueryBuilder::new(
+            ParticipantGoals::table_name(),
+            &ParticipantGoalsColumn::all(),
+        )
+        .where_equals(ParticipantGoalsColumn::ParticipantId, participant_id)
+        .query_as()
+        .fetch_all(database)
+        .await
+    }
+
+    pub async fn process_red_cap_indexes(
+        participant_id: i32,
+        database: &PgPool,
+    ) -> sqlx::Result<()> {
+        let mut goals = Self::get_all_participant_goals(participant_id, database).await?;
+        goals.sort_by(|a, b| {
+            a.red_cap_index
+                .unwrap_or_default()
+                .cmp(&b.red_cap_index.unwrap_or_default())
+        });
+        for (index, goal) in goals.iter_mut().enumerate() {
+            let red_cap_index = index as i32 + 1;
+
+            if goal.red_cap_index == Some(red_cap_index) {
+                continue;
+            }
+
+            goal.set_red_cap_index(red_cap_index, database).await?;
+        }
+        Ok(())
+    }
+}
 impl TableType for ParticipantGoals {
     type Columns = ParticipantGoalsColumn;
     fn table_name() -> &'static str {
@@ -116,6 +182,60 @@ pub struct ParticipantGoalsSteps {
     /// Select No until goal is achieved
     pub action_step: Option<bool>,
     pub red_cap_index: Option<i32>,
+}
+impl ParticipantGoalsSteps {
+    pub async fn set_red_cap_index(
+        &mut self,
+        red_cap_index: i32,
+        database: impl Executor<'_, Database = sqlx::Postgres>,
+    ) -> sqlx::Result<()> {
+        if self.red_cap_index == Some(red_cap_index) {
+            return Ok(());
+        }
+        self.red_cap_index = Some(red_cap_index);
+        sqlx::query("UPDATE participant_goal_steps SET red_cap_index = $1 WHERE id = $2")
+            .bind(red_cap_index)
+            .bind(self.id)
+            .execute(database)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn get_all_participant_goals_steps(
+        participant_id: i32,
+        database: impl Executor<'_, Database = sqlx::Postgres>,
+    ) -> sqlx::Result<Vec<ParticipantGoalsSteps>> {
+        SimpleSelectQueryBuilder::new(
+            ParticipantGoalsSteps::table_name(),
+            &ParticipantGoalsStepsColumn::all(),
+        )
+        .where_equals(ParticipantGoalsStepsColumn::ParticipantId, participant_id)
+        .query_as()
+        .fetch_all(database)
+        .await
+    }
+
+    pub async fn process_red_cap_indexes(
+        participant_id: i32,
+        database: &PgPool,
+    ) -> sqlx::Result<()> {
+        let mut goals = Self::get_all_participant_goals_steps(participant_id, database).await?;
+        goals.sort_by(|a, b| {
+            a.red_cap_index
+                .unwrap_or_default()
+                .cmp(&b.red_cap_index.unwrap_or_default())
+        });
+        for (index, goal) in goals.iter_mut().enumerate() {
+            let red_cap_index = index as i32 + 1;
+
+            if goal.red_cap_index == Some(red_cap_index) {
+                continue;
+            }
+
+            goal.set_red_cap_index(red_cap_index, database).await?;
+        }
+        Ok(())
+    }
 }
 impl TableType for ParticipantGoalsSteps {
     type Columns = ParticipantGoalsStepsColumn;

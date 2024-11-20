@@ -1,6 +1,9 @@
 use crate::{
     database::prelude::*,
     red_cap::{
+        converter::participants::{
+            RedCapHealthOverview, RedCapParticipant, RedCapParticipantDemographics,
+        },
         DegreeLevel, Ethnicity, Gender, HealthInsurance, PreferredLanguage, Programs, Race, Status,
     },
 };
@@ -18,6 +21,7 @@ pub mod overview;
 pub use medications::*;
 pub use new::*;
 use sqlx::{postgres::PgRow, prelude::FromRow};
+use tracing::warn;
 pub trait ParticipantType: for<'r> FromRow<'r, PgRow> + Unpin + Send + Sync {
     fn get_id(&self) -> i32;
 
@@ -85,6 +89,33 @@ pub struct Participants {
     /// For Database Only
     pub last_synced_with_redcap: Option<DateTime<FixedOffset>>,
 }
+impl Participants {
+    pub async fn set_red_cap_id(
+        &mut self,
+        red_cap_id: Option<i32>,
+        db: &sqlx::PgPool,
+    ) -> DBResult<()> {
+        self.red_cap_id = red_cap_id;
+        sqlx::query("UPDATE participants SET red_cap_id = $1 WHERE id = $2")
+            .bind(red_cap_id)
+            .bind(self.id)
+            .execute(db)
+            .await?;
+        Ok(())
+    }
+    #[tracing::instrument(skip(db))]
+    pub async fn update_from_red_cap(
+        &mut self,
+        red_cap_participant: RedCapParticipant,
+        red_cap_demographics: RedCapParticipantDemographics,
+        red_cap_health_overview: RedCapHealthOverview,
+        db: &sqlx::PgPool,
+    ) -> DBResult<()> {
+        //TODO: Implement
+        warn!("Not Implemented");
+        Ok(())
+    }
+}
 impl TableType for Participants {
     type Columns = ParticipantsColumn;
     fn table_name() -> &'static str {
@@ -124,7 +155,7 @@ pub struct ParticipantDemograhics {
     /// Redcap Gender
     pub gender: Option<Gender>,
     /// Redcap: Race
-    pub race: Option<Race>,
+    pub race: Option<Vec<Race>>,
     /// Not Sure???
     pub race_other: Option<String>,
     pub race_multiple: Option<String>,

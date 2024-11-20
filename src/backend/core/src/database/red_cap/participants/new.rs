@@ -96,7 +96,7 @@ pub struct NewDemographics {
     /// Redcap Gender
     pub gender: Option<Gender>,
     /// Redcap: Race
-    pub race: Option<Race>,
+    pub race: Option<Vec<Race>>,
     /// Not Sure???
     pub race_other: Option<String>,
     pub race_multiple: Option<String>,
@@ -168,6 +168,40 @@ pub struct NewHealthOverview {
     pub takes_more_than_5_medications: Option<bool>,
 }
 impl NewHealthOverview {
+    pub async fn insert_return_health_overview(
+        self,
+        participant_id: i32,
+        database: impl Executor<'_, Database = sqlx::Postgres>,
+    ) -> DBResult<HealthOverview> {
+        let Self {
+            height,
+            reported_health_conditions,
+            allergies,
+            has_blood_pressure_cuff,
+            takes_more_than_5_medications,
+        } = self;
+
+        SimpleInsertQueryBuilder::new(HealthOverview::table_name())
+            .insert(HealthOverviewColumn::ParticipantId, participant_id)
+            .insert(HealthOverviewColumn::Height, height)
+            .insert(
+                HealthOverviewColumn::ReportedHealthConditions,
+                reported_health_conditions,
+            )
+            .insert(HealthOverviewColumn::Allergies, allergies)
+            .insert(
+                HealthOverviewColumn::HasBloodPressureCuff,
+                has_blood_pressure_cuff,
+            )
+            .insert(
+                HealthOverviewColumn::TakesMoreThan5Medications,
+                takes_more_than_5_medications,
+            )
+            .return_all()
+            .query_as::<HealthOverview>()
+            .fetch_one(database)
+            .await
+    }
     pub async fn insert_return_none(
         self,
         participant_id: i32,

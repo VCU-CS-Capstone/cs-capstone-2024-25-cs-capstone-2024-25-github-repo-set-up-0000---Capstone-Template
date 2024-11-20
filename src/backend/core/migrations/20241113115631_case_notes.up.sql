@@ -14,11 +14,12 @@ CREATE TABLE IF NOT EXISTS case_notes(
             ON UPDATE CASCADE
             ON DELETE SET NULL,
     visit_type VARCHAR(255),
-    age smallint NOT NULL,
+    age smallint,
     reason_for_visit TEXT,
     info_provided_by_caregiver TEXT,
     date_of_visit DATE NOT NULL,
     pushed_to_redcap BOOLEAN,
+    completed BOOLEAN NOT NULL DEFAULT FALSE,
     redcap_instance integer,
     last_synced_with_redcap TIMESTAMP WITH TIME ZONE
 );

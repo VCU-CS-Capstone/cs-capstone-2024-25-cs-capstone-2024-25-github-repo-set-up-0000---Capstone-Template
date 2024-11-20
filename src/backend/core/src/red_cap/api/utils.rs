@@ -63,12 +63,20 @@ impl From<CheckboxValue> for bool {
         }
     }
 }
+impl From<CheckboxValue> for usize {
+    fn from(val: CheckboxValue) -> Self {
+        match val {
+            CheckboxValue::Checked => 1,
+            CheckboxValue::Unchecked => 0,
+        }
+    }
+}
 impl FromStr for CheckboxValue {
     type Err = RedCapParseError;
     fn from_str(value: &str) -> Result<Self, Self::Err> {
         match value {
             "Checked" | "1" => Ok(Self::Checked),
-            "Unchecked" | "0" => Ok(Self::Unchecked),
+            "Unchecked" | "0" | "" => Ok(Self::Unchecked),
             _ => Err(RedCapParseError::InvalidMultiCheckboxField {
                 input: value.to_owned(),
                 reason: super::GenericError::Other("Invalid value".to_owned()),

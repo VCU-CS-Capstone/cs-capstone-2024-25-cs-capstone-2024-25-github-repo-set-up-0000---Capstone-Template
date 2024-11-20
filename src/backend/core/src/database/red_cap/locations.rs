@@ -107,10 +107,35 @@ impl RedCapLocationConnectionRules {
             && self.mhwp_location == location.mhwp_location
             && self.mhwp_location_petersburg == location.mhwp_location_petersburg
     }
+    pub fn does_match_visit(&self, location: &RedCapLocationConnectionRules) -> bool {
+        self.rhwp_location_visit == location.rhwp_location_visit
+            && self.mhwp_location_visit == location.mhwp_location_visit
+            && self.mhwp_location_visit_petersburg == location.mhwp_location_visit_petersburg
+    }
+    pub fn non_visit_rules(&self) -> RedCapLocationConnectionRules {
+        RedCapLocationConnectionRules {
+            rhwp_location: self.rhwp_location,
+            rhwp_location_visit: None,
+            mhwp_location: self.mhwp_location,
+            mhwp_location_visit: None,
+            mhwp_location_petersburg: self.mhwp_location_petersburg,
+            mhwp_location_visit_petersburg: None,
+        }
+    }
+    pub fn visit_rules(&self) -> RedCapLocationConnectionRules {
+        RedCapLocationConnectionRules {
+            rhwp_location: None,
+            rhwp_location_visit: self.rhwp_location_visit,
+            mhwp_location: None,
+            mhwp_location_visit: self.mhwp_location_visit,
+            mhwp_location_petersburg: None,
+            mhwp_location_visit_petersburg: self.mhwp_location_visit_petersburg,
+        }
+    }
 }
 
 impl RedCapType for RedCapLocationConnectionRules {
-    fn read(data: &impl RedCapDataSet) -> Option<Self>
+    fn read<D: RedCapDataSet>(data: &D) -> Option<Self>
     where
         Self: Sized,
     {
@@ -124,5 +149,26 @@ impl RedCapType for RedCapLocationConnectionRules {
         };
 
         Some(value)
+    }
+
+    fn write<D: RedCapDataSet>(&self, data: &mut D) {
+        if let Some(value) = self.rhwp_location {
+            data.insert("rhwp_location".to_string(), value.into());
+        }
+        if let Some(value) = self.rhwp_location_visit {
+            data.insert("rhwp_location_visit".to_string(), value.into());
+        }
+        if let Some(value) = self.mhwp_location {
+            data.insert("mhwp_location".to_string(), value.into());
+        }
+        if let Some(value) = self.mhwp_location_visit {
+            data.insert("mhwp_location_visit".to_string(), value.into());
+        }
+        if let Some(value) = self.mhwp_location_petersburg {
+            data.insert("mhwp_location_petersburg".to_string(), value.into());
+        }
+        if let Some(value) = self.mhwp_location_visit_petersburg {
+            data.insert("mhwp_location_visit_petersburg".to_string(), value.into());
+        }
     }
 }
