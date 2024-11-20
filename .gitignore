@@ -1,3 +1,4 @@
-src/model/data/source_data/*
-src/model/data/dataset/data_*.npy
-
+src/model/data/testing_data/data_*.npy
+src/model/data/training_data/data_*.npy
+src/model/data/source_data/2_4ghz_indoor.h5
+src/model/data/source_data/2_4ghz_bluetooth.h5

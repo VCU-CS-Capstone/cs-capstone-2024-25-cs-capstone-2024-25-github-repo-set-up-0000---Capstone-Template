@@ -15,14 +15,21 @@ def hdf5_to_dataset(hdf5_file):
 
 
 def main():
-    hdf5_file = "./data/2_4ghz_indoor.h5"
+    hdf5_file = "./data/source_data/2_4ghz_bluetooth.h5"
     output = "./data/convert"
     data, keys = hdf5_to_dataset(hdf5_file)
-    for idx, key in enumerate(keys, start=180):
+    for idx, key in enumerate(keys, start=143):
         source_data = data[key][()]
         source_data = np.array(source_data)
         np.save(f"{output}/data_{idx}.npy", source_data)
         print(f"Saved data_{idx}.npy")
+    csv_output = f"{output}/data_index.csv"
+    with open(csv_output, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["idx", "wifi"])
+        for idx, key in enumerate(keys, start=143):
+            writer.writerow([idx, "bluetooth"])
+    print(f"Saved data_index.csv")
 
 
 if __name__ == "__main__":
