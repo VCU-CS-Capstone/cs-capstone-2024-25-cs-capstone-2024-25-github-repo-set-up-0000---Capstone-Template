@@ -5,12 +5,12 @@ import scipy
 
 usrp = uhd.usrp.MultiUSRP()
 
-num_samps = 1000 * 1000 # number of samples received
+num_samps = 1000  # number of samples received
 num_samps_h = 2000 # number of samples received
 num_samps_w = 2000 # number of samples received
 center_freq = 2422e6 # Hz
 sample_rate = 15e6 # Hz
-gain = 50 # dB
+gain = 70 # dB
 
 usrp.set_rx_rate(sample_rate, 0)
 usrp.set_rx_bandwidth(20e6)
@@ -48,4 +48,9 @@ print(abs_samples.max(), abs_samples.mean(), abs_samples.std())
 max_display_value =  abs_samples.mean() + 2 * abs_samples.std()
 abs_samples[np.where(abs_samples > max_display_value)] = max_display_value
 plt.imshow(abs_samples)
+plt.xlabel('Frequency (Samples)', fontsize=18)
+plt.ylabel('Time (Samples)', fontsize=18)
+plt.title('FFT Magnitude', fontsize=20)
+
+
 plt.show()
