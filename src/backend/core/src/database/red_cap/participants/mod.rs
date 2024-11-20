@@ -10,7 +10,6 @@ use crate::{
 use chrono::{DateTime, FixedOffset};
 use cs25_303_macros::Columns;
 use serde::{Deserialize, Serialize};
-mod extra;
 pub mod goals;
 pub mod health_overview;
 mod lookup;

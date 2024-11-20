@@ -2,7 +2,7 @@ use crate::database::prelude::*;
 use derive_builder::Builder;
 use serde::{Deserialize, Serialize};
 
-use super::{Question, QuestionCategory, QuestionOptions, QuestionType};
+use super::{Question, QuestionCategory, QuestionForm, QuestionOptions, QuestionType};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Builder)]
 
@@ -10,6 +10,7 @@ pub struct NewQuestionCategory {
     pub string_id: String,
     pub name: String,
     pub description: Option<String>,
+    pub form: QuestionForm,
 }
 impl NewQuestionCategory {
     pub async fn insert_return_category(self, conn: &PgPool) -> DBResult<QuestionCategory> {
@@ -17,18 +18,20 @@ impl NewQuestionCategory {
             string_id,
             name,
             description,
+            form,
         } = self;
 
         let category = sqlx::query_as(
             r#"
-            INSERT INTO question_categories (string_id, name, description)
-            VALUES ($1, $2, $3)
+            INSERT INTO question_categories (string_id, name, description, form)
+            VALUES ($1, $2, $3, $4)
             RETURNING *
             "#,
         )
         .bind(&string_id)
         .bind(&name)
         .bind(&description)
+        .bind(&form)
         .fetch_one(conn)
         .await?;
 
@@ -40,6 +43,7 @@ impl NewQuestionCategory {
 pub struct NewQuestion {
     pub category_id: Option<i32>,
     pub question_type: QuestionType,
+
     pub question: String,
     pub red_cap_id: String,
     pub red_cap_other_id: Option<String>,

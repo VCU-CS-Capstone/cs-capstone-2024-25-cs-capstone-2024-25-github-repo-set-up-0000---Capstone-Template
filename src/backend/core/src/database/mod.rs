@@ -31,7 +31,7 @@ pub async fn connect(
     if run_migrations {
         info!("Running migrations");
         MIGRATOR.run(&database).await?;
-        red_cap::case_notes::questions::default::add_default_questions(&database).await?;
+        red_cap::questions::default::add_default_questions(&database).await?;
     }
     Ok(database)
 }

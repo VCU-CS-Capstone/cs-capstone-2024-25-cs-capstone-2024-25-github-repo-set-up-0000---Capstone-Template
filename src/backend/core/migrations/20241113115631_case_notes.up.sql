@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS case_note_question_answers(
     value_boolean BOOLEAN
 );
 
-CREATE TABLE IF NOT EXISTS question_answer_multi_check_box(
+CREATE TABLE IF NOT EXISTS case_note_question_answer_mcb(
     id serial PRIMARY KEY,
     question_answers_id integer NOT NULL,
         CONSTRAINT FK_question_answer_multi_check_box_question_answers_id

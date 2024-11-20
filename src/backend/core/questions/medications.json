@@ -1,7 +1,8 @@
 {
     "category": {
         "string_id": "case_note_medications",
-        "name": "Medication Changes"
+        "name": "Medication Changes",
+        "form": "CaseNotes"
     },
     "questions": [
         {
@@ -16,7 +17,13 @@
                 "question_type": "Boolean",
                 "question": "new_medication_is_opioid",
                 "red_cap_id": "opiod"
-            }
+            },
+            "requirements": [
+                {
+                    "question": "changemeds",
+                    "equals": true
+                }
+            ]
         },
         {
             "question": {

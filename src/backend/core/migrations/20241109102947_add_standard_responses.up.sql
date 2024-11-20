@@ -156,6 +156,7 @@ INSERT INTO locations(name, program, parent_location, red_cap_connection_rules) 
 
 CREATE TABLE question_categories(
     id serial PRIMARY KEY,
+    form VARCHAR(255) NOT NULL,
     string_id VARCHAR(255) NOT NULL UNIQUE,
     name VARCHAR(255) NOT NULL,
     description TEXT

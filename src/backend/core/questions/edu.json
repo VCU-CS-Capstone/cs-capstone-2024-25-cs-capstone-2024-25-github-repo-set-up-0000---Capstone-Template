@@ -1,7 +1,8 @@
 {
     "category": {
         "string_id": "health_wellness_education_coordination_and_resources",
-        "name": "Health and Wellness - Education & Coordination / Resources"
+        "name": "Health and Wellness - Education & Coordination / Resources",
+        "form": "CaseNotes"
     },
     "questions": [
         {

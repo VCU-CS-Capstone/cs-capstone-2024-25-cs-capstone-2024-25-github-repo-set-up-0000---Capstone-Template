@@ -126,3 +126,43 @@ CREATE TABLE IF NOT EXISTS participant_goal_steps(
     action_step BOOLEAN,
     red_cap_index INTEGER
 );
+
+CREATE TABLE IF NOT EXISTS participant_question_answers(
+    id serial PRIMARY KEY,
+    participant_id INTEGER NOT NULL,
+        CONSTRAINT FK_participant_question_answers_participant_id
+            FOREIGN KEY (participant_id)
+            REFERENCES participants(id)
+            ON DELETE CASCADE,
+    question_id integer NOT NULL,
+        CONSTRAINT FK_participant_question_answers_question_id
+            FOREIGN KEY (question_id)
+            REFERENCES questions(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE,
+    value_radio INTEGER,
+        CONSTRAINT FK_case_note_question_answers_value_radio
+            FOREIGN KEY (value_radio)
+            REFERENCES question_options(id)
+            ON UPDATE CASCADE
+            ON DELETE SET NULL,
+    value_text TEXT,
+    value_number INTEGER,
+    value_boolean BOOLEAN
+);
+
+CREATE TABLE IF NOT EXISTS participant_question_answer_mcb(
+    id serial PRIMARY KEY,
+    question_answers_id integer NOT NULL,
+        CONSTRAINT FK_participant_question_answer_mcb_question_answers_id
+            FOREIGN KEY (question_answers_id)
+            REFERENCES participant_question_answers(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE,
+    option_id integer NOT NULL,
+        CONSTRAINT FK_participant_question_answer_mcb_option_id
+            FOREIGN KEY (option_id)
+            REFERENCES question_options(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE
+);
