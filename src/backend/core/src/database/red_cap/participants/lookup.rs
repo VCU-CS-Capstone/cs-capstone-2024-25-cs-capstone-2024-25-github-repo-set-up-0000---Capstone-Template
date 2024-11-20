@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use tabled::Tabled;
 use tracing::{debug, instrument};
 
-use crate::red_cap_data::Programs;
+use crate::red_cap::Programs;
 
 use super::{ParticipantType, ParticipantsColumn};
 
@@ -21,6 +21,7 @@ pub struct ParticipantLookup {
     #[tabled(display_with = "crate::database::table_utils::display_option")]
     pub location: Option<i32>,
 }
+
 impl ParticipantType for ParticipantLookup {
     fn get_id(&self) -> i32 {
         self.id

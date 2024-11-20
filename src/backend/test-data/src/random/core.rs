@@ -4,7 +4,7 @@ use cs25_303_core::{
         goals::{NewParticipantGoal, NewParticipantGoalsSteps},
         NewMedication,
     },
-    red_cap_data::{Gender, MedicationFrequency},
+    red_cap::{Gender, MedicationFrequency},
 };
 use rand::{seq::SliceRandom, Rng};
 use serde::{Deserialize, Serialize};
@@ -153,6 +153,7 @@ impl RandomGoal {
         NewParticipantGoal {
             goal: goal.clone(),
             is_active: Some(*is_active),
+            ..Default::default()
         }
     }
 }
@@ -207,13 +208,11 @@ impl RandomMedication {
 
         NewMedication {
             name: name.clone(),
-            dosage,
-            frequency: freqeuency,
+            dosage: Some(dosage),
+            frequency: Some(freqeuency),
             date_prescribed: None,
             date_entered_into_system: start_date,
-            is_current: None,
-            date_discontinued: None,
-            comments: None,
+            ..Default::default()
         }
     }
 }

@@ -9,7 +9,7 @@ use cs25_303_core::{
             NewDemographics, NewHealthOverview, NewMedication,
         },
     },
-    red_cap_data::{Gender, HealthInsurance, Programs, Race, Status, VisitType},
+    red_cap::{Gender, HealthInsurance, Programs, Race, Status, VisitType},
 };
 use rand::{seq::SliceRandom, Rng, SeedableRng};
 use serde::{Deserialize, Serialize};

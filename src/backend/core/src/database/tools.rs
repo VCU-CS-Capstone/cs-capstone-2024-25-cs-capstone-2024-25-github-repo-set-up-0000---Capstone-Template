@@ -1,11 +1,65 @@
 use std::fmt::Display;
+mod insert;
 mod select;
+mod update;
+pub use insert::*;
 pub use select::*;
-
-use sqlx::{query_builder::Separated, Database, Encode, Postgres, Type};
+use sqlx::{
+    postgres::PgRow,
+    query::{Query, QueryAs, QueryScalar},
+    Database, FromRow, Postgres,
+};
+use tracing::trace;
 pub struct FunctionCallColumn<C> {
     pub function_name: &'static str,
     pub column: C,
+}
+
+pub trait QueryTool<'args> {
+    fn sql(&mut self) -> &str;
+
+    fn take_arguments_or_error(&mut self) -> <Postgres as Database>::Arguments<'args>;
+
+    fn query(&mut self) -> Query<'_, Postgres, <Postgres as Database>::Arguments<'args>> {
+        let args = self.take_arguments_or_error();
+        let sql = self.sql();
+        if tracing::enabled!(tracing::Level::TRACE) {
+            trace!(?sql, "Generated SQL");
+        }
+        sqlx::query_with(sql, args)
+    }
+    fn query_as<T>(&mut self) -> QueryAs<'_, Postgres, T, <Postgres as Database>::Arguments<'args>>
+    where
+        T: for<'r> FromRow<'r, PgRow>,
+    {
+        let args = self.take_arguments_or_error();
+
+        let sql = self.sql();
+        if tracing::enabled!(tracing::Level::TRACE) {
+            trace!(?sql, "Generated SQL");
+        }
+        sqlx::query_as_with(sql, args)
+    }
+    fn query_scalar<O>(
+        &mut self,
+    ) -> QueryScalar<'_, Postgres, O, <Postgres as Database>::Arguments<'args>>
+    where
+        (O,): for<'r> FromRow<'r, PgRow>,
+    {
+        let args = self.take_arguments_or_error();
+
+        let sql = self.sql();
+        if tracing::enabled!(tracing::Level::TRACE) {
+            trace!(?sql, "Generated SQL");
+        }
+        sqlx::query_scalar_with(sql, args)
+    }
+}
+pub trait TableType {
+    type Columns: ColumnType;
+    fn table_name() -> &'static str
+    where
+        Self: Sized;
 }
 pub trait ColumnType {
     fn column_name(&self) -> &'static str;
@@ -55,30 +109,6 @@ where
     }
 }
 
-pub trait SeparatedExt<'args, DB>
-where
-    DB: Database,
-{
-    fn like_lower_and_bind(&mut self, column: impl ColumnType, value: &str);
-    fn column_equals<T>(&mut self, column: impl ColumnType, value: T)
-    where
-        T: 'args + Encode<'args, DB> + Type<DB>;
-}
-
-impl<'args> SeparatedExt<'args, Postgres> for Separated<'_, 'args, Postgres, &str> {
-    fn like_lower_and_bind(&mut self, column: impl ColumnType, value: &str) {
-        self.push(format!("LOWER({}) LIKE ", column.column_name()));
-        self.push_bind_unseparated(format!("%{}%", value.to_lowercase()));
-    }
-
-    fn column_equals<T>(&mut self, column: impl ColumnType, value: T)
-    where
-        T: 'args + Encode<'args, Postgres> + Type<Postgres>,
-    {
-        self.push(format!("{} = ", column.column_name()));
-        self.push_bind_unseparated(value);
-    }
-}
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AndOr {
     And,

@@ -37,7 +37,7 @@ pub async fn connect(
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use sqlx::PgPool;
 
     use crate::database::{DatabaseConfig, MIGRATOR};
@@ -62,6 +62,13 @@ mod tests {
 
         let config: DatabaseConfig = serde_env::from_iter_with_prefix(test_env.iter(), "QUERY")?;
         let database = PgPool::connect_with(config.try_into()?).await?;
+        Ok(database)
+    }
+
+    pub async fn setup_red_cap_db_test(env: &crate::env_utils::EnvMap) -> anyhow::Result<PgPool> {
+        let config: DatabaseConfig = serde_env::from_iter_with_prefix(env.iter(), "RED_CAP")?;
+        let database = super::connect(config.try_into()?, true).await?;
+
         Ok(database)
     }
 }

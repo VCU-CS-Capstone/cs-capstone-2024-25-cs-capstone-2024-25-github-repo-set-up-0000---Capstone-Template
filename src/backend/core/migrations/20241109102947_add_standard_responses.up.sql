@@ -13,31 +13,145 @@ CREATE TABLE IF NOT EXISTS locations(
         CONSTRAINT FK_locations_parent_location
             FOREIGN KEY (parent_location)
             REFERENCES locations(id)
-            ON DELETE CASCADE
+            ON DELETE CASCADE,
+    red_cap_connection_rules JSONB DEFAULT '{}'
 );
 
-INSERT INTO locations(name, program) VALUES
-    ('Church Hill House', 'RHWP'),
-    ('Dominion Place', 'RHWP'),
-    ('Highland Park', 'RHWP'),
-    ('4th Ave', 'RHWP'),
-    ('Health Hub', 'RHWP'),
-    ('The Rosa', 'RHWP'),
-    ('Petersburg', 'MHWP'),
-    ('Lawrenceville','MHWP'),
-    ('Tappahannock', 'MHWP'),
-    ('Southwood', 'MHWP');
+INSERT INTO locations(name, program, red_cap_connection_rules) VALUES
+    ('Church Hill House', 'RHWP',
+        '
+            {
+                "rhwp_location_visit": 1,
+                "rhwp_location": 1
+            }
+        '
+    ),
+    ('Dominion Place', 'RHWP',
+        '
+            {
+                "rhwp_location_visit": 2,
+                "rhwp_location": 2
+            }
+        '
+    ),
+    ('Highland Park', 'RHWP',
+        '
+            {
+                "rhwp_location_visit": 3,
+                "rhwp_location": 3
+            }
+    '),
+    ('Randolph Place', 'RHWP',
+        '
+            {
+                "rhwp_location_visit": 4,
+                "rhwp_location": 4
+            }
+        '
+    ),
+    ('4th Ave', 'RHWP',
+        '
+            {
+                "rhwp_location_visit": 5,
+                "rhwp_location": 5
+            }
+    '),
+    ('Health Hub', 'RHWP',
+        '
+            {
+                "rhwp_location_visit": 6,
+                "rhwp_location": 6
+            }
+    '),
+    ('The Rosa', 'RHWP',
+        '
+            {
+                "rhwp_location_visit": 7,
+                "rhwp_location": 7
+            }
+        '
+    ),
+    ('Lawrenceville','MHWP',
+        '
+            {
+                "mhwp_location_visit": 1,
+                "mhwp_location": 1
+            }
+        '
+    ),
+    ('Petersburg', 'MHWP',
+        '
+            {
+                "mhwp_location_visit": 2,
+                "mhwp_location": 2
+            }
+        '
+    ),
+    ('Tappahannock', 'MHWP',
+        '
+            {
+                "mhwp_location_visit": 3,
+                "mhwp_location": 3
+            }
+        '
+    ),
+    ('Southwood', 'MHWP',
+        '
+            {
+                "mhwp_location_visit": 4,
+                "mhwp_location": 4
+            }
+        '
+    );
+
+
 
 -- Take the primary key from petersburg and insert setting the parent location
 -- VCRC
 -- Police substation
 -- Gilhaven
 -- VSU Van
-INSERT INTO locations(name, program, parent_location) VALUES
-    ('VCRC', 'MHWP', (SELECT id FROM locations WHERE name = 'Petersburg' LIMIT 1)),
-    ('Police substation', 'MHWP', (SELECT id FROM locations WHERE name = 'Petersburg' LIMIT 1)),
-    ('Gilhaven', 'MHWP', (SELECT id FROM locations WHERE name = 'Petersburg' LIMIT 1)),
-    ('VSU Van', 'MHWP', (SELECT id FROM locations WHERE name = 'Petersburg' LIMIT 1));
+INSERT INTO locations(name, program, parent_location, red_cap_connection_rules) VALUES
+    ('VCRC', 'MHWP', (SELECT id FROM locations WHERE name = 'Petersburg' LIMIT 1),
+        '
+            {
+                "mhwp_location_visit": 2,
+                "mhwp_location": 2,
+                "mhwp_location_visit_petersburg": 1,
+                "mhwp_location_petersburg": 1
+            }
+        '
+    ),
+    ('Police substation', 'MHWP', (SELECT id FROM locations WHERE name = 'Petersburg' LIMIT 1),
+        '
+            {
+                "mhwp_location_visit": 2,
+                "mhwp_location": 2,
+                "mhwp_location_visit_petersburg": 2,
+                "mhwp_location_petersburg": 2
+            }
+        '
+    ),
+    ('Gilhaven', 'MHWP', (SELECT id FROM locations WHERE name = 'Petersburg' LIMIT 1),
+        '
+            {
+                "mhwp_location_visit": 2,
+                "mhwp_location": 2,
+                "mhwp_location_visit_petersburg": 3,
+                "mhwp_location_petersburg": 3
+            }
+        '
+    ),
+    ('VSU Van', 'MHWP', (SELECT id FROM locations WHERE name = 'Petersburg' LIMIT 1),
+        '
+            {
+                "mhwp_location_visit": 2,
+                "mhwp_location": 2,
+                "mhwp_location_visit_petersburg": 4,
+                "mhwp_location_petersburg": 4
+            }
+        '
+    );
 
 
 CREATE TABLE question_categories(

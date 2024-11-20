@@ -9,7 +9,7 @@ use cs25_303_core::{
         locations::Locations,
         participants::{NewParticipant, Participants},
     },
-    red_cap_data::Programs,
+    red_cap::Programs,
 };
 use rand::{seq::SliceRandom, Rng};
 use serde::de::DeserializeOwned;
@@ -92,7 +92,9 @@ pub async fn generate_participants(count: usize, database: PgPool) -> anyhow::Re
         let extra_info = random_sets.create_extended_profile_for_partiicpant(part.id);
         info!("Created Participant {:?} and extra {:?}", part, extra_info);
         let health_overview = random_sets.random_health_overview();
-        health_overview.insert_none(part.id, &database).await?;
+        health_overview
+            .insert_return_none(part.id, &database)
+            .await?;
 
         let demographics = random_sets.random_demographics(gender);
 
@@ -101,7 +103,7 @@ pub async fn generate_participants(count: usize, database: PgPool) -> anyhow::Re
         let medications = random_sets.random_medications();
 
         for medication in medications {
-            medication.insert_none(part.id, &database).await?;
+            medication.insert_return_none(part.id, &database).await?;
         }
 
         let goals = random_sets.random_goals();

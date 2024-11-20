@@ -50,12 +50,12 @@ pub async fn create_participant_from_dir(
     }
     if let Some(health_overview) = health_overview {
         health_overview
-            .insert_none(participant.id, database.as_mut())
+            .insert_return_none(participant.id, database.as_mut())
             .await?;
     }
     for medication in medications {
         medication
-            .insert_none(participant.id, database.as_mut())
+            .insert_return_none(participant.id, database.as_mut())
             .await?;
     }
     find_and_add_goals(participant.id, path, database).await?;

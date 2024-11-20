@@ -1,11 +1,8 @@
 use std::fmt::Display;
 
-use sqlx::{
-    query::{Query, QueryAs},
-    Arguments, Database, Encode, FromRow, Postgres, Type,
-};
+use sqlx::{Arguments, Database, Encode, Postgres, Type};
 
-use super::{concat_columns, AndOr, ColumnType, FunctionCallColumn, WhereComparison};
+use super::{concat_columns, AndOr, ColumnType, FunctionCallColumn, QueryTool, WhereComparison};
 pub trait SelectColumn {
     fn format_where(&self) -> String;
 }
@@ -26,10 +23,8 @@ where
         format!("{}({})", self.function_name, self.column.column_name())
     }
 }
-#[derive(Default)]
 pub struct SimpleSelectQueryBuilder<'args> {
     query: String,
-    init_len: usize,
     arguments: Option<<Postgres as Database>::Arguments<'args>>,
     created_where: bool,
     added_limit: bool,
@@ -43,9 +38,9 @@ impl<'args> SimpleSelectQueryBuilder<'args> {
         let query = format!("SELECT {columns} FROM {table}");
         Self {
             query: query.to_string(),
-            init_len: query.len(),
             arguments: Some(Default::default()),
-            ..Default::default()
+            created_where: false,
+            added_limit: false,
         }
     }
 
@@ -129,25 +124,16 @@ impl<'args> SimpleSelectQueryBuilder<'args> {
         self.push_bind(value);
         SimpleSelectWhereQueryBuilder { query: self }
     }
-
-    pub fn sql(&self) -> &str {
+}
+impl<'args> QueryTool<'args> for SimpleSelectQueryBuilder<'args> {
+    fn sql(&mut self) -> &str {
         &self.query
     }
-    pub fn query(&mut self) -> Query<'_, Postgres, <Postgres as Database>::Arguments<'args>> {
-        let args = self.arguments.take().expect("BUG: Arguments taken already");
-        sqlx::query_with(self.sql(), args)
-    }
-    pub fn query_as<T>(
-        &mut self,
-    ) -> QueryAs<'_, Postgres, T, <Postgres as Database>::Arguments<'args>>
-    where
-        T: for<'r> FromRow<'r, <Postgres as Database>::Row>,
-    {
-        let args = self.arguments.take().expect("BUG: Arguments taken already");
-        sqlx::query_as_with(self.sql(), args)
+
+    fn take_arguments_or_error(&mut self) -> <Postgres as Database>::Arguments<'args> {
+        self.arguments.take().expect("BUG: Arguments taken already")
     }
 }
-
 pub struct SimpleSelectWhereQueryBuilder<'query, 'args> {
     query: &'query mut SimpleSelectQueryBuilder<'args>,
 }

@@ -1,6 +1,6 @@
 use crate::{
     database::prelude::*,
-    red_cap_data::{
+    red_cap::{
         DegreeLevel, Ethnicity, Gender, HealthInsurance, PreferredLanguage, Programs, Race, Status,
     },
 };
@@ -11,24 +11,39 @@ mod extra;
 pub mod goals;
 pub mod health_overview;
 mod lookup;
-pub mod medications;
+mod medications;
 mod new;
 pub use lookup::*;
 pub mod overview;
-use crate::database::tools::ColumnType;
+pub use medications::*;
 pub use new::*;
 use sqlx::{postgres::PgRow, prelude::FromRow};
 pub trait ParticipantType: for<'r> FromRow<'r, PgRow> + Unpin + Send + Sync {
     fn get_id(&self) -> i32;
+
     /// Leaving this to the default implementation is not recommended. As it will return all columns
     fn columns() -> Vec<ParticipantsColumn> {
         ParticipantsColumn::all()
     }
 
-    async fn find_by_id(id: i32, database: &sqlx::PgPool) -> DBResult<Option<Self>> {
-        let columns = concat_columns(&Self::columns(), None);
-        let result = sqlx::query_as(&format!("SELECT {columns} FROM participants WHERE id = $1"))
-            .bind(id)
+    async fn find_by_id(id: i32, database: &sqlx::PgPool) -> DBResult<Option<Self>>
+    where
+        Self: TableType,
+    {
+        let result = SimpleSelectQueryBuilder::new(Self::table_name(), &Self::columns())
+            .where_equals(ParticipantsColumn::Id, id)
+            .query_as()
+            .fetch_optional(database)
+            .await?;
+        Ok(result)
+    }
+    async fn find_by_red_cap_id(red_cap_id: i32, database: &sqlx::PgPool) -> DBResult<Option<Self>>
+    where
+        Self: TableType,
+    {
+        let result = SimpleSelectQueryBuilder::new(Self::table_name(), &Self::columns())
+            .where_equals(ParticipantsColumn::RedCapId, red_cap_id)
+            .query_as()
             .fetch_optional(database)
             .await?;
         Ok(result)
@@ -70,26 +85,32 @@ pub struct Participants {
     /// For Database Only
     pub last_synced_with_redcap: Option<DateTime<FixedOffset>>,
 }
+impl TableType for Participants {
+    type Columns = ParticipantsColumn;
+    fn table_name() -> &'static str {
+        "participants"
+    }
+}
 impl ParticipantType for Participants {
     fn get_id(&self) -> i32 {
         self.id
     }
 }
 
-pub trait ParticipantDemograhicsType: for<'r> FromRow<'r, PgRow> + Unpin + Send + Sync {
+pub trait ParticipantDemograhicsType:
+    for<'r> FromRow<'r, PgRow> + Unpin + Send + Sync + TableType
+{
     fn get_id(&self) -> i32;
     fn columns() -> Vec<ParticipantDemograhicsColumn> {
         ParticipantDemograhicsColumn::all()
     }
 
     async fn find_by_participant(id: i32, database: &sqlx::PgPool) -> DBResult<Option<Self>> {
-        let columns = concat_columns(&Self::columns(), None);
-        let result = sqlx::query_as(&format!(
-            "SELECT {columns} FROM participant_demograhics WHERE id = $1"
-        ))
-        .bind(id)
-        .fetch_optional(database)
-        .await?;
+        let result = SimpleSelectQueryBuilder::new(Self::table_name(), &Self::columns())
+            .where_equals(ParticipantDemograhicsColumn::ParticipantId, id)
+            .query_as()
+            .fetch_optional(database)
+            .await?;
         Ok(result)
     }
 }
@@ -118,7 +139,12 @@ pub struct ParticipantDemograhics {
     /// Red Cap: education
     pub highest_education_level: Option<DegreeLevel>,
 }
-
+impl TableType for ParticipantDemograhics {
+    type Columns = ParticipantDemograhicsColumn;
+    fn table_name() -> &'static str {
+        "participant_demographics"
+    }
+}
 impl ParticipantDemograhicsType for ParticipantDemograhics {
     fn get_id(&self) -> i32 {
         self.id

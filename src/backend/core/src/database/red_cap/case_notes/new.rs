@@ -2,7 +2,7 @@ use chrono::{Local, NaiveDate};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use crate::{database::DBResult, red_cap_data::VisitType};
+use crate::{database::DBResult, red_cap::VisitType};
 
 use super::CaseNote;
 

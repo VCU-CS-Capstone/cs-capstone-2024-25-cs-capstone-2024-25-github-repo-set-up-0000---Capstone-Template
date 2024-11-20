@@ -76,3 +76,7 @@ impl FromStr for CheckboxValue {
         }
     }
 }
+
+pub fn is_check_box_item(value: &str) -> bool {
+    value.contains("___")
+}

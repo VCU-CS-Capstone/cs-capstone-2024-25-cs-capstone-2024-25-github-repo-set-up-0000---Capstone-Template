@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS participants(
     -- serial 64 auto incrementing
     id serial PRIMARY KEY,
-    red_cap_id INTEGER,
+    red_cap_id INTEGER UNIQUE,
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
     -- Contact Info
@@ -85,10 +85,11 @@ CREATE TABLE IF NOT EXISTS participant_medications(
     dosage VARCHAR(255),
     frequency TEXT,
     date_prescribed DATE,
-    date_entered_into_system DATE NOT NULL DEFAULT CURRENT_DATE,
+    date_entered_into_system DATE DEFAULT CURRENT_DATE,
     is_current BOOLEAN,
     date_discontinued DATE,
-    comments TEXT
+    comments TEXT,
+    red_cap_index INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS participant_goals(
@@ -100,7 +101,8 @@ CREATE TABLE IF NOT EXISTS participant_goals(
             REFERENCES participants(id)
             ON DELETE CASCADE,
     goal TEXT NOT NULL,
-    is_active BOOLEAN
+    is_active BOOLEAN,
+    red_cap_index INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS participant_goal_steps(
@@ -121,5 +123,6 @@ CREATE TABLE IF NOT EXISTS participant_goal_steps(
     confidence_level smallint,
     date_set DATE,
     date_to_be_completed DATE,
-    action_step BOOLEAN
+    action_step BOOLEAN,
+    red_cap_index INTEGER
 );

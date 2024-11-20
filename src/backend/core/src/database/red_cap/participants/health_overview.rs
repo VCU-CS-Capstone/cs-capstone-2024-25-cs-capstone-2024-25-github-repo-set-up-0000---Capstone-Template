@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgRow;
 use tracing::debug;
 
-use crate::red_cap_data::MobilityDevice;
+use crate::red_cap::MobilityDevice;
 pub trait HealthOverviewType: for<'r> FromRow<'r, PgRow> + Unpin + Send + Sync {
     fn get_id(&self) -> i32;
 
@@ -58,6 +58,12 @@ pub struct HealthOverview {
     /// Red Cap: num_meds
     pub takes_more_than_5_medications: Option<bool>,
 }
+impl TableType for HealthOverview {
+    type Columns = HealthOverviewColumn;
+    fn table_name() -> &'static str {
+        "participant_health_overview"
+    }
+}
 impl HealthOverviewType for HealthOverview {
     fn get_id(&self) -> i32 {
         self.id
@@ -68,13 +74,15 @@ impl HealthOverview {
         &self,
         database: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> sqlx::Result<Vec<HealthOverviewMobilityDevices>> {
-        sqlx::query_as(
-            r#"
-            SELECT * FROM health_overview_mobility_devices
-            WHERE health_overview_id = $1
-            "#,
+        SimpleSelectQueryBuilder::new(
+            HealthOverviewMobilityDevices::table_name(),
+            &HealthOverviewMobilityDevicesColumn::all(),
         )
-        .bind(self.id)
+        .where_equals(
+            HealthOverviewMobilityDevicesColumn::HealthOverviewId,
+            self.id,
+        )
+        .query_as::<HealthOverviewMobilityDevices>()
         .fetch_all(database)
         .await
     }
@@ -83,26 +91,30 @@ impl HealthOverview {
         device: MobilityDevice,
         database: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> sqlx::Result<()> {
-        sqlx::query(
-            r#"
-                INSERT INTO health_overview_mobility_devices (health_overview_id, mobility_devices)
-                VALUES ($1, $2)
-                "#,
-        )
-        .bind(self.id)
-        .bind(device)
-        .execute(database)
-        .await?;
-
+        SimpleInsertQueryBuilder::new(HealthOverviewMobilityDevices::table_name())
+            .insert(
+                HealthOverviewMobilityDevicesColumn::HealthOverviewId,
+                self.id,
+            )
+            .insert(HealthOverviewMobilityDevicesColumn::Device, device)
+            .query()
+            .execute(database)
+            .await?;
         Ok(())
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow, Columns)]
 pub struct HealthOverviewMobilityDevices {
     pub id: i32,
     /// 1:many with [HealthOverviw]
     pub health_overview_id: i32,
     /// Red Cap: info_mobility
     pub device: MobilityDevice,
+}
+impl TableType for HealthOverviewMobilityDevices {
+    type Columns = HealthOverviewMobilityDevicesColumn;
+    fn table_name() -> &'static str {
+        "health_overview_mobility_devices"
+    }
 }

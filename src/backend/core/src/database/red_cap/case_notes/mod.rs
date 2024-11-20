@@ -1,5 +1,5 @@
 pub mod new;
-use crate::red_cap_data::VisitType;
+use crate::red_cap::VisitType;
 use chrono::{DateTime, FixedOffset, NaiveDate};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;

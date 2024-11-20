@@ -1,8 +1,7 @@
 pub mod database;
 pub mod red_cap;
-pub mod red_cap_data;
 pub mod user;
-
+pub mod utils;
 pub mod env_utils {
 
     use ahash::{HashMap, HashMapExt};
