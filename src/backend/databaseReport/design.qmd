@@ -42,8 +42,6 @@ erDiagram
     case_note_question_answers ||--o{ question_answers_multi_check : "Might be connected to many options"
     case_note_question_answers }o--o| question_options : "Might be connected to single options"
 
-    question_requirements }o--o| questions : "Questions might have many requirements"
-    question_requirements }o--o| question_options : ""
 
     question_options ||--o{  question_answers_multi_check : ""
     questions ||--o{ case_note_question_answers :""
@@ -63,16 +61,6 @@ erDiagram
         string red_cap_other_id "Nullable"
         bool removed "Was Question Removed"
     }
-    question_requirements{
-        i32 id
-        i32 question_to_check FK
-        i32 question_to_add FK "The question to be added if requirement met"
-        i32 has_option FK "Nullable"
-        i32 equals_radio FK "Nullable"
-        i32 equals_text "Nullable"
-        i32 equals_number  "Nullable"
-        boolean equals_boolean "Nullable"
-    }
     question_options{
         i32 id PK
         i32 question_id FK
@@ -81,8 +69,6 @@ erDiagram
         i32 red_cap_option_index "Nullable"
         bool removed "Was Option Removed"
     }
-
-
     participants{
         i32 participant_id PK
         i32 red_cap_id

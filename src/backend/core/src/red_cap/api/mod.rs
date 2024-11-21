@@ -168,19 +168,10 @@ impl RedcapClient {
 }
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
 
     use tracing::warn;
 
-    use crate::{
-        database::red_cap::{
-            self,
-            participants::{
-                health_overview::{HealthOverview, HealthOverviewType},
-                ParticipantDemograhics, ParticipantDemograhicsType, ParticipantType, Participants,
-            },
-        },
-        red_cap::{
+    use crate::red_cap::{
             api::{ExportOptions, Forms, RedcapClient},
             converter::{
                 case_notes::{OtherCaseNoteData, RedCapCaseNoteBase, RedCapHealthMeasures},
@@ -190,10 +181,8 @@ mod tests {
                     RedCapHealthOverview, RedCapParticipant, RedCapParticipantDemographics,
                 },
                 RedCapConverter,
-            },
-            flatten_data_to_red_cap_format, process_flat_json, tasks,
-        },
-    };
+            }, process_flat_json,
+        };
     #[tokio::test]
     #[ignore]
     pub async fn test_next_record_id() {

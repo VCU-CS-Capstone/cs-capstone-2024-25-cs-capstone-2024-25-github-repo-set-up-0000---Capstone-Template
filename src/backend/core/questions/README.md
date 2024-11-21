@@ -7,16 +7,15 @@ Each file in the directory contains a category then the questions within it.
 
 
 ## What Still Needs Mapping
-- [ ] Education
-  - Only Some of the questions are mapped
+- [X] Transitions of Care
+- [X] Education
 - [X] Medications
 - [X] Fall Screening
 - [ ] Fall Risk Screening And Risk Assessment
   - First 2 Sections are mapped
-- [ ] Opioid Screening
+- [X] Opioid Screening
 - [X] Case Note Faculty and Staff
-- [ ] Case Note Student
-  - Still need to map all the time questions
+- [X] Case Note Student
 
 
 ## Requirements

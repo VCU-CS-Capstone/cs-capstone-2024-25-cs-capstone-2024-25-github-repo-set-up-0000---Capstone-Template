@@ -1,5 +1,5 @@
 use ahash::HashMap;
-use rhai::{CustomType, Engine, EvalAltResult, TypeBuilder};
+use rhai::{CustomType, TypeBuilder};
 
 use super::{QuestionAnswerMCB, QuestionAnswerRadio, QuestionType};
 

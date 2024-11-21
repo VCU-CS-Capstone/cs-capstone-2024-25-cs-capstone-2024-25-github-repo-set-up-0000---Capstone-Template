@@ -71,7 +71,7 @@ KEY2=value2
 pub mod test_utils {
     use std::sync::Once;
 
-    use tracing::{info, level_filters::LevelFilter};
+    use tracing::{error, info, level_filters::LevelFilter};
     use tracing_subscriber::{filter, layer::SubscriberExt, util::SubscriberInitExt, Layer};
 
     pub fn init_logger() {
@@ -89,5 +89,6 @@ pub mod test_utils {
                 .init();
         });
         info!("Logger initialized");
+        error!("This is an error message");
     }
 }

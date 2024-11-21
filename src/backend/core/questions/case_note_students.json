@@ -46,9 +46,9 @@
                     "string_id": "ot"
                 },
                 {
-                    "name": "NP",
+                    "name": "APRN",
                     "red_cap_option_index": 6,
-                    "string_id": "np"
+                    "string_id": "aprn"
                 },
                 {
                     "name": "Psychology",
@@ -88,7 +88,87 @@
                 "question_type": "Number",
                 "question": "Number of PharmD",
                 "string_id": "numpharmd",
-                "requirements": "questions.get(\"students\").contains('pharmd')"
+                "requirements": "questions.get(\"students\").contains(\"PharmD\")"
+            }
+        },
+        {
+            "question": {
+                "question_type": "Number",
+                "question": "Number of MD",
+                "string_id": "nummd",
+                "requirements": "questions.get(\"students\").contains(\"md\")"
+            }
+        },
+        {
+            "question": {
+                "question_type": "Number",
+                "question": "Number of BSN",
+                "string_id": "numbsn",
+                "requirements": "questions.get(\"students\").contains(\"bsn\")"
+            }
+        },
+        {
+            "question": {
+                "question_type": "Number",
+                "question": "Number of BSW/MSW",
+                "string_id": "numbsw_msw",
+                "requirements": "questions.get(\"students\").contains(\"bsw_msw\")"
+            }
+        },
+        {
+            "question": {
+                "question_type": "Number",
+                "question": "Number of OT",
+                "string_id": "numot",
+                "requirements": "questions.get(\"students\").contains(\"ot\")"
+            }
+        },
+        {
+            "question": {
+                "question_type": "Number",
+                "question": "Number of APRN",
+                "string_id": "numaprn",
+                "requirements": "questions.get(\"students\").contains(\"aprn\")"
+            }
+        },
+        {
+            "question": {
+                "question_type": "Number",
+                "question": "Number of Psychology",
+                "string_id": "numpsych",
+                "requirements": "questions.get(\"students\").contains(\"psych\")"
+            }
+        },
+        {
+            "question": {
+                "question_type": "Number",
+                "question": "Number of Health Science",
+                "string_id": "numhs",
+                "requirements": "questions.get(\"students\").contains(\"health_science\")"
+            }
+        },
+        {
+            "question": {
+                "question_type": "Number",
+                "question": "Number of Other",
+                "string_id": "numother",
+                "requirements": "questions.get(\"students\").contains(\"other\")"
+            }
+        },
+        {
+            "question": {
+                "question_type": "Number",
+                "question": "Number of PT",
+                "string_id": "numpt",
+                "requirements": "questions.get(\"students\").contains(\"pt\")"
+            }
+        },
+        {
+            "question": {
+                "question_type": "Number",
+                "question": "Number of AD Nursing",
+                "string_id": "numad",
+                "requirements": "questions.get(\"students\").contains(\"ad_nursing\")"
             }
         }
     ]

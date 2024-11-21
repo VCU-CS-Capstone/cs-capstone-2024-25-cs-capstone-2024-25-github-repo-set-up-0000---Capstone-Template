@@ -193,31 +193,3 @@ impl CaseNoteHealthMeasures {
             .map_err(DBError::from)
     }
 }
-/// Case Note Questions Related to a patient call to 911 or their PCP
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow)]
-pub struct CaseNoteOtherHealthVisits {
-    pub id: i32,
-    /// 1:1 with [CaseNote]
-    pub case_note_id: i32,
-    /// Red Cap ID: `ercall`
-    ///
-    /// The two fields are derived from
-    /// - No - not required
-    /// - Yes, and taken to hospital in ambulance
-    /// - Yes, but refused ambulance
-    pub emergency_number_called: bool,
-
-    pub refused_ambulance: Option<bool>,
-    /// Red Cap ID: `erreason`
-    pub reason_for_call: Option<String>,
-    ///Red Cap ID: exit_pcp_visit
-    pub last_see_pcp: Option<String>,
-    /// Red Cap ID: transition_hospital
-    pub did_visit_hospital: Option<bool>,
-    /// Red Cap ID: `hospital_transition`
-    pub hospital_visit: Option<String>,
-    /// Red Cap ID: `transition_ed`
-    pub did_visit_ed: Option<bool>,
-    /// Red Cap ID: `ed_transition`
-    pub ed_visit: Option<String>,
-}

@@ -1,5 +1,3 @@
-use std::io;
-
 use crate::database::prelude::*;
 use derive_builder::Builder;
 use serde::{Deserialize, Serialize};

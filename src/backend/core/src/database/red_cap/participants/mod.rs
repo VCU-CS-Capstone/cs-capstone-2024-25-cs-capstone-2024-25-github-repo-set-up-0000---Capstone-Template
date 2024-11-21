@@ -101,13 +101,13 @@ impl Participants {
             .await?;
         Ok(())
     }
-    #[tracing::instrument(skip(db))]
+    #[tracing::instrument]
     pub async fn update_from_red_cap(
         &mut self,
         red_cap_participant: RedCapParticipant,
         red_cap_demographics: RedCapParticipantDemographics,
         red_cap_health_overview: RedCapHealthOverview,
-        db: &sqlx::PgPool,
+        _db: &sqlx::PgPool,
     ) -> DBResult<()> {
         //TODO: Implement
         warn!("Not Implemented");

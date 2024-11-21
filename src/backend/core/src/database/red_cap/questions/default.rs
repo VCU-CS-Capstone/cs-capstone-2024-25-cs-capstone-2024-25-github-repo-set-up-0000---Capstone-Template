@@ -1,8 +1,8 @@
 use chrono::{DateTime, FixedOffset};
 use rust_embed::Embed;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use sqlx::{prelude::FromRow, PgPool};
+use tracing::{debug, error};
 
 use super::{
     new::{NewQuestion, NewQuestionCategory, NewQuestionOptions},
@@ -69,12 +69,28 @@ pub async fn add_default_questions(conn: &PgPool) -> DBResult<()> {
             category,
             questions,
         } = question;
-        let category = category.insert_return_category(conn).await?;
+        let category = match category.clone().insert_return_category(conn).await {
+            Ok(ok) => ok,
+            Err(err) => {
+                error!(?category, "Error inserting category: {:?}", err);
+                return Err(err);
+            }
+        };
         for question in questions {
             let DefaultQuestionWithOptions { question, options } = question;
-            let question = question
+            debug!(?question, "Inserting question");
+            let question = match question
+                .clone()
                 .insert_with_category_return_question(category.id, conn)
-                .await?;
+                .await
+            {
+                Ok(ok) => ok,
+                Err(err) => {
+                    println!("Error inserting question: {:?}", question);
+                    error!(?question, "Error inserting question: {:?}", err);
+                    return Err(err);
+                }
+            };
             if let Some(options) = options {
                 for option in options {
                     option
