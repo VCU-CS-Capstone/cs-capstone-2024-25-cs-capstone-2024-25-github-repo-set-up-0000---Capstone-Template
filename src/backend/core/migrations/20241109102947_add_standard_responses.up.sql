@@ -174,7 +174,9 @@ CREATE TABLE questions(
     question VARCHAR(255) NOT NULL,
     description TEXT,
     required BOOLEAN DEFAULT FALSE,
-    removed BOOLEAN DEFAULT FALSE
+    removed BOOLEAN DEFAULT FALSE,
+    requirements TEXT,
+    additional_options JSONB
 );
 CREATE TABLE IF NOT EXISTS question_options(
     id serial PRIMARY KEY,
@@ -187,37 +189,6 @@ CREATE TABLE IF NOT EXISTS question_options(
     name VARCHAR(255) NOT NULL,
     description TEXT,
     red_cap_option_index INTEGER,
-    unique_option BOOLEAN NOT NULL DEFAULT FALSE,
-    removed BOOLEAN DEFAULT FALSE
+    removed BOOLEAN NOT NULL DEFAULT FALSE,
+    additional_options JSONB
 );
-CREATE TABLE IF NOT EXISTS question_requirements(
-    id serial PRIMARY KEY,
-    question_to_check INTEGER NOT NULL,
-        CONSTRAINT FK_question_requirements_question_to_check
-            FOREIGN KEY (question_to_check)
-            REFERENCES questions(id)
-            ON DELETE CASCADE,
-    question_to_add INTEGER NOT NULL,
-        CONSTRAINT FK_question_requirements_question_to_add
-            FOREIGN KEY (question_to_add)
-            REFERENCES questions(id)
-            ON DELETE CASCADE,
-    has_option INTEGER,
-        CONSTRAINT FK_question_requirements_has_option
-            FOREIGN KEY (has_option)
-            REFERENCES question_options(id)
-            ON DELETE CASCADE,
-    equals_radio INTEGER,
-        CONSTRAINT FK_question_requirements_equals_radio
-            FOREIGN KEY (equals_radio)
-            REFERENCES question_options(id)
-            ON DELETE CASCADE,
-    equals_boolean BOOLEAN,
-    equals_text TEXT,
-    equals_number INTEGER,
-    equals_float REAL
-);
-
-
-
-

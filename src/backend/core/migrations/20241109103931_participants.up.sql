@@ -76,12 +76,15 @@ CREATE TABLE IF NOT EXISTS participant_medications(
     dosage VARCHAR(255),
     frequency TEXT,
     date_prescribed DATE,
+    date_stopped_taking DATE,
     date_entered_into_system DATE DEFAULT CURRENT_DATE,
     is_current BOOLEAN,
     date_discontinued DATE,
     comments TEXT,
-    red_cap_index INTEGER
-
+    -- Following Fields are for RedCap Sync and Internal Use
+    red_cap_index INTEGER,
+    hidden_from_red_cap BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS participant_goals(
@@ -94,7 +97,10 @@ CREATE TABLE IF NOT EXISTS participant_goals(
             ON DELETE CASCADE,
     goal TEXT NOT NULL,
     is_active BOOLEAN,
-    red_cap_index INTEGER
+    -- Following Fields are for RedCap Sync and Internal Use
+    red_cap_index INTEGER,
+    hidden_from_red_cap BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS participant_goal_steps(
@@ -107,6 +113,7 @@ CREATE TABLE IF NOT EXISTS participant_goal_steps(
             ON DELETE CASCADE,
     goal_id INTEGER,
     -- Relates to participant_goals table
+    -- However, this is not required due to some weird logic within in RedCap
         CONSTRAINT FK_participant_goal_steps_goal_id
             FOREIGN KEY (goal_id)
             REFERENCES participant_goals(id)
@@ -116,7 +123,10 @@ CREATE TABLE IF NOT EXISTS participant_goal_steps(
     date_set DATE,
     date_to_be_completed DATE,
     action_step BOOLEAN,
-    red_cap_index INTEGER
+    -- Following Fields are for RedCap Sync and Internal Use
+    red_cap_index INTEGER,
+    hidden_from_red_cap BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS participant_question_answers(
     id bigserial PRIMARY KEY,

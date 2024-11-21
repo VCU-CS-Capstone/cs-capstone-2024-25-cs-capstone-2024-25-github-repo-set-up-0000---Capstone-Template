@@ -362,7 +362,7 @@ pub struct RedCapHealthOverview {
     /// Red Cap: mobility_devices
     pub mobility_devices: Option<Vec<MobilityDevice>>,
 }
-impl From<RedCapHealthOverview> for (NewHealthOverview) {
+impl From<RedCapHealthOverview> for NewHealthOverview {
     fn from(value: RedCapHealthOverview) -> Self {
         let RedCapHealthOverview {
             height,
@@ -372,15 +372,15 @@ impl From<RedCapHealthOverview> for (NewHealthOverview) {
             takes_more_than_5_medications,
             mobility_devices,
         } = value;
-        let overview = NewHealthOverview {
+
+        NewHealthOverview {
             height,
             reported_health_conditions,
             allergies,
             has_blood_pressure_cuff,
             takes_more_than_5_medications,
             mobility_devices,
-        };
-        overview
+        }
     }
 }
 

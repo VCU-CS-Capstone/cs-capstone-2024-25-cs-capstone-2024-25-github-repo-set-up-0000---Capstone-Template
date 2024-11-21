@@ -1,5 +1,5 @@
 use chrono::{DateTime, Duration, FixedOffset, Local};
-use cs25_303_core::database::{self, user::User};
+use cs25_303_core::database::{self, user::User, DBError};
 use serde::{Deserialize, Serialize};
 use tracing::error;
 use utoipa::ToSchema;
@@ -38,7 +38,7 @@ impl Session {
         self.expires < Local::now().fixed_offset()
     }
 
-    pub async fn get_user(&self, db: &sqlx::PgPool) -> Result<Option<User>, sqlx::Error> {
+    pub async fn get_user(&self, db: &sqlx::PgPool) -> Result<Option<User>, DBError> {
         database::user::find_user_by_id(self.user_id, db).await
     }
 }

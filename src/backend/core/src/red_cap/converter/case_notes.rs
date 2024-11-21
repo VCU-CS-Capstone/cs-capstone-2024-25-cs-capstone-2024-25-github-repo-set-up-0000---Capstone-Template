@@ -1,6 +1,7 @@
-use chrono::NaiveDate;
+use ahash::{HashMap, HashMapExt};
+use chrono::{Local, NaiveDate};
 use serde::{Deserialize, Serialize};
-use tracing::info;
+use tracing::{debug, error, info, warn};
 
 use crate::{
     database::red_cap::{
@@ -9,8 +10,9 @@ use crate::{
             CaseNote, CaseNoteHealthMeasures,
         },
         locations::RedCapLocationConnectionRules,
+        questions::{Question, QuestionDataValue, QuestionOptions, QuestionType},
     },
-    red_cap::{RedCapDataSet, RedCapExportDataType, RedCapType, VisitType},
+    red_cap::{MultiSelect, RedCapDataSet, RedCapExportDataType, RedCapType, VisitType},
 };
 
 use super::{RedCapConverter, RedCapConverterError};
@@ -24,7 +26,7 @@ pub struct RedCapCaseNoteBase {
     pub info_provided_by_caregiver: Option<String>,
     pub date_of_visit: NaiveDate,
     pub pushed_to_redcap: bool,
-    pub redcap_instance: Option<i32>,
+    pub red_cap_instance: Option<i32>,
     pub completed: bool,
 }
 impl From<RedCapCaseNoteBase> for NewCaseNote {
@@ -37,7 +39,7 @@ impl From<RedCapCaseNoteBase> for NewCaseNote {
             info_provided_by_caregiver,
             date_of_visit,
             pushed_to_redcap,
-            redcap_instance,
+            red_cap_instance: redcap_instance,
             completed,
         } = value;
 
@@ -51,6 +53,7 @@ impl From<RedCapCaseNoteBase> for NewCaseNote {
             pushed_to_redcap,
             redcap_instance,
             completed,
+            last_synced_with_redcap: Some(Local::now().fixed_offset()),
         }
     }
 }
@@ -64,7 +67,7 @@ impl From<CaseNote> for RedCapCaseNoteBase {
             info_provided_by_caregiver,
             date_of_visit,
             pushed_to_redcap,
-            redcap_instance,
+            red_cap_instance,
             completed,
             ..
         } = value;
@@ -77,7 +80,7 @@ impl From<CaseNote> for RedCapCaseNoteBase {
             info_provided_by_caregiver,
             date_of_visit,
             pushed_to_redcap,
-            redcap_instance,
+            red_cap_instance,
             completed,
         }
     }
@@ -95,7 +98,7 @@ impl RedCapCaseNoteBase {
             reason_for_visit,
             info_provided_by_caregiver,
             date_of_visit,
-            redcap_instance,
+            red_cap_instance,
             ..
         } = self;
 
@@ -119,7 +122,7 @@ impl RedCapCaseNoteBase {
             info_provided_by_caregiver.clone().into(),
         );
         data.insert("visit_date".to_string(), (*date_of_visit).into());
-        if let Some(redcap_instance) = redcap_instance {
+        if let Some(redcap_instance) = red_cap_instance {
             data.insert(
                 "redcap_repeat_instance".to_string(),
                 (*redcap_instance).into(),
@@ -166,7 +169,7 @@ impl RedCapCaseNoteBase {
             info_provided_by_caregiver: data.get_string("subjective_info"),
             date_of_visit: data.get_date("visit_date").unwrap_or_default(),
             pushed_to_redcap: true,
-            redcap_instance: Some(redcap_repeat_instance as i32),
+            red_cap_instance: Some(redcap_repeat_instance as i32),
             completed: data
                 .get_bad_boolean("case_note_complete")
                 .unwrap_or_default(),
@@ -302,7 +305,7 @@ impl RedCapHealthMeasures {
     }
     pub async fn read_health_measures<D: RedCapDataSet>(
         data: &D,
-    ) -> Result<Option<Self>, RedCapConverterError> {
+    ) -> Result<Self, RedCapConverterError> {
         let sit = read_blood_pressure(data, "bp_sit");
         let stand = read_blood_pressure(data, "bp_stand");
         let weight = data.get_number("weight");
@@ -321,7 +324,7 @@ impl RedCapHealthMeasures {
             other,
         };
 
-        Ok(Some(result))
+        Ok(result)
     }
 }
 
@@ -337,4 +340,123 @@ fn read_blood_pressure<D: RedCapDataSet>(data: &D, prefix: &str) -> Option<NewBl
 fn write_blood_pressure<D: RedCapDataSet>(data: &mut D, prefix: &str, value: &NewBloodPressure) {
     data.insert(format!("{}_syst", prefix), value.systolic.into());
     data.insert(format!("{}_dia", prefix), value.diastolic.into());
+}
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct OtherCaseNoteData {
+    pub values: HashMap<i32, QuestionDataValue>,
+}
+
+impl OtherCaseNoteData {
+    pub async fn read(
+        data: &HashMap<String, RedCapExportDataType>,
+        converter: &mut RedCapConverter,
+    ) -> Result<Self, RedCapConverterError> {
+        let mut values: HashMap<i32, QuestionDataValue> = HashMap::new();
+        for (key, value) in data {
+            let question =
+                Question::find_by_string_id_or_other(key, &key, &converter.database).await?;
+            if let Some(question) = question {
+                let question_data = match value {
+                    RedCapExportDataType::MultiSelect(multi_select) => {
+                        if !question.question_type.is_multi_check_box() {
+                            error!(?question, ?key, ?value, "Question is not a multi check box");
+                            continue;
+                        }
+                        let result =
+                            process_multiselect(&question, multi_select, &mut values, converter)
+                                .await?;
+                        if let Some(result) = result {
+                            result
+                        } else {
+                            continue;
+                        }
+                    }
+                    RedCapExportDataType::Text(value) => {
+                        if let Some(old_question_value) = values.get_mut(&question.id) {
+                            debug!("The Multicheck Box has an Other Field Most Likely");
+                            old_question_value.push_other_to_other(value.clone());
+                            continue;
+                        } else {
+                            QuestionDataValue::Text(value.clone())
+                        }
+                    }
+                    RedCapExportDataType::Null => continue,
+                    RedCapExportDataType::Float(value) => QuestionDataValue::Float(*value),
+                    RedCapExportDataType::Number(number) => match question.question_type {
+                        QuestionType::Radio => {
+                            let Some(option) =
+                                QuestionOptions::find_option_with_red_cap_index_and_in_question(
+                                    *number as i32,
+                                    question.id,
+                                    &converter.database,
+                                )
+                                .await?
+                            else {
+                                warn!(?question, ?number, "Option Not Found");
+                                continue;
+                            };
+                            QuestionDataValue::Radio {
+                                option,
+                                other: None,
+                            }
+                        }
+                        QuestionType::Number => QuestionDataValue::Number(*number as i32),
+                        QuestionType::Float => QuestionDataValue::Float(*number as f32),
+                        QuestionType::Boolean => {
+                            let value = *number == 1;
+                            QuestionDataValue::Boolean(value)
+                        }
+                        _ => {
+                            warn!(?question, ?number, "Option Not Found");
+                            continue;
+                        }
+                    },
+                    RedCapExportDataType::Date(naive_date) => {
+                        QuestionDataValue::Text(naive_date.to_string())
+                    }
+                };
+                values.insert(question.id, question_data);
+            } else {
+                warn!(?key, ?value, "Question Not Found");
+            }
+        }
+        Ok(Self { values })
+    }
+}
+
+async fn process_multiselect(
+    question: &Question,
+    multi_select: &MultiSelect,
+    values: &mut HashMap<i32, QuestionDataValue>,
+    converter: &mut RedCapConverter,
+) -> Result<Option<QuestionDataValue>, RedCapConverterError> {
+    let mut options = Vec::new();
+    for (index, value) in &multi_select.set_values {
+        let Some(option) = QuestionOptions::find_option_with_red_cap_index_and_in_question(
+            *index,
+            question.id,
+            &converter.database,
+        )
+        .await?
+        else {
+            warn!(?question, ?index, ?value, "Option Not Found");
+            continue;
+        };
+
+        debug!(?option, ?index, ?value, "Option Found");
+
+        if value.is_checked() {
+            options.push(option);
+        }
+    }
+    if let Some(old_question_value) = values.get_mut(&question.id) {
+        debug!("The Multicheck Box has an Other Field Most Likely");
+        old_question_value.make_multi_check_with_other(options);
+        Ok(None)
+    } else {
+        return Ok(Some(QuestionDataValue::MultiCheckBox {
+            options,
+            other: None,
+        }));
+    }
 }

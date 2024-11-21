@@ -18,10 +18,11 @@ CREATE TABLE IF NOT EXISTS case_notes(
     reason_for_visit TEXT,
     info_provided_by_caregiver TEXT,
     date_of_visit DATE NOT NULL,
-    pushed_to_redcap BOOLEAN,
     completed BOOLEAN NOT NULL DEFAULT FALSE,
-    redcap_instance integer,
-    last_synced_with_redcap TIMESTAMP WITH TIME ZONE
+    pushed_to_redcap BOOLEAN,
+    red_cap_instance integer,
+    last_synced_with_redcap TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS case_note_health_measures(
@@ -65,6 +66,7 @@ CREATE TABLE IF NOT EXISTS case_note_question_answers(
             REFERENCES questions(id)
             ON UPDATE CASCADE
             ON DELETE CASCADE,
+    response_type VARCHAR(255) NOT NULL,
     value_radio INTEGER,
         CONSTRAINT FK_case_note_question_answers_value_radio
             FOREIGN KEY (value_radio)

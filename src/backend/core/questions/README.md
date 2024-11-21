@@ -10,6 +10,16 @@ Each file in the directory contains a category then the questions within it.
 - [ ] Education
   - Only Some of the questions are mapped
 - [X] Medications
-- [ ] Fall Screening
-- [ ] Fall Risk Screening
+- [X] Fall Screening
+- [ ] Fall Risk Screening And Risk Assessment
+  - First 2 Sections are mapped
 - [ ] Opioid Screening
+- [X] Case Note Faculty and Staff
+- [ ] Case Note Student
+  - Still need to map all the time questions
+
+
+## Requirements
+
+The requirements stuff will be based on a simple DSL to grab other questions and check values
+

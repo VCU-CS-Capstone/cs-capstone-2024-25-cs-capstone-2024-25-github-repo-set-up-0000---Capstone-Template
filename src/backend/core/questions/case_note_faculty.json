@@ -54,7 +54,9 @@
                     "name": "No screening completed",
                     "red_cap_option_index": 7,
                     "string_id": "no_screening_completed",
-                    "unique": true
+                    "options": {
+                        "unique": true
+                    }
                 },
                 {
                     "name": "Data Upload March 2023",

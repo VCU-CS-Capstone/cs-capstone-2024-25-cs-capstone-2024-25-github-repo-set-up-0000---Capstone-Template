@@ -1,7 +1,6 @@
-use std::{collections::HashMap, num::ParseIntError};
-
-use clap::builder::Str;
+use ahash::{HashMap, HashMapExt};
 use responses::RedCapValue;
+use std::num::ParseIntError;
 use thiserror::Error;
 use tracing::{debug, instrument};
 mod request;
@@ -184,7 +183,7 @@ mod tests {
         red_cap::{
             api::{ExportOptions, Forms, RedcapClient},
             converter::{
-                case_notes::{RedCapCaseNoteBase, RedCapHealthMeasures},
+                case_notes::{OtherCaseNoteData, RedCapCaseNoteBase, RedCapHealthMeasures},
                 goals::RedCapCompleteGoals,
                 medications::RedCapMedication,
                 participants::{
@@ -284,6 +283,10 @@ mod tests {
             println!("{:#?}", base);
             let health_measures = RedCapHealthMeasures::read_health_measures(&record).await?;
             println!("{:#?}", health_measures);
+
+            let other = OtherCaseNoteData::read(&record, &mut converter).await?;
+
+            println!("{:#?}", other);
         }
         Ok(())
     }
@@ -306,7 +309,7 @@ mod tests {
         for record in records {
             let record = process_flat_json(record);
             println!("{:#?}", record);
-            let goals = RedCapCompleteGoals::read(&record).await?;
+            let goals = RedCapCompleteGoals::read(&record)?;
             println!("{:#?}", goals);
         }
         Ok(())

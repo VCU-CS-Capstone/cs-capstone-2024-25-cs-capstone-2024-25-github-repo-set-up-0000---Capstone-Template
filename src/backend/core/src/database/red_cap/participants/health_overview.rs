@@ -15,7 +15,7 @@ pub trait HealthOverviewType: for<'r> FromRow<'r, PgRow> + Unpin + Send + Sync {
     async fn find_by_id(
         id: i32,
         database: impl Executor<'_, Database = Postgres>,
-    ) -> sqlx::Result<Option<Self>> {
+    ) -> DBResult<Option<Self>> {
         let columns = concat_columns(&Self::columns(), None);
         let result = sqlx::query_as(&format!(
             "SELECT {columns} FROM health_overview WHERE id = $1"
@@ -29,7 +29,7 @@ pub trait HealthOverviewType: for<'r> FromRow<'r, PgRow> + Unpin + Send + Sync {
     async fn find_by_participant_id(
         participant_id: i32,
         database: impl Executor<'_, Database = Postgres>,
-    ) -> sqlx::Result<Option<Self>> {
+    ) -> DBResult<Option<Self>> {
         let mut result =
             SimpleSelectQueryBuilder::new("participant_health_overview", &Self::columns());
         result.where_equals(HealthOverviewColumn::ParticipantId, participant_id);

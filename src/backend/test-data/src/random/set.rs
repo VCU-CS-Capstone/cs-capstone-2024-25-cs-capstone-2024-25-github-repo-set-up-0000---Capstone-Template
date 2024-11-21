@@ -69,12 +69,16 @@ impl RandomSets {
     }
     pub fn random_health_overview(&mut self) -> NewHealthOverview {
         let height = match self.rand.gen_range(0..100) {
-            0..50 => None,
-            50..75 => Some(self.rand.gen_range(50..100)),
-            _ => Some(self.rand.gen_range(100..300)),
+            0..5 => None,
+            5..80 => Some(self.rand.gen_range(50..75)),
+            _ => Some(self.rand.gen_range(75..84)),
         };
+        let has_blood_pressure_cuff = self.rand_bool(0.5);
+        let takes_more_than_5_medications = self.rand_bool(0.5);
         NewHealthOverview {
             height,
+            has_blood_pressure_cuff: Some(has_blood_pressure_cuff),
+            takes_more_than_5_medications: Some(takes_more_than_5_medications),
             ..Default::default()
         }
     }

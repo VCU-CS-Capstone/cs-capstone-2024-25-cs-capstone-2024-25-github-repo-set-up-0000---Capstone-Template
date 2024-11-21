@@ -1,14 +1,17 @@
-use std::{any::type_name, collections::HashMap, str::FromStr};
+use std::{any::type_name, str::FromStr};
 pub mod tasks;
+use ahash::{HashMap, HashMapExt};
 use api::utils::{is_check_box_item, CheckboxValue, FieldNameAndIndex};
 use chrono::NaiveDate;
 use tracing::{error, warn};
 pub mod converter;
+
 mod enum_types;
 pub use enum_types::*;
 pub mod utils;
 
 pub mod api;
+// TODO: Use a faster hash map. It doesn't have to be DDOS resistant
 pub type RedCapDataMap = HashMap<String, RedCapExportDataType>;
 pub trait RedCapEnum {
     /// To Prevent Obscure Bugs. It will return None
@@ -27,7 +30,7 @@ pub trait MultiSelectType: RedCapEnum {
 
         for (id, value) in multi_select.set_values.iter() {
             if value == &CheckboxValue::Checked {
-                if let Some(value) = Self::from_usize(*id) {
+                if let Some(value) = Self::from_usize(*id as usize) {
                     result.push(value);
                 } else {
                     warn!(?id, "Unknown {}", type_name::<Self>());
@@ -43,7 +46,7 @@ pub trait MultiSelectType: RedCapEnum {
     {
         let mut set_values = HashMap::new();
         for value in values {
-            set_values.insert(value.to_usize(), CheckboxValue::Checked);
+            set_values.insert(value.to_usize() as i32, CheckboxValue::Checked);
         }
         MultiSelect {
             field_base: field_base.into(),
@@ -124,7 +127,7 @@ impl RedCapDataSet for RedCapDataMap {
 #[derive(Debug, Clone)]
 pub struct MultiSelect {
     pub field_base: String,
-    pub set_values: HashMap<usize, CheckboxValue>,
+    pub set_values: HashMap<i32, CheckboxValue>,
 }
 
 pub fn find_and_extract_multi_selects(items: &mut HashMap<String, String>) -> Vec<MultiSelect> {
@@ -359,4 +362,27 @@ pub fn flatten_data_to_red_cap_format(
         }
     }
     output
+}
+
+#[cfg(test)]
+mod tests {
+    use anyhow::Context;
+
+    use super::api::RedcapClient;
+
+    pub async fn load_red_cap_api_and_db() -> anyhow::Result<(RedcapClient, sqlx::PgPool)> {
+        crate::test_utils::init_logger();
+
+        let env = crate::env_utils::read_env_file_in_core("test.env")
+            .context("Unable to load test.env")?;
+
+        let database = crate::database::tests::setup_red_cap_db_test(&env).await?;
+        let client = RedcapClient::new(
+            env.get("RED_CAP_TOKEN")
+                .context("Missing Red Cap Token")?
+                .to_owned(),
+        );
+
+        Ok((client, database))
+    }
 }

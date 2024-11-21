@@ -61,28 +61,31 @@ impl Locations {
     pub async fn find_children_of(
         parent_id: i32,
         database: &sqlx::PgPool,
-    ) -> Result<Vec<Locations>, sqlx::Error> {
+    ) -> Result<Vec<Locations>, DBError> {
         SimpleSelectQueryBuilder::new(Locations::table_name(), &LocationsColumn::all())
             .where_equals(LocationsColumn::ParentLocation, parent_id)
             .query_as()
             .fetch_all(database)
             .await
+            .map_err(DBError::from)
     }
-    pub async fn get_all(database: &sqlx::PgPool) -> Result<Vec<Locations>, sqlx::Error> {
+    pub async fn get_all(database: &sqlx::PgPool) -> Result<Vec<Locations>, DBError> {
         SimpleSelectQueryBuilder::new(Locations::table_name(), &LocationsColumn::all())
             .query_as()
             .fetch_all(database)
             .await
+            .map_err(DBError::from)
     }
     pub async fn find_all_in_program(
         program: Programs,
         database: &sqlx::PgPool,
-    ) -> Result<Vec<Locations>, sqlx::Error> {
+    ) -> Result<Vec<Locations>, DBError> {
         SimpleSelectQueryBuilder::new(Locations::table_name(), &LocationsColumn::all())
             .where_equals(LocationsColumn::Program, program)
             .query_as()
             .fetch_all(database)
             .await
+            .map_err(DBError::from)
     }
 }
 /// So In Red Cap locations are split over multiple questions.

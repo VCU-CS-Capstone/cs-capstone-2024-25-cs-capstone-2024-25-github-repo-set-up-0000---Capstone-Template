@@ -1,3 +1,5 @@
+use strum::EnumIs;
+
 use super::RedCapParseError;
 use std::str::FromStr;
 /// So redcap stores multi check boxes like this
@@ -17,7 +19,7 @@ use std::str::FromStr;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FieldNameAndIndex {
     pub field_name: String,
-    pub index: Option<usize>,
+    pub index: Option<i32>,
 }
 impl FromStr for FieldNameAndIndex {
     type Err = RedCapParseError;
@@ -32,7 +34,7 @@ impl FromStr for FieldNameAndIndex {
         let actual_field_name = parts.next().unwrap();
         let index = parts.next();
         if let Some(index) = index {
-            let index = usize::from_str(index).map_err(|err| {
+            let index = i32::from_str(index).map_err(|err| {
                 RedCapParseError::InvalidMultiCheckboxField {
                     input: field_name.to_owned(),
                     reason: err.into(),
@@ -50,7 +52,7 @@ impl FromStr for FieldNameAndIndex {
         }
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, EnumIs)]
 pub enum CheckboxValue {
     Checked,
     Unchecked,

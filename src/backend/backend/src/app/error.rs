@@ -89,6 +89,7 @@ macro_rules! basic_internal_error {
 basic_internal_error!(
     std::io::Error => "IO",
     sqlx::Error => "Database",
+    cs25_303_core::database::DBError => "Database",
     // Do not use this when handing user input. An error message saying request error should be returned.
     serde_json::Error => "JSON",
     http::Error => "HTTP",

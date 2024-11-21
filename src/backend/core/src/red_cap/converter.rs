@@ -1,7 +1,10 @@
 use sqlx::PgPool;
 use thiserror::Error;
 
-use crate::database::red_cap::locations::{Locations, RedCapLocationConnectionRules};
+use crate::database::{
+    red_cap::locations::{Locations, RedCapLocationConnectionRules},
+    DBError,
+};
 pub mod case_notes;
 pub mod goals;
 pub mod medications;
@@ -9,7 +12,7 @@ pub mod participants;
 #[derive(Debug, Error)]
 pub enum RedCapConverterError {
     #[error("Error in database: {0}")]
-    DatabaseError(#[from] sqlx::Error),
+    DatabaseError(#[from] DBError),
     #[error("Required field missing: {0}")]
     RequiredFieldMissing(&'static str),
 }

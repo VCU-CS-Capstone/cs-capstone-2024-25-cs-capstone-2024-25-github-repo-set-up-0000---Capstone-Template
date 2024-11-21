@@ -87,14 +87,9 @@
             "question": {
                 "question_type": "Number",
                 "question": "Number of PharmD",
-                "string_id": "numpharmd"
-            },
-            "requirements": [
-                {
-                    "question": "students",
-                    "contains": "pharmd"
-                }
-            ]
+                "string_id": "numpharmd",
+                "requirements": "questions.get(\"students\").contains('pharmd')"
+            }
         }
     ]
 }

@@ -19,7 +19,7 @@ impl NewParticipantGoal {
         self,
         participant_id: i32,
         database: impl Executor<'_, Database = sqlx::Postgres>,
-    ) -> sqlx::Result<ParticipantGoals> {
+    ) -> DBResult<ParticipantGoals> {
         let Self {
             goal,
             is_active,
@@ -34,6 +34,7 @@ impl NewParticipantGoal {
             .query_as()
             .fetch_one(database)
             .await
+            .map_err(DBError::from)
     }
 }
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow, Columns)]
@@ -43,12 +44,14 @@ pub struct ParticipantGoals {
     pub goal: String,
     pub is_active: Option<bool>,
     pub red_cap_index: Option<i32>,
+    pub hidden_from_red_cap: bool,
+    pub created_at: DateTime<FixedOffset>,
 }
 impl ParticipantGoals {
     pub async fn get_goal_by_id(
         goal_id: i32,
         database: impl Executor<'_, Database = sqlx::Postgres>,
-    ) -> sqlx::Result<Option<ParticipantGoals>> {
+    ) -> DBResult<Option<ParticipantGoals>> {
         SimpleSelectQueryBuilder::new(
             ParticipantGoals::table_name(),
             &ParticipantGoalsColumn::all(),
@@ -57,12 +60,13 @@ impl ParticipantGoals {
         .query_as()
         .fetch_optional(database)
         .await
+        .map_err(DBError::from)
     }
     pub async fn set_red_cap_index(
         &mut self,
         red_cap_index: i32,
         database: impl Executor<'_, Database = sqlx::Postgres>,
-    ) -> sqlx::Result<()> {
+    ) -> DBResult<()> {
         if self.red_cap_index == Some(red_cap_index) {
             return Ok(());
         }
@@ -77,7 +81,7 @@ impl ParticipantGoals {
     pub async fn get_all_participant_goals(
         participant_id: i32,
         database: impl Executor<'_, Database = sqlx::Postgres>,
-    ) -> sqlx::Result<Vec<ParticipantGoals>> {
+    ) -> DBResult<Vec<ParticipantGoals>> {
         SimpleSelectQueryBuilder::new(
             ParticipantGoals::table_name(),
             &ParticipantGoalsColumn::all(),
@@ -86,12 +90,10 @@ impl ParticipantGoals {
         .query_as()
         .fetch_all(database)
         .await
+        .map_err(DBError::from)
     }
 
-    pub async fn process_red_cap_indexes(
-        participant_id: i32,
-        database: &PgPool,
-    ) -> sqlx::Result<()> {
+    pub async fn process_red_cap_indexes(participant_id: i32, database: &PgPool) -> DBResult<()> {
         let mut goals = Self::get_all_participant_goals(participant_id, database).await?;
         goals.sort_by(|a, b| {
             a.red_cap_index
@@ -131,24 +133,23 @@ pub struct NewParticipantGoalsSteps {
     pub red_cap_index: Option<i32>,
 }
 impl NewParticipantGoalsSteps {
-    pub async fn insert_with_goal_return_none(
+    pub async fn insert_return_none(
         self,
         participant_id: i32,
-        related_goal_id: i32,
         database: impl Executor<'_, Database = sqlx::Postgres>,
-    ) -> sqlx::Result<()> {
+    ) -> DBResult<()> {
         let Self {
+            goal_id,
             step,
             confidence_level,
             date_set,
             date_to_be_completed,
             action_step,
             red_cap_index,
-            ..
         } = self;
         SimpleInsertQueryBuilder::new(ParticipantGoalsSteps::table_name())
             .insert(ParticipantGoalsStepsColumn::ParticipantId, participant_id)
-            .insert(ParticipantGoalsStepsColumn::GoalId, related_goal_id)
+            .insert(ParticipantGoalsStepsColumn::GoalId, goal_id)
             .insert(ParticipantGoalsStepsColumn::Step, step)
             .insert(
                 ParticipantGoalsStepsColumn::ConfidenceLevel,
@@ -159,11 +160,23 @@ impl NewParticipantGoalsSteps {
                 ParticipantGoalsStepsColumn::DateToBeCompleted,
                 date_to_be_completed,
             )
-            .insert(ParticipantGoalsStepsColumn::ActionStep, Some(action_step))
+            .insert(ParticipantGoalsStepsColumn::ActionStep, action_step)
             .insert(ParticipantGoalsStepsColumn::RedCapIndex, red_cap_index)
             .query()
             .execute(database)
             .await?;
+        Ok(())
+    }
+    /// Uses the the argument `related_goal_id` as the goal_id
+    #[inline]
+    pub async fn insert_with_goal_return_none(
+        mut self,
+        participant_id: i32,
+        related_goal_id: i32,
+        database: impl Executor<'_, Database = sqlx::Postgres>,
+    ) -> DBResult<()> {
+        self.goal_id = Some(related_goal_id);
+        self.insert_return_none(participant_id, database).await?;
         Ok(())
     }
 }
@@ -182,13 +195,15 @@ pub struct ParticipantGoalsSteps {
     /// Select No until goal is achieved
     pub action_step: Option<bool>,
     pub red_cap_index: Option<i32>,
+    pub hidden_from_red_cap: bool,
+    pub created_at: chrono::DateTime<FixedOffset>,
 }
 impl ParticipantGoalsSteps {
     pub async fn set_red_cap_index(
         &mut self,
         red_cap_index: i32,
         database: impl Executor<'_, Database = sqlx::Postgres>,
-    ) -> sqlx::Result<()> {
+    ) -> DBResult<()> {
         if self.red_cap_index == Some(red_cap_index) {
             return Ok(());
         }
@@ -204,7 +219,7 @@ impl ParticipantGoalsSteps {
     pub async fn get_all_participant_goals_steps(
         participant_id: i32,
         database: impl Executor<'_, Database = sqlx::Postgres>,
-    ) -> sqlx::Result<Vec<ParticipantGoalsSteps>> {
+    ) -> DBResult<Vec<ParticipantGoalsSteps>> {
         SimpleSelectQueryBuilder::new(
             ParticipantGoalsSteps::table_name(),
             &ParticipantGoalsStepsColumn::all(),
@@ -213,12 +228,10 @@ impl ParticipantGoalsSteps {
         .query_as()
         .fetch_all(database)
         .await
+        .map_err(DBError::from)
     }
 
-    pub async fn process_red_cap_indexes(
-        participant_id: i32,
-        database: &PgPool,
-    ) -> sqlx::Result<()> {
+    pub async fn process_red_cap_indexes(participant_id: i32, database: &PgPool) -> DBResult<()> {
         let mut goals = Self::get_all_participant_goals_steps(participant_id, database).await?;
         goals.sort_by(|a, b| {
             a.red_cap_index

@@ -2,9 +2,12 @@ use chrono::{Local, NaiveDate};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use crate::{database::DBResult, red_cap::VisitType};
+use crate::{
+    database::{tools::TableType, DBResult},
+    red_cap::VisitType,
+};
 
-use super::CaseNote;
+use super::{CaseNote, CaseNoteColumn, SimpleInsertQueryBuilder};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NewCaseNote {
@@ -16,6 +19,7 @@ pub struct NewCaseNote {
     pub date_of_visit: NaiveDate,
     pub pushed_to_redcap: bool,
     pub redcap_instance: Option<i32>,
+    pub last_synced_with_redcap: Option<chrono::DateTime<chrono::FixedOffset>>,
     pub completed: bool,
 }
 impl NewCaseNote {
@@ -34,40 +38,32 @@ impl NewCaseNote {
             pushed_to_redcap,
             redcap_instance,
             completed,
+            last_synced_with_redcap,
         } = self;
 
-        let result: CaseNote = sqlx::query_as(
-            "
-                INSERT INTO case_notes (
-                    participant_id,
-                    location,
-                    visit_type,
-                    age,
-                    reason_for_visit,
-                    info_provided_by_caregiver,
-                    date_of_visit,
-                    pushed_to_redcap,
-                    redcap_instance,
-                    completed
-                )
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-                RETURNING *
-                ",
-        )
-        .bind(participant)
-        .bind(location)
-        .bind(visit_type)
-        .bind(age)
-        .bind(reason_for_visit)
-        .bind(info_provided_by_caregiver)
-        .bind(date_of_visit)
-        .bind(pushed_to_redcap)
-        .bind(redcap_instance)
-        .bind(completed)
-        .fetch_one(database)
-        .await?;
-
-        Ok(result)
+        let case_note = SimpleInsertQueryBuilder::new(CaseNote::table_name())
+            .insert(CaseNoteColumn::ParticipantId, participant)
+            .insert(CaseNoteColumn::Location, location)
+            .insert(CaseNoteColumn::VisitType, visit_type)
+            .insert(CaseNoteColumn::Age, age)
+            .insert(CaseNoteColumn::ReasonForVisit, reason_for_visit)
+            .insert(
+                CaseNoteColumn::InfoProvidedByCaregiver,
+                info_provided_by_caregiver,
+            )
+            .insert(CaseNoteColumn::DateOfVisit, date_of_visit)
+            .insert(CaseNoteColumn::PushedToRedcap, pushed_to_redcap)
+            .insert(CaseNoteColumn::RedCapInstance, redcap_instance)
+            .insert(CaseNoteColumn::Completed, completed)
+            .insert(
+                CaseNoteColumn::LastSyncedWithRedcap,
+                last_synced_with_redcap,
+            )
+            .return_all()
+            .query_as()
+            .fetch_one(database)
+            .await?;
+        Ok(case_note)
     }
 }
 impl Default for NewCaseNote {
@@ -82,6 +78,7 @@ impl Default for NewCaseNote {
             pushed_to_redcap: false,
             redcap_instance: Default::default(),
             completed: false,
+            last_synced_with_redcap: Default::default(),
         }
     }
 }

@@ -20,6 +20,8 @@ pub struct ParticipantMedications {
     pub date_discontinued: Option<NaiveDate>,
     pub comments: Option<String>,
     pub red_cap_index: Option<i32>,
+    pub hidden_from_red_cap: bool,
+    pub created_at: chrono::DateTime<FixedOffset>,
 }
 impl ParticipantMedications {
     pub async fn get_all_participant_medications(
@@ -91,10 +93,10 @@ pub struct NewMedication {
     pub name: String,
     pub dosage: Option<String>,
     pub frequency: Option<MedicationFrequency>,
-    pub date_prescribed: Option<chrono::NaiveDate>,
+    pub date_prescribed: Option<NaiveDate>,
     pub date_entered_into_system: Option<NaiveDate>,
     pub is_current: Option<bool>,
-    pub date_discontinued: Option<chrono::NaiveDate>,
+    pub date_discontinued: Option<NaiveDate>,
     pub comments: Option<String>,
     pub red_cap_index: Option<i32>,
 }

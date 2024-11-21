@@ -12,8 +12,8 @@ use crate::{
 
 use super::{
     health_overview::{HealthOverview, HealthOverviewColumn},
-    ParticipantDemograhics, ParticipantDemograhicsColumn, Participants, ParticipantsColumn,
-    SimpleInsertQueryBuilder, TableType,
+    DBError, ParticipantDemograhics, ParticipantDemograhicsColumn, Participants,
+    ParticipantsColumn, SimpleInsertQueryBuilder, TableType,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -206,6 +206,7 @@ impl NewHealthOverview {
             .query_as::<HealthOverview>()
             .fetch_one(database)
             .await
+            .map_err(DBError::from)
     }
     pub async fn insert_return_none(
         self,

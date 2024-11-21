@@ -1,10 +1,13 @@
+use std::io;
+
 use crate::database::prelude::*;
 use derive_builder::Builder;
 use serde::{Deserialize, Serialize};
+use sqlx::types::Json;
 
 use super::{
-    Question, QuestionCategory, QuestionColumn, QuestionForm, QuestionOptions,
-    QuestionOptionsColumn, QuestionType,
+    AdditionalQuestionOptions, OptionOptions, Question, QuestionCategory, QuestionColumn,
+    QuestionError, QuestionForm, QuestionOptions, QuestionOptionsColumn, QuestionType,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize, Builder)]
@@ -51,6 +54,8 @@ pub struct NewQuestion {
     pub question: String,
     pub string_id: String,
     pub string_id_other: Option<String>,
+    pub requirements: Option<String>,
+    pub additional_options: Option<AdditionalQuestionOptions>,
 }
 
 impl NewQuestion {
@@ -65,8 +70,16 @@ impl NewQuestion {
             string_id,
             string_id_other,
             required,
+            additional_options,
+            requirements,
             ..
         } = self;
+        if let Some(options) = &additional_options {
+            if !options.is_of_type(question_type) {
+                return Err(QuestionError::AdditionalOptionsMismatch(question_type).into());
+            }
+        }
+        let json_options = additional_options.map(Json);
 
         let question = SimpleInsertQueryBuilder::new(Question::table_name())
             .insert(QuestionColumn::CategoryId, category_id)
@@ -75,6 +88,8 @@ impl NewQuestion {
             .insert(QuestionColumn::StringId, string_id)
             .insert(QuestionColumn::StringIdOther, string_id_other)
             .insert(QuestionColumn::Required, required)
+            .insert(QuestionColumn::Requirements, requirements)
+            .insert(QuestionColumn::AdditionalOptions, json_options)
             .return_all()
             .query_as::<Question>()
             .fetch_one(conn)
@@ -91,8 +106,8 @@ pub struct NewQuestionOptions {
     pub string_id: Option<String>,
     pub description: Option<String>,
     pub red_cap_option_index: Option<i32>,
-    #[serde(default)]
-    pub unique: bool,
+    #[serde(alias = "options")]
+    pub additional_options: Option<OptionOptions>,
 }
 
 impl NewQuestionOptions {
@@ -106,9 +121,10 @@ impl NewQuestionOptions {
             description,
             red_cap_option_index,
             string_id,
-            unique,
+            additional_options,
             ..
         } = self;
+        let additional = additional_options.map(Json);
 
         let option = SimpleInsertQueryBuilder::new(QuestionOptions::table_name())
             .insert(QuestionOptionsColumn::QuestionId, question_id)
@@ -119,7 +135,7 @@ impl NewQuestionOptions {
                 red_cap_option_index,
             )
             .insert(QuestionOptionsColumn::StringId, string_id)
-            .insert(QuestionOptionsColumn::UniqueOption, unique)
+            .insert(QuestionOptionsColumn::AdditionalOptions, additional)
             .return_all()
             .query_as::<QuestionOptions>()
             .fetch_one(conn)

@@ -6,8 +6,7 @@ use sqlx::{prelude::FromRow, PgPool};
 
 use super::{
     new::{NewQuestion, NewQuestionCategory, NewQuestionOptions},
-    DBResult, Question, QuestionOptions, QuestionRequirements, QuestionRequirementsColumn,
-    SimpleInsertQueryBuilder, TableType,
+    DBResult,
 };
 /// Table name: _default_questions
 #[derive(Debug, FromRow)]
@@ -43,69 +42,11 @@ impl DefaultQuestionsTable {
 #[derive(Embed)]
 #[folder = "$CARGO_MANIFEST_DIR/questions"]
 struct DefaultQuestionsData;
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DefaultRequirement {
-    /// Should reference the red_cap_id of the question
-    pub question: String,
-    pub equals: Option<Value>,
-    pub contains: Option<String>,
-}
-impl DefaultRequirement {
-    pub async fn insert_with_question_return_options(
-        self,
-        question_to_add: i32,
-        conn: &PgPool,
-    ) -> DBResult<()> {
-        let Self {
-            question,
-            equals,
-            contains,
-        } = self;
-        let Some(question) = Question::find_by_red_cap_id(&question, conn).await? else {
-            return Ok(());
-        };
-        let mut builder = SimpleInsertQueryBuilder::new(QuestionRequirements::table_name());
-        builder
-            .insert(QuestionRequirementsColumn::QuestionToCheck, question.id)
-            .insert(QuestionRequirementsColumn::QuestionToAdd, question_to_add);
-        if let Some(equals) = equals {
-            match equals {
-                Value::Bool(value) => {
-                    builder.insert(QuestionRequirementsColumn::EqualsBoolean, value);
-                }
-                Value::Number(number) => {
-                    builder.insert(
-                        QuestionRequirementsColumn::EqualsNumber,
-                        number.as_i64().unwrap() as i32,
-                    );
-                }
-                Value::String(value) => {
-                    builder.insert(QuestionRequirementsColumn::EqualsText, value);
-                }
-                _ => todo!("Handle Error"),
-            }
-        } else if let Some(contains) = contains {
-            let option = QuestionOptions::find_option_with_string_id_and_in_question(
-                &contains,
-                question.id,
-                conn,
-            )
-            .await?;
-            if let Some(option) = option {
-                builder.insert(QuestionRequirementsColumn::HasOption, option.id);
-            }else{
-                panic!("Option Not Found")
-            }
-        };
-        builder.query().execute(conn).await?;
-        Ok(())
-    }
-}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DefaultQuestionWithOptions {
     pub question: NewQuestion,
     pub options: Option<Vec<NewQuestionOptions>>,
-    pub requirements: Option<Vec<DefaultRequirement>>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DefaultQuestions {
@@ -130,24 +71,13 @@ pub async fn add_default_questions(conn: &PgPool) -> DBResult<()> {
         } = question;
         let category = category.insert_return_category(conn).await?;
         for question in questions {
-            let DefaultQuestionWithOptions {
-                question,
-                options,
-                requirements,
-            } = question;
+            let DefaultQuestionWithOptions { question, options } = question;
             let question = question
                 .insert_with_category_return_question(category.id, conn)
                 .await?;
             if let Some(options) = options {
                 for option in options {
                     option
-                        .insert_with_question_return_options(question.id, conn)
-                        .await?;
-                }
-            }
-            if let Some(requirements) = requirements {
-                for requirement in requirements {
-                    requirement
                         .insert_with_question_return_options(question.id, conn)
                         .await?;
                 }

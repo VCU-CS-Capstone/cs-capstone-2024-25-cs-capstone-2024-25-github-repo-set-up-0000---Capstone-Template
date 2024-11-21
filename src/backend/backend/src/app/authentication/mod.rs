@@ -23,7 +23,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use axum_extra::extract::cookie::Cookie;
-use cs25_303_core::database::user::User;
+use cs25_303_core::database::{user::User, DBError};
 use cs25_303_core::user::Scopes;
 use header::AuthorizationHeader;
 use http::request::Parts;
@@ -47,8 +47,8 @@ pub enum AuthenticationError {
     #[error("Forbidden")]
     Forbidden,
 }
-impl From<sqlx::Error> for AuthenticationError {
-    fn from(err: sqlx::Error) -> Self {
+impl From<DBError> for AuthenticationError {
+    fn from(err: DBError) -> Self {
         AuthenticationError::RequestTypeError(Box::new(err))
     }
 }

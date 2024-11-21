@@ -16,14 +16,9 @@
             "question": {
                 "question_type": "Boolean",
                 "question": "New Opioid?",
-                "string_id": "opiod"
-            },
-            "requirements": [
-                {
-                    "question": "changemeds",
-                    "equals": true
-                }
-            ]
+                "string_id": "opiod",
+                "requirements": "questions.get(\"changemeds\") == true"
+            }
         },
         {
             "question": {
@@ -36,27 +31,17 @@
             "question": {
                 "question_type": "Boolean",
                 "question": "Discrepancies identified?",
-                "string_id": "med_list_discrep"
-            },
-            "requirements": [
-                {
-                    "question": "med_rec",
-                    "equals": true
-                }
-            ]
+                "string_id": "med_list_discrep",
+                "requirements": "questions.get(\"med_rec\") == true"
+            }
         },
         {
             "question": {
                 "question_type": "Text",
                 "question": "Notes on discrepancies",
-                "string_id": "med_notes"
-            },
-            "requirements": [
-                {
-                    "question": "med_list_discrep",
-                    "equals": true
-                }
-            ]
+                "string_id": "med_notes",
+                "requirements": "questions.get(\"med_list_discrep\") == true"
+            }
         },
         {
             "question": {

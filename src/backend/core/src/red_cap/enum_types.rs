@@ -1,6 +1,6 @@
 use crate::utils::InvalidVariant;
 use cs25_303_macros::RedCapEnum;
-use serde::{ Serialize};
+use serde::Serialize;
 use tracing::debug;
 
 use crate::red_cap::{utils::is_all_none, MultiSelectType, RedCapDataSet, RedCapEnum, RedCapType};

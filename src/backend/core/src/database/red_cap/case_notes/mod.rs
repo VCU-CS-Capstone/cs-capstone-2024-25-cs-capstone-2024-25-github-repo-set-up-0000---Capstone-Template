@@ -1,5 +1,8 @@
 pub mod new;
 use crate::database::prelude::*;
+use crate::red_cap::converter::case_notes::{
+    OtherCaseNoteData, RedCapCaseNoteBase, RedCapHealthMeasures,
+};
 use crate::{
     database::tools::{SimpleSelectQueryBuilder, TableType},
     red_cap::VisitType,
@@ -7,8 +10,8 @@ use crate::{
 use chrono::{DateTime, FixedOffset, NaiveDate};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
+use tracing::error;
 pub mod questions;
-pub mod staff;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow, Columns)]
 pub struct CaseNote {
     pub id: i32,
@@ -31,15 +34,16 @@ pub struct CaseNote {
     pub info_provided_by_caregiver: Option<String>,
     /// Red Cap ID: visit_date
     pub date_of_visit: NaiveDate,
+    /// Whether the case note is completed
+    pub completed: bool,
     /// DATABASE ONLY
     pub pushed_to_redcap: bool,
-
-    pub completed: bool,
-
     /// Instance Number of the case note
-    pub redcap_instance: Option<i32>,
+    pub red_cap_instance: Option<i32>,
     /// DATABASE ONLY
     pub last_synced_with_redcap: Option<DateTime<FixedOffset>>,
+    /// DATABASE ONLY
+    pub created_at: DateTime<FixedOffset>,
 }
 impl TableType for CaseNote {
     type Columns = CaseNoteColumn;
@@ -48,7 +52,24 @@ impl TableType for CaseNote {
     }
 }
 impl CaseNote {
-    pub async fn find_by_id(id: i32, database: &sqlx::PgPool) -> sqlx::Result<Option<Self>> {
+    pub async fn find_by_participant_id_and_redcap_instance(
+        participant_id: i32,
+        redcap_instance: i32,
+        database: &sqlx::PgPool,
+    ) -> DBResult<Option<Self>> {
+        let result = sqlx::query_as(
+            "
+            SELECT * FROM case_notes
+            WHERE participant_id = $1 AND red_cap_instance = $2
+            ",
+        )
+        .bind(participant_id)
+        .bind(redcap_instance)
+        .fetch_optional(database)
+        .await?;
+        Ok(result)
+    }
+    pub async fn find_by_id(id: i32, database: &sqlx::PgPool) -> DBResult<Option<Self>> {
         let result = sqlx::query_as(
             "
             SELECT * FROM case_notes
@@ -63,7 +84,7 @@ impl CaseNote {
     pub async fn find_by_participant_id(
         participant_id: i32,
         database: &sqlx::PgPool,
-    ) -> sqlx::Result<Vec<Self>> {
+    ) -> DBResult<Vec<Self>> {
         let result = sqlx::query_as(
             "
             SELECT * FROM case_notes
@@ -79,7 +100,7 @@ impl CaseNote {
         &self,
         instance_id: i32,
         database: &sqlx::PgPool,
-    ) -> sqlx::Result<()> {
+    ) -> DBResult<()> {
         sqlx::query(
             "
             UPDATE case_notes
@@ -91,6 +112,18 @@ impl CaseNote {
         .bind(self.id)
         .execute(database)
         .await?;
+        Ok(())
+    }
+    #[tracing::instrument()]
+    pub async fn update_from_red_cap(
+        &self,
+        case_note: RedCapCaseNoteBase,
+        health_measures: RedCapHealthMeasures,
+        other: OtherCaseNoteData,
+        database: &sqlx::PgPool,
+    ) -> DBResult<()> {
+        error!("Not Implemented");
+        //TODO: Implement
         Ok(())
     }
 }
@@ -136,7 +169,7 @@ impl TableType for CaseNoteHealthMeasures {
     }
 }
 impl CaseNoteHealthMeasures {
-    pub async fn find_by_id(id: i32, database: &sqlx::PgPool) -> sqlx::Result<Option<Self>> {
+    pub async fn find_by_id(id: i32, database: &sqlx::PgPool) -> DBResult<Option<Self>> {
         let result = sqlx::query_as(
             "
             SELECT * FROM case_note_health_measures
@@ -151,12 +184,13 @@ impl CaseNoteHealthMeasures {
     pub async fn find_by_case_note_id(
         case_note_id: i32,
         database: &sqlx::PgPool,
-    ) -> sqlx::Result<Option<Self>> {
+    ) -> DBResult<Option<Self>> {
         SimpleSelectQueryBuilder::new(Self::table_name(), &CaseNoteHealthMeasuresColumn::all())
             .where_equals(CaseNoteHealthMeasuresColumn::CaseNoteId, case_note_id)
             .query_as()
             .fetch_optional(database)
             .await
+            .map_err(DBError::from)
     }
 }
 /// Case Note Questions Related to a patient call to 911 or their PCP

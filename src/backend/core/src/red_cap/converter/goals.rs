@@ -1,7 +1,9 @@
 use chrono::NaiveDate;
 
 use crate::{
-    database::red_cap::participants::goals::{ParticipantGoals, ParticipantGoalsSteps},
+    database::red_cap::participants::goals::{
+        NewParticipantGoal, ParticipantGoals, ParticipantGoalsSteps,
+    },
     red_cap::RedCapDataSet,
 };
 
@@ -14,6 +16,20 @@ pub struct RedCapGoals {
     // Format active_ltg{number} 1-9
     pub is_active: Option<bool>,
     pub red_cap_index: i32,
+}
+impl From<RedCapGoals> for NewParticipantGoal {
+    fn from(value: RedCapGoals) -> Self {
+        let RedCapGoals {
+            goal,
+            is_active,
+            red_cap_index,
+        } = value;
+        Self {
+            goal,
+            is_active,
+            red_cap_index: Some(red_cap_index),
+        }
+    }
 }
 impl From<ParticipantGoals> for RedCapGoals {
     fn from(value: ParticipantGoals) -> Self {
@@ -159,7 +175,7 @@ pub struct RedCapCompleteGoals {
     pub steps: Vec<RedCapGoalsSteps>,
 }
 impl RedCapCompleteGoals {
-    pub async fn read<D: RedCapDataSet>(data: &D) -> Result<Self, RedCapConverterError> {
+    pub fn read<D: RedCapDataSet>(data: &D) -> Result<Self, RedCapConverterError> {
         let goals = RedCapGoals::read(data);
         let steps = RedCapGoalsSteps::read(data);
         Ok(Self { goals, steps })
