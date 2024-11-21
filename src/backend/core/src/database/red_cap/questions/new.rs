@@ -2,7 +2,10 @@ use crate::database::prelude::*;
 use derive_builder::Builder;
 use serde::{Deserialize, Serialize};
 
-use super::{Question, QuestionCategory, QuestionForm, QuestionOptions, QuestionType};
+use super::{
+    Question, QuestionCategory, QuestionColumn, QuestionForm, QuestionOptions,
+    QuestionOptionsColumn, QuestionType,
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Builder)]
 
@@ -43,10 +46,11 @@ impl NewQuestionCategory {
 pub struct NewQuestion {
     pub category_id: Option<i32>,
     pub question_type: QuestionType,
-
+    #[serde(default)]
+    pub required: bool,
     pub question: String,
-    pub red_cap_id: String,
-    pub red_cap_other_id: Option<String>,
+    pub string_id: String,
+    pub string_id_other: Option<String>,
 }
 
 impl NewQuestion {
@@ -58,25 +62,23 @@ impl NewQuestion {
         let Self {
             question_type,
             question,
-            red_cap_id,
-            red_cap_other_id,
+            string_id,
+            string_id_other,
+            required,
             ..
         } = self;
 
-        let question = sqlx::query_as(
-            r#"
-            INSERT INTO questions (category_id, question_type, question, red_cap_id, red_cap_other_id)
-            VALUES ($1, $2, $3, $4, $5)
-            RETURNING *
-            "#,
-        )
-        .bind(category_id)
-        .bind(question_type)
-        .bind(question)
-        .bind(red_cap_id)
-        .bind(red_cap_other_id)
-        .fetch_one(conn)
-        .await?;
+        let question = SimpleInsertQueryBuilder::new(Question::table_name())
+            .insert(QuestionColumn::CategoryId, category_id)
+            .insert(QuestionColumn::QuestionType, question_type)
+            .insert(QuestionColumn::Question, question)
+            .insert(QuestionColumn::StringId, string_id)
+            .insert(QuestionColumn::StringIdOther, string_id_other)
+            .insert(QuestionColumn::Required, required)
+            .return_all()
+            .query_as::<Question>()
+            .fetch_one(conn)
+            .await?;
 
         Ok(question)
     }
@@ -86,8 +88,11 @@ impl NewQuestion {
 pub struct NewQuestionOptions {
     pub question_id: Option<i32>,
     pub name: String,
+    pub string_id: Option<String>,
     pub description: Option<String>,
     pub red_cap_option_index: Option<i32>,
+    #[serde(default)]
+    pub unique: bool,
 }
 
 impl NewQuestionOptions {
@@ -100,23 +105,25 @@ impl NewQuestionOptions {
             name,
             description,
             red_cap_option_index,
+            string_id,
+            unique,
             ..
         } = self;
 
-        let options = sqlx::query_as(
-            r#"
-            INSERT INTO question_options (question_id, name, description, red_cap_option_index)
-            VALUES ($1, $2, $3, $4)
-            RETURNING *
-            "#,
-        )
-        .bind(question_id)
-        .bind(name)
-        .bind(description)
-        .bind(red_cap_option_index)
-        .fetch_one(conn)
-        .await?;
-
-        Ok(options)
+        let option = SimpleInsertQueryBuilder::new(QuestionOptions::table_name())
+            .insert(QuestionOptionsColumn::QuestionId, question_id)
+            .insert(QuestionOptionsColumn::Name, name)
+            .insert(QuestionOptionsColumn::Description, description)
+            .insert(
+                QuestionOptionsColumn::RedCapOptionIndex,
+                red_cap_option_index,
+            )
+            .insert(QuestionOptionsColumn::StringId, string_id)
+            .insert(QuestionOptionsColumn::UniqueOption, unique)
+            .return_all()
+            .query_as::<QuestionOptions>()
+            .fetch_one(conn)
+            .await?;
+        Ok(option)
     }
 }

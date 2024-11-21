@@ -167,16 +167,15 @@ CREATE TABLE questions(
         CONSTRAINT FK_questions_category
             FOREIGN KEY (category_id)
             REFERENCES question_categories(id)
-            ON DELETE SET NULL,
+            ON DELETE CASCADE,
+    string_id VARCHAR(255) UNIQUE,
+    string_id_other VARCHAR(255) UNIQUE,
     question_type VARCHAR(255) NOT NULL,
     question VARCHAR(255) NOT NULL,
     description TEXT,
-    red_cap_id VARCHAR(255) UNIQUE,
-    red_cap_other_id VARCHAR(255) UNIQUE,
+    required BOOLEAN DEFAULT FALSE,
     removed BOOLEAN DEFAULT FALSE
 );
-
-
 CREATE TABLE IF NOT EXISTS question_options(
     id serial PRIMARY KEY,
     question_id INTEGER NOT NULL,
@@ -184,9 +183,11 @@ CREATE TABLE IF NOT EXISTS question_options(
             FOREIGN KEY (question_id)
             REFERENCES questions(id)
             ON DELETE CASCADE,
+    string_id VARCHAR(255),
     name VARCHAR(255) NOT NULL,
     description TEXT,
     red_cap_option_index INTEGER,
+    unique_option BOOLEAN NOT NULL DEFAULT FALSE,
     removed BOOLEAN DEFAULT FALSE
 );
 CREATE TABLE IF NOT EXISTS question_requirements(
@@ -213,7 +214,8 @@ CREATE TABLE IF NOT EXISTS question_requirements(
             ON DELETE CASCADE,
     equals_boolean BOOLEAN,
     equals_text TEXT,
-    equals_number INTEGER
+    equals_number INTEGER,
+    equals_float REAL
 );
 
 

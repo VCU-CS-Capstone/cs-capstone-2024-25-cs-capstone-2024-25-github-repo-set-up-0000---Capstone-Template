@@ -60,17 +60,8 @@ CREATE TABLE IF NOT EXISTS participant_health_overview(
     reported_health_conditions TEXT,
     allergies TEXT,
     has_blood_pressure_cuff BOOLEAN,
-    takes_more_than_5_medications BOOLEAN
-);
-CREATE TABLE IF NOT EXISTS health_overview_mobility_devices(
-    id serial PRIMARY KEY,
-    health_overview_id INTEGER NOT NULL,
-    -- Relates to participants table
-        CONSTRAINT FK_health_overview_mobility_devices_participant_id
-            FOREIGN KEY (health_overview_id)
-            REFERENCES participant_health_overview(id)
-            ON DELETE CASCADE,
-    device VARCHAR(255)
+    takes_more_than_5_medications BOOLEAN,
+    mobility_devices VARCHAR(255)[]
 );
 
 CREATE TABLE IF NOT EXISTS participant_medications(
@@ -90,6 +81,7 @@ CREATE TABLE IF NOT EXISTS participant_medications(
     date_discontinued DATE,
     comments TEXT,
     red_cap_index INTEGER
+
 );
 
 CREATE TABLE IF NOT EXISTS participant_goals(
@@ -126,9 +118,8 @@ CREATE TABLE IF NOT EXISTS participant_goal_steps(
     action_step BOOLEAN,
     red_cap_index INTEGER
 );
-
 CREATE TABLE IF NOT EXISTS participant_question_answers(
-    id serial PRIMARY KEY,
+    id bigserial PRIMARY KEY,
     participant_id INTEGER NOT NULL,
         CONSTRAINT FK_participant_question_answers_participant_id
             FOREIGN KEY (participant_id)
@@ -148,18 +139,19 @@ CREATE TABLE IF NOT EXISTS participant_question_answers(
             ON DELETE SET NULL,
     value_text TEXT,
     value_number INTEGER,
-    value_boolean BOOLEAN
+    value_boolean BOOLEAN,
+    value_float REAL
 );
 
 CREATE TABLE IF NOT EXISTS participant_question_answer_mcb(
-    id serial PRIMARY KEY,
+    id bigserial PRIMARY KEY,
     question_answers_id integer NOT NULL,
         CONSTRAINT FK_participant_question_answer_mcb_question_answers_id
             FOREIGN KEY (question_answers_id)
             REFERENCES participant_question_answers(id)
             ON UPDATE CASCADE
             ON DELETE CASCADE,
-    option_id integer NOT NULL,
+    option_id bigint NOT NULL,
         CONSTRAINT FK_participant_question_answer_mcb_option_id
             FOREIGN KEY (option_id)
             REFERENCES question_options(id)

@@ -16,7 +16,6 @@ mod lookup;
 mod medications;
 mod new;
 pub use lookup::*;
-pub mod overview;
 pub use medications::*;
 pub use new::*;
 use sqlx::{postgres::PgRow, prelude::FromRow};

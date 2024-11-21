@@ -77,7 +77,7 @@ pub async fn pull_record_base_types(
     } else {
         let new_participant: NewParticipant = red_cap_participant.into();
         let new_demographics: Option<NewDemographics> = demographics.into();
-        let new_overview: (NewHealthOverview, Option<Vec<MobilityDevice>>) = overview.into();
+        let new_overview: NewHealthOverview = overview.into();
 
         let participant = new_participant.insert_return_participant(database).await?;
 
@@ -85,19 +85,9 @@ pub async fn pull_record_base_types(
             demographics.insert_none(participant.id, database).await?;
         }
 
-        let (overview, devices) = new_overview;
-        if let Some(devices) = devices {
-            let overview = overview
-                .insert_return_health_overview(participant.id, database)
-                .await?;
-            for device in devices {
-                overview.insert_mobility_device(device, database).await?;
-            }
-        } else {
-            overview
-                .insert_return_none(participant.id, database)
-                .await?;
-        }
+        new_overview
+            .insert_return_none(participant.id, database)
+            .await?;
     }
 
     Ok(())

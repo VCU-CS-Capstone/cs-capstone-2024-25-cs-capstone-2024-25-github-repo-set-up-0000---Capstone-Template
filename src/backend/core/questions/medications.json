@@ -9,14 +9,14 @@
             "question": {
                 "question_type": "Boolean",
                 "question": "Has Medications_changed_since_last_visit",
-                "red_cap_id": "changemeds"
+                "string_id": "changemeds"
             }
         },
         {
             "question": {
                 "question_type": "Boolean",
-                "question": "new_medication_is_opioid",
-                "red_cap_id": "opiod"
+                "question": "New Opioid?",
+                "string_id": "opiod"
             },
             "requirements": [
                 {
@@ -28,37 +28,67 @@
         {
             "question": {
                 "question_type": "Boolean",
-                "question": "confirmed_medication_list",
-                "red_cap_id": "med_rec"
+                "question": "Confirm medication list with client?",
+                "string_id": "med_rec"
             }
         },
         {
             "question": {
                 "question_type": "Boolean",
-                "question": "has_discrepancies",
-                "red_cap_id": "med_list_discrep"
-            }
+                "question": "Discrepancies identified?",
+                "string_id": "med_list_discrep"
+            },
+            "requirements": [
+                {
+                    "question": "med_rec",
+                    "equals": true
+                }
+            ]
         },
         {
             "question": {
                 "question_type": "Text",
-                "question": "disrepancies",
-                "red_cap_id": "med_notes"
-            }
+                "question": "Notes on discrepancies",
+                "string_id": "med_notes"
+            },
+            "requirements": [
+                {
+                    "question": "med_list_discrep",
+                    "equals": true
+                }
+            ]
         },
         {
             "question": {
-                "question_type": "Text",
-                "question": "medication_adherence",
-                "red_cap_id": "adherence"
-            }
+                "question_type": "MultiCheckBox",
+                "question": "Screened for medication adherence",
+                "description": "You have been prescribed medication(s) for your health conditions which is to be taken regularly. How would you describe your past experience with taking your medication(s)?",
+                "string_id": "adherence"
+            },
+            "options": [
+                {
+                    "name": "NOT ASKED",
+                    "red_cap_option_index": 1
+                },
+                {
+                    "name": "I take my medications regularly : 9/10 time",
+                    "red_cap_option_index": 2
+                },
+                {
+                    "name": " I want to be very regular in taking my meds, but I am not always good with it due to some challenges",
+                    "red_cap_option_index": 3
+                },
+                {
+                    "name": "I am not very regular in taking my medications because I feel unwilling",
+                    "red_cap_option_index": 4
+                }
+            ]
         },
         {
             "question": {
                 "question_type": "Boolean",
-                "question": "did_provide_medication_education",
-                "red_cap_id": "med_ed",
-                "red_cap_other_id": "medication_other"
+                "question": "Adherence issues identified?",
+                "string_id": "adherence_issue"
             }
         }
     ]

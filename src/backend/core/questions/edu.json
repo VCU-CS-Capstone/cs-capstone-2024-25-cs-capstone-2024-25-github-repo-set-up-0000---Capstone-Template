@@ -9,8 +9,8 @@
             "question": {
                 "question_type": "MultiCheckBox",
                 "question": "Disease and medication related education",
-                "red_cap_id": "health_ed",
-                "red_cap_other_id": "health_other_ed"
+                "string_id": "health_ed",
+                "string_id_other": "health_other_ed"
             },
             "options": [
                 {
@@ -51,8 +51,8 @@
             "question": {
                 "question_type": "MultiCheckBox",
                 "question": "Health behavior education",
-                "red_cap_id": "health_beh",
-                "red_cap_other_id": "beh_ed"
+                "string_id": "health_beh",
+                "string_id_other": "beh_ed"
             },
             "options": [
                 {
@@ -109,8 +109,8 @@
             "question": {
                 "question_type": "MultiCheckBox",
                 "question": "Coordinated care with",
-                "red_cap_id": "visit_collab",
-                "red_cap_other_id": "referral_colab"
+                "string_id": "visit_collab",
+                "string_id_other": "referral_colab"
             },
             "options": [
                 {
@@ -155,8 +155,8 @@
             "question": {
                 "question_type": "MultiCheckBox",
                 "question": "Resources to/for",
-                "red_cap_id": "visit_referral",
-                "red_cap_other_id": "referral_other"
+                "string_id": "visit_referral",
+                "string_id_other": "referral_other"
             },
             "options": [
                 {
@@ -213,7 +213,7 @@
             "question": {
                 "question_type": "Text",
                 "question": "Other activities/outcomes",
-                "red_cap_id": "visit_other"
+                "string_id": "visit_other"
             }
         }
     ]

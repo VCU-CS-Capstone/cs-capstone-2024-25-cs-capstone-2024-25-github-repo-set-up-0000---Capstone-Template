@@ -6,7 +6,7 @@ use sqlx::{prelude::FromRow, PgPool};
 
 use super::{
     new::{NewQuestion, NewQuestionCategory, NewQuestionOptions},
-    DBResult, QueryTool, Question, QuestionRequirements, QuestionRequirementsColumn,
+    DBResult, Question, QuestionOptions, QuestionRequirements, QuestionRequirementsColumn,
     SimpleInsertQueryBuilder, TableType,
 };
 /// Table name: _default_questions
@@ -17,6 +17,12 @@ pub struct DefaultQuestionsTable {
     pub added_at: DateTime<FixedOffset>,
 }
 impl DefaultQuestionsTable {
+    pub async fn clear(conn: &PgPool) -> DBResult<()> {
+        sqlx::query("DELETE FROM _default_questions")
+            .execute(conn)
+            .await?;
+        Ok(())
+    }
     pub async fn was_file_added(file_name: &str, conn: &PgPool) -> DBResult<bool> {
         let count: i64 =
             sqlx::query_scalar("SELECT COUNT(*) FROM _default_questions WHERE file_name = $1")
@@ -42,6 +48,7 @@ pub struct DefaultRequirement {
     /// Should reference the red_cap_id of the question
     pub question: String,
     pub equals: Option<Value>,
+    pub contains: Option<String>,
 }
 impl DefaultRequirement {
     pub async fn insert_with_question_return_options(
@@ -49,7 +56,11 @@ impl DefaultRequirement {
         question_to_add: i32,
         conn: &PgPool,
     ) -> DBResult<()> {
-        let Self { question, equals } = self;
+        let Self {
+            question,
+            equals,
+            contains,
+        } = self;
         let Some(question) = Question::find_by_red_cap_id(&question, conn).await? else {
             return Ok(());
         };
@@ -73,8 +84,18 @@ impl DefaultRequirement {
                 }
                 _ => todo!("Handle Error"),
             }
-        } else {
-            todo!("Not Supported Yet");
+        } else if let Some(contains) = contains {
+            let option = QuestionOptions::find_option_with_string_id_and_in_question(
+                &contains,
+                question.id,
+                conn,
+            )
+            .await?;
+            if let Some(option) = option {
+                builder.insert(QuestionRequirementsColumn::HasOption, option.id);
+            }else{
+                panic!("Option Not Found")
+            }
         };
         builder.query().execute(conn).await?;
         Ok(())
@@ -136,4 +157,19 @@ pub async fn add_default_questions(conn: &PgPool) -> DBResult<()> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::database::red_cap::questions::{default::DefaultQuestionsTable, QuestionCategory};
+
+    #[tokio::test]
+    #[ignore]
+    pub async fn refresh_default_questions() -> anyhow::Result<()> {
+        let conn = crate::database::tests::setup_query_test().await?;
+        DefaultQuestionsTable::clear(&conn).await?;
+        QuestionCategory::delete_all(&conn).await?;
+        super::add_default_questions(&conn).await?;
+        Ok(())
+    }
 }

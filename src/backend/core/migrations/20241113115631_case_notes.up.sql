@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS case_note_health_measures(
 );
 
 CREATE TABLE IF NOT EXISTS case_note_question_answers(
-    id serial PRIMARY KEY,
+    id bigserial PRIMARY KEY,
     case_note_id integer NOT NULL,
         CONSTRAINT FK_case_note_question_answers_case_note_id
             FOREIGN KEY (case_note_id)
@@ -73,12 +73,13 @@ CREATE TABLE IF NOT EXISTS case_note_question_answers(
             ON DELETE SET NULL,
     value_text TEXT,
     value_number INTEGER,
-    value_boolean BOOLEAN
+    value_boolean BOOLEAN,
+    value_float REAL
 );
 
 CREATE TABLE IF NOT EXISTS case_note_question_answer_mcb(
-    id serial PRIMARY KEY,
-    question_answers_id integer NOT NULL,
+    id bigserial PRIMARY KEY,
+    question_answers_id bigint NOT NULL,
         CONSTRAINT FK_question_answer_multi_check_box_question_answers_id
             FOREIGN KEY (question_answers_id)
             REFERENCES case_note_question_answers(id)

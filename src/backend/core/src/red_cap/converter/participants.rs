@@ -6,9 +6,8 @@ use crate::{
     database::red_cap::{
         locations::RedCapLocationConnectionRules,
         participants::{
-            health_overview::{HealthOverview, HealthOverviewMobilityDevices},
-            NewDemographics, NewHealthOverview, NewParticipant, ParticipantDemograhics,
-            Participants,
+            health_overview::HealthOverview, NewDemographics, NewHealthOverview, NewParticipant,
+            ParticipantDemograhics, Participants,
         },
     },
     red_cap::{
@@ -363,7 +362,7 @@ pub struct RedCapHealthOverview {
     /// Red Cap: mobility_devices
     pub mobility_devices: Option<Vec<MobilityDevice>>,
 }
-impl From<RedCapHealthOverview> for (NewHealthOverview, Option<Vec<MobilityDevice>>) {
+impl From<RedCapHealthOverview> for (NewHealthOverview) {
     fn from(value: RedCapHealthOverview) -> Self {
         let RedCapHealthOverview {
             height,
@@ -379,32 +378,21 @@ impl From<RedCapHealthOverview> for (NewHealthOverview, Option<Vec<MobilityDevic
             allergies,
             has_blood_pressure_cuff,
             takes_more_than_5_medications,
+            mobility_devices,
         };
-        (overview, mobility_devices)
-    }
-}
-impl From<HealthOverview> for RedCapHealthOverview {
-    fn from(value: HealthOverview) -> Self {
-        RedCapHealthOverview::from((value, vec![]))
+        overview
     }
 }
 
-impl From<(HealthOverview, Vec<HealthOverviewMobilityDevices>)> for RedCapHealthOverview {
-    fn from(
-        (demographics, mobility_devices): (HealthOverview, Vec<HealthOverviewMobilityDevices>),
-    ) -> Self {
-        let mobility_devices = if mobility_devices.is_empty() {
-            None
-        } else {
-            Some(mobility_devices.into_iter().map(Into::into).collect())
-        };
+impl From<HealthOverview> for RedCapHealthOverview {
+    fn from(overview: HealthOverview) -> Self {
         Self {
-            height: demographics.height,
-            reported_health_conditions: demographics.reported_health_conditions,
-            allergies: demographics.allergies,
-            has_blood_pressure_cuff: demographics.has_blood_pressure_cuff,
-            takes_more_than_5_medications: demographics.takes_more_than_5_medications,
-            mobility_devices,
+            height: overview.height,
+            reported_health_conditions: overview.reported_health_conditions,
+            allergies: overview.allergies,
+            has_blood_pressure_cuff: overview.has_blood_pressure_cuff,
+            takes_more_than_5_medications: overview.takes_more_than_5_medications,
+            mobility_devices: overview.mobility_devices,
         }
     }
 }

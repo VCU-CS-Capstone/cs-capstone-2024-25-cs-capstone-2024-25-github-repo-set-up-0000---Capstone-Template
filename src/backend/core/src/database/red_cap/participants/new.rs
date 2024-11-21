@@ -5,7 +5,8 @@ use sqlx::Executor;
 use crate::{
     database::DBResult,
     red_cap::{
-        DegreeLevel, Ethnicity, Gender, HealthInsurance, PreferredLanguage, Programs, Race, Status,
+        DegreeLevel, Ethnicity, Gender, HealthInsurance, MobilityDevice, PreferredLanguage,
+        Programs, Race, Status,
     },
 };
 
@@ -166,6 +167,8 @@ pub struct NewHealthOverview {
     pub has_blood_pressure_cuff: Option<bool>,
     /// Red Cap: num_meds
     pub takes_more_than_5_medications: Option<bool>,
+
+    pub mobility_devices: Option<Vec<MobilityDevice>>,
 }
 impl NewHealthOverview {
     pub async fn insert_return_health_overview(
@@ -179,6 +182,7 @@ impl NewHealthOverview {
             allergies,
             has_blood_pressure_cuff,
             takes_more_than_5_medications,
+            mobility_devices,
         } = self;
 
         SimpleInsertQueryBuilder::new(HealthOverview::table_name())
@@ -197,6 +201,7 @@ impl NewHealthOverview {
                 HealthOverviewColumn::TakesMoreThan5Medications,
                 takes_more_than_5_medications,
             )
+            .insert(HealthOverviewColumn::MobilityDevices, mobility_devices)
             .return_all()
             .query_as::<HealthOverview>()
             .fetch_one(database)

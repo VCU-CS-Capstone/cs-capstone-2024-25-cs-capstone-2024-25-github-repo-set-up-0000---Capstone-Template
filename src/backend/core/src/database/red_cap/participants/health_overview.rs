@@ -57,6 +57,8 @@ pub struct HealthOverview {
     pub has_blood_pressure_cuff: Option<bool>,
     /// Red Cap: num_meds
     pub takes_more_than_5_medications: Option<bool>,
+
+    pub mobility_devices: Option<Vec<MobilityDevice>>,
 }
 impl TableType for HealthOverview {
     type Columns = HealthOverviewColumn;
@@ -67,59 +69,5 @@ impl TableType for HealthOverview {
 impl HealthOverviewType for HealthOverview {
     fn get_id(&self) -> i32 {
         self.id
-    }
-}
-impl HealthOverview {
-    pub async fn get_mobility_devices(
-        &self,
-        database: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> sqlx::Result<Vec<HealthOverviewMobilityDevices>> {
-        SimpleSelectQueryBuilder::new(
-            HealthOverviewMobilityDevices::table_name(),
-            &HealthOverviewMobilityDevicesColumn::all(),
-        )
-        .where_equals(
-            HealthOverviewMobilityDevicesColumn::HealthOverviewId,
-            self.id,
-        )
-        .query_as::<HealthOverviewMobilityDevices>()
-        .fetch_all(database)
-        .await
-    }
-    pub async fn insert_mobility_device(
-        &self,
-        device: MobilityDevice,
-        database: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> sqlx::Result<()> {
-        SimpleInsertQueryBuilder::new(HealthOverviewMobilityDevices::table_name())
-            .insert(
-                HealthOverviewMobilityDevicesColumn::HealthOverviewId,
-                self.id,
-            )
-            .insert(HealthOverviewMobilityDevicesColumn::Device, device)
-            .query()
-            .execute(database)
-            .await?;
-        Ok(())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow, Columns)]
-pub struct HealthOverviewMobilityDevices {
-    pub id: i32,
-    /// 1:many with [HealthOverviw]
-    pub health_overview_id: i32,
-    /// Red Cap: info_mobility
-    pub device: MobilityDevice,
-}
-impl From<HealthOverviewMobilityDevices> for MobilityDevice {
-    fn from(value: HealthOverviewMobilityDevices) -> Self {
-        value.device
-    }
-}
-impl TableType for HealthOverviewMobilityDevices {
-    type Columns = HealthOverviewMobilityDevicesColumn;
-    fn table_name() -> &'static str {
-        "health_overview_mobility_devices"
     }
 }
