@@ -5,11 +5,7 @@
 ### backend
 Within the backend directory you will find the src for the web api for the project
 ### Core
-Within the core directory you find core code for the project. Just structures and utilities
-### redcap
-Within the redcap directory you will find the source code to interact with the redcap api.
-Specifically structures to interact with the design of the VCU Medical REDCap project
-
+Within the core directory you find core code for the project. Database Design, Red Cap Integration, etc.
 
 ## Setting Up The Development Environment
 

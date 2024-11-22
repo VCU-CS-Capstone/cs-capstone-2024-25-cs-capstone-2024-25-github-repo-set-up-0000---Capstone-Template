@@ -2,7 +2,7 @@ use sqlx::PgPool;
 use thiserror::Error;
 
 use crate::database::{
-    red_cap::locations::{Locations, RedCapLocationConnectionRules, RedCapLocationRules},
+    red_cap::locations::{Locations, RedCapLocationRules},
     DBError,
 };
 pub mod case_notes;
