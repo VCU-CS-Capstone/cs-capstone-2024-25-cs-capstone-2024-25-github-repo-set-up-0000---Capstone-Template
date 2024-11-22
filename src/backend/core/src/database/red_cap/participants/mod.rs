@@ -19,7 +19,7 @@ pub use lookup::*;
 pub use medications::*;
 pub use new::*;
 use sqlx::{postgres::PgRow, prelude::FromRow};
-use tracing::warn;
+use tracing::error;
 pub trait ParticipantType: for<'r> FromRow<'r, PgRow> + Unpin + Send + Sync {
     fn get_id(&self) -> i32;
 
@@ -110,7 +110,7 @@ impl Participants {
         _db: &sqlx::PgPool,
     ) -> DBResult<()> {
         //TODO: Implement
-        warn!("Not Implemented");
+        error!("Not Implemented");
         Ok(())
     }
 }

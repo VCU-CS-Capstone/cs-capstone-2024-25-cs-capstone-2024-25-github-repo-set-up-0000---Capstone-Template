@@ -88,6 +88,9 @@ pub trait RedCapDataSet {
     fn get_number(&self, key: &str) -> Option<usize> {
         self.get(key).and_then(|value| value.to_number())
     }
+    fn get_float(&self, key: &str) -> Option<f32> {
+        self.get(key).and_then(|value| value.to_float())
+    }
 
     fn get_date(&self, key: &str) -> Option<NaiveDate> {
         self.get(key).and_then(|value| value.to_date())
@@ -114,6 +117,8 @@ pub trait RedCapDataSet {
     fn get_bool(&self, key: &str) -> Option<bool> {
         self.get(key).and_then(|value| value.to_bool())
     }
+
+    fn iter(&self) -> impl Iterator<Item = (&String, &RedCapExportDataType)>;
 }
 impl RedCapDataSet for RedCapDataMap {
     fn insert(&mut self, key: impl Into<String>, value: RedCapExportDataType) {
@@ -122,6 +127,9 @@ impl RedCapDataSet for RedCapDataMap {
 
     fn get(&self, key: &str) -> Option<&RedCapExportDataType> {
         self.get(key)
+    }
+    fn iter(&self) -> impl Iterator<Item = (&String, &RedCapExportDataType)> {
+        self.iter()
     }
 }
 #[derive(Debug, Clone)]
@@ -244,6 +252,8 @@ impl RedCapExportDataType {
             Self::Null
         } else if let Ok(number) = value.parse::<isize>() {
             Self::Number(number)
+        } else if let Ok(float) = value.parse::<f32>() {
+            Self::Float(float)
         } else if let Ok(date) = NaiveDate::parse_from_str(&value, "%Y-%m-%d") {
             Self::Date(date)
         } else {
@@ -258,6 +268,10 @@ impl RedCapExportDataType {
             _ => None,
         }
     }
+    /// Bad Booleans are 2 = true, 1 = false
+    /// Wouldn't shock me if they sometimes use 0 = false
+    ///
+    /// So I only check for value = 2
     pub fn to_bad_boolean(&self) -> Option<bool> {
         match self {
             Self::Text(value) => Some(value == "2"),
@@ -272,9 +286,20 @@ impl RedCapExportDataType {
             Self::Number(1)
         }
     }
+    pub fn to_float(&self) -> Option<f32> {
+        match self {
+            Self::Float(value) => Some(*value),
+            Self::Number(value) => Some(*value as f32),
+            _ => None,
+        }
+    }
     pub fn to_number(&self) -> Option<usize> {
         match self {
             Self::Number(value) => Some(*value as usize),
+            Self::Float(value) => {
+                error!(?value, "Float to Number Conversion");
+                Some(*value as usize)
+            }
             _ => None,
         }
     }

@@ -1,4 +1,3 @@
-
 use ahash::{HashMap, HashMapExt};
 use sqlx::PgPool;
 use tracing::{debug, error, info, instrument};
@@ -18,7 +17,10 @@ use crate::{
     red_cap::{
         api::{ExportOptions, Forms, RedcapClient},
         converter::{
-            case_notes::{OtherCaseNoteData, RedCapCaseNoteBase, RedCapHealthMeasures},
+            case_notes::{
+                OtherCaseNoteData, RedCapBloodPressureReadings, RedCapCaseNoteBase,
+                RedCapHealthMeasures,
+            },
             goals::{RedCapCompleteGoals, RedCapGoalsSteps},
             medications::RedCapMedication,
             participants::{
@@ -221,6 +223,8 @@ async fn add_case_note(
 
     let health_measures = RedCapHealthMeasures::read_health_measures(&record).await?;
 
+    let bp_readings = RedCapBloodPressureReadings::read(&record);
+
     let other = OtherCaseNoteData::read(&record, converter).await?;
     if let Some(existing_case_note) = CaseNote::find_by_participant_id_and_redcap_instance(
         participants.id,
@@ -242,10 +246,13 @@ async fn add_case_note(
             .insert_return_case_note(participants.id, database)
             .await?;
 
-        new_health_measures
-            .insert_return_none(case_note.id, database)
+        let measures = new_health_measures
+            .insert_return_measure(case_note.id, database)
             .await?;
-
+        // TODO: Use 1 INSERT statement for all the blood pressures
+        for bp in bp_readings.readings {
+            measures.add_bp(bp, database).await?;
+        }
         for (question_id, value) in other.values {
             debug!(?question_id, ?value, "Adding question");
             crate::database::red_cap::case_notes::questions::add_question(

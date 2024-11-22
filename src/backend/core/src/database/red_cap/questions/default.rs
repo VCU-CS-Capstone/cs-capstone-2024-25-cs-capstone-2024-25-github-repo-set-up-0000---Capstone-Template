@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use chrono::{DateTime, FixedOffset};
 use rust_embed::Embed;
 use serde::{Deserialize, Serialize};
@@ -50,25 +52,82 @@ pub struct DefaultQuestionWithOptions {
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DefaultQuestions {
+    pub after: Option<Vec<String>>,
     pub category: NewQuestionCategory,
     #[serde(default)]
     pub questions: Vec<DefaultQuestionWithOptions>,
 }
-pub async fn add_default_questions(conn: &PgPool) -> DBResult<()> {
+/// Orders the files based on the after field
+///
+/// Conn is optional for testing purposes
+pub async fn get_question_files(
+    conn: Option<&PgPool>,
+) -> DBResult<Vec<(Cow<'static, str>, DefaultQuestions)>> {
+    let mut question_files = Vec::new();
     for question_file in DefaultQuestionsData::iter() {
         if question_file == "README.md" {
             continue;
         }
-        if DefaultQuestionsTable::was_file_added(&question_file, conn).await? {
-            continue;
+        if let Some(conn) = &conn {
+            if DefaultQuestionsTable::was_file_added(&question_file, conn).await? {
+                continue;
+            }
         }
         let question = DefaultQuestionsData::get(&question_file).expect("File Should Exist");
-        let question: DefaultQuestions =
+        let mut question: DefaultQuestions =
             serde_json::from_slice(&question.data).expect("This is a bug in the code");
+        // Remove after options  that already exist in DefaultQuestionsTable
+        // Ignored if conn is None
+        if let Some(conn) = &conn {
+            if let Some(after) = question.after {
+                let mut new_after = Vec::new();
+                for after in after {
+                    if !DefaultQuestionsTable::was_file_added(&after, conn).await? {
+                        new_after.push(after);
+                    } else {
+                        debug!(
+                            "Skipping after requirement {} because it has already been added",
+                            after
+                        );
+                    }
+                }
+                if new_after.is_empty() {
+                    question.after = None;
+                } else {
+                    question.after = Some(new_after);
+                }
+            }
+        }
+        question_files.push((question_file, question));
+    }
+    // QuestionFiles have an optional after field that is a list of file names that should be added before this file.
+    // This is to ensure that the files are added in the correct order.
+    // So we will sort the files based on the after field.
+
+    question_files.sort_by(|(a_name, a), (b_name, b)| {
+        if a.after.is_none() && b.after.is_none() {
+            return std::cmp::Ordering::Equal;
+        }
+        let a_after = a.after.as_deref().unwrap_or(&[]);
+        let b_after = b.after.as_deref().unwrap_or(&[]);
+        if a_after.iter().any(|a| a == b_name.as_ref()) {
+            std::cmp::Ordering::Greater
+        } else if b_after.iter().any(|b| b == a_name.as_ref()) {
+            std::cmp::Ordering::Less
+        } else {
+            std::cmp::Ordering::Equal
+        }
+    });
+    Ok(question_files)
+}
+pub async fn add_default_questions(conn: &PgPool) -> DBResult<()> {
+    let question_files = get_question_files(Some(conn)).await?;
+    for (question_file, questions) in question_files {
         let DefaultQuestions {
             category,
             questions,
-        } = question;
+            ..
+        } = questions;
         let category = match category.clone().insert_return_category(conn).await {
             Ok(ok) => ok,
             Err(err) => {
@@ -116,6 +175,15 @@ mod tests {
         DefaultQuestionsTable::clear(&conn).await?;
         QuestionCategory::delete_all(&conn).await?;
         super::add_default_questions(&conn).await?;
+        Ok(())
+    }
+
+    #[tokio::test]
+    pub async fn get_question_file_order() -> anyhow::Result<()> {
+        let question_files = super::get_question_files(None).await?;
+        for (file, _) in question_files {
+            println!("{}", file);
+        }
         Ok(())
     }
 }

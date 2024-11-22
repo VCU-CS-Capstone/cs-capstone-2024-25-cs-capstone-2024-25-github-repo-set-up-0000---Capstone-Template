@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use cs25_303_core::{
     database::red_cap::{
-        case_notes::new::NewBloodPressure,
+        case_notes::{new::NewBloodPressure, BloodPressureType},
         locations::Locations,
         participants::{
             goals::{NewParticipantGoal, NewParticipantGoalsSteps},
@@ -127,11 +127,17 @@ impl RandomSets {
     pub fn random_medications(&mut self) -> Vec<NewMedication> {
         let number_of_meds = self.rand.gen_range(0..10);
 
-        let mut meds = Vec::with_capacity(number_of_meds);
+        let mut meds: Vec<NewMedication> = Vec::with_capacity(number_of_meds);
 
         for _ in 0..number_of_meds {
-            let random = self.medications.choose(&mut self.rand).unwrap();
-            // TODO: Prevent duplicates
+            let random = loop {
+                let random_med = self.medications.choose(&mut self.rand).unwrap();
+                // Check if the medication is already in the list
+                if meds.iter().any(|med| med.name == random_med.name) {
+                    continue;
+                }
+                break random_med;
+            };
             meds.push(random.create_new_medication());
         }
         meds
@@ -191,26 +197,36 @@ impl RandomSets {
         }
     }
     // TODO: Add Standing blood pressure
-    pub fn random_blood_pressure(
-        &mut self,
-        participant: i32,
-    ) -> (Option<NewBloodPressure>, Option<NewBloodPressure>) {
+    pub fn random_blood_pressure(&mut self, participant: i32) -> Vec<NewBloodPressure> {
+        let should_add_stand = self.rand_bool(0.25);
         if self.extended_patient_info[&participant].has_high_blood_pressure {
-            (
-                Some(NewBloodPressure {
+            let mut result = vec![NewBloodPressure {
+                blood_pressure_type: BloodPressureType::Sit,
+                systolic: self.rand.gen_range(130..180) as i16,
+                diastolic: self.rand.gen_range(80..120) as i16,
+            }];
+            if should_add_stand {
+                result.push(NewBloodPressure {
+                    blood_pressure_type: BloodPressureType::Stand,
                     systolic: self.rand.gen_range(130..180) as i16,
                     diastolic: self.rand.gen_range(80..120) as i16,
-                }),
-                None,
-            )
+                });
+            }
+            result
         } else {
-            (
-                Some(NewBloodPressure {
+            let mut result = vec![NewBloodPressure {
+                blood_pressure_type: BloodPressureType::Sit,
+                systolic: self.rand.gen_range(90..120) as i16,
+                diastolic: self.rand.gen_range(60..80) as i16,
+            }];
+            if should_add_stand {
+                result.push(NewBloodPressure {
+                    blood_pressure_type: BloodPressureType::Stand,
                     systolic: self.rand.gen_range(90..120) as i16,
                     diastolic: self.rand.gen_range(60..80) as i16,
-                }),
-                None,
-            )
+                });
+            }
+            result
         }
     }
     fn rand_bool(&mut self, chance: f64) -> bool {

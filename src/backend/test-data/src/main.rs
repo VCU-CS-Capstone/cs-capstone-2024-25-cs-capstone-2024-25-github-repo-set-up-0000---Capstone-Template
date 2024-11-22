@@ -4,7 +4,6 @@ use cs25_303_core::database::DatabaseConfig;
 use sqlx::PgPool;
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::{filter, layer::SubscriberExt, util::SubscriberInitExt, Layer};
-pub mod manual_test;
 pub mod random;
 use std::path::{Path, PathBuf};
 #[derive(Debug, Clone, Parser)]
@@ -16,7 +15,6 @@ pub struct CLI {
 }
 #[derive(Debug, Clone, clap::Subcommand)]
 pub enum Commands {
-    RunManualTests { path: PathBuf },
     Random { count: usize },
 }
 
@@ -26,10 +24,6 @@ async fn main() -> anyhow::Result<()> {
     load_logging()?;
     let database = cs25_303_core::database::connect(cli.database.try_into()?, true).await?;
     match cli.command {
-        Commands::RunManualTests { path } => {
-            println!("Running manual tests from path: {:?}", path);
-            run_manual_dir(path, database).await?;
-        }
         Commands::Random { count } => {
             println!("Generating {} random participants", count);
             random::generate_participants(count, database).await?;
@@ -49,23 +43,6 @@ fn load_logging() -> anyhow::Result<()> {
             ),
         )
         .init();
-    Ok(())
-}
-pub async fn run_manual_dir(path: PathBuf, database: PgPool) -> anyhow::Result<()> {
-    let folders = std::fs::read_dir(path)?;
-    for folder in folders {
-        let folder = folder?;
-        let path = folder.path();
-        if !path.is_dir() {
-            continue;
-        }
-        if does_file_name_start_with(&path, "participant")? {
-            let mut tx = database.begin().await?;
-
-            manual_test::create_participant_from_dir(path, &mut tx).await?;
-            tx.commit().await?;
-        }
-    }
     Ok(())
 }
 

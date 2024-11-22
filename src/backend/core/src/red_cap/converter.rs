@@ -2,7 +2,7 @@ use sqlx::PgPool;
 use thiserror::Error;
 
 use crate::database::{
-    red_cap::locations::{Locations, RedCapLocationConnectionRules},
+    red_cap::locations::{Locations, RedCapLocationConnectionRules, RedCapLocationRules},
     DBError,
 };
 pub mod case_notes;
@@ -33,16 +33,16 @@ impl RedCapConverter {
     }
     pub fn find_location_from_connection_rules(
         &self,
-        location: &RedCapLocationConnectionRules,
+        location: &RedCapLocationRules,
     ) -> Option<Locations> {
         self.locations
             .iter()
-            .find(|x| x.red_cap_connection_rules.does_match_no_visit(location))
+            .find(|x| x.red_cap_connection_rules.does_match_participant(location))
             .cloned()
     }
     pub fn find_location_from_connection_rules_for_visit(
         &self,
-        location: &RedCapLocationConnectionRules,
+        location: &RedCapLocationRules,
     ) -> Option<Locations> {
         self.locations
             .iter()

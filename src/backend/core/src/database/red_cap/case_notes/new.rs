@@ -7,7 +7,10 @@ use crate::{
     red_cap::VisitType,
 };
 
-use super::{CaseNote, CaseNoteColumn, SimpleInsertQueryBuilder};
+use super::{
+    BloodPressureType, CaseNote, CaseNoteColumn, CaseNoteHealthMeasures,
+    CaseNoteHealthMeasuresColumn, HealthMeasureBloodPressure, SimpleInsertQueryBuilder,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NewCaseNote {
@@ -52,7 +55,7 @@ impl NewCaseNote {
                 info_provided_by_caregiver,
             )
             .insert(CaseNoteColumn::DateOfVisit, date_of_visit)
-            .insert(CaseNoteColumn::PushedToRedcap, pushed_to_redcap)
+            .insert(CaseNoteColumn::PushedToRedCap, pushed_to_redcap)
             .insert(CaseNoteColumn::RedCapInstance, redcap_instance)
             .insert(CaseNoteColumn::Completed, completed)
             .insert(
@@ -84,13 +87,21 @@ impl Default for NewCaseNote {
 }
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct NewBloodPressure {
+    pub blood_pressure_type: BloodPressureType,
     pub systolic: i16,
     pub diastolic: i16,
 }
+impl From<HealthMeasureBloodPressure> for NewBloodPressure {
+    fn from(bp: HealthMeasureBloodPressure) -> Self {
+        Self {
+            blood_pressure_type: bp.blood_pressure_type,
+            systolic: bp.systolic,
+            diastolic: bp.diastolic,
+        }
+    }
+}
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default, ToSchema)]
 pub struct NewCaseNoteHealthMeasures {
-    pub sit: Option<NewBloodPressure>,
-    pub stand: Option<NewBloodPressure>,
     /// Weight Taken RED Cap ID: weight_yn
     /// Weight Red Cap: weight
     pub weight: Option<f32>,
@@ -99,21 +110,19 @@ pub struct NewCaseNoteHealthMeasures {
     /// Redcap ID: glucose
     pub glucose_result: Option<f32>,
     /// Redcap ID: glucose_fasting
-    pub fasted_atleast_2_hours: bool,
+    pub fasted_atleast_2_hours: Option<bool>,
     ///Function, Assistive Devices, and/or Limitations to ADLs/IADLs
     /// Redcap ID: visit_function
     pub other: Option<String>,
 }
 
 impl NewCaseNoteHealthMeasures {
-    pub async fn insert_return_none(
+    pub async fn insert_return_measure(
         self,
         case_note: i32,
         database: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> DBResult<()> {
+    ) -> DBResult<CaseNoteHealthMeasures> {
         let Self {
-            sit,
-            stand,
             weight,
             glucose_tested,
             glucose_result,
@@ -121,40 +130,20 @@ impl NewCaseNoteHealthMeasures {
             other,
         } = self;
 
-        let (sit_sys, sit_dia) =
-            sit.map_or((None, None), |bp| (Some(bp.systolic), Some(bp.diastolic)));
-        let (stand_sys, stand_dia) =
-            stand.map_or((None, None), |bp| (Some(bp.systolic), Some(bp.diastolic)));
-
-        sqlx::query(
-            "
-                INSERT INTO case_note_health_measures (
-                    case_note_id,
-                    blood_pressure_sit_systolic,
-                    blood_pressure_sit_diastolic,
-                    blood_pressure_stand_systolic,
-                    blood_pressure_stand_diastolic,
-                    weight,
-                    glucose_tested,
-                    glucose_result,
-                    fasted_atleast_2_hours,
-                    other
-                )
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-                ",
-        )
-        .bind(case_note)
-        .bind(sit_sys)
-        .bind(sit_dia)
-        .bind(stand_sys)
-        .bind(stand_dia)
-        .bind(weight)
-        .bind(glucose_tested)
-        .bind(glucose_result)
-        .bind(fasted_atleast_2_hours)
-        .bind(other)
-        .execute(database)
-        .await?;
-        Ok(())
+        let measure = SimpleInsertQueryBuilder::new(CaseNoteHealthMeasures::table_name())
+            .insert(CaseNoteHealthMeasuresColumn::CaseNoteId, case_note)
+            .insert(CaseNoteHealthMeasuresColumn::Weight, weight)
+            .insert(CaseNoteHealthMeasuresColumn::GlucoseTested, glucose_tested)
+            .insert(CaseNoteHealthMeasuresColumn::GlucoseResult, glucose_result)
+            .insert(
+                CaseNoteHealthMeasuresColumn::FastedAtleast2Hours,
+                fasted_atleast_2_hours,
+            )
+            .insert(CaseNoteHealthMeasuresColumn::Other, other)
+            .return_all()
+            .query_as::<CaseNoteHealthMeasures>()
+            .fetch_one(database)
+            .await?;
+        Ok(measure)
     }
 }

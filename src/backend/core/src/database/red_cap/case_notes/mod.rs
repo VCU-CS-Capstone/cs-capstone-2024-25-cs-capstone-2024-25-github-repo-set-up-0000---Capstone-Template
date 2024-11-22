@@ -1,4 +1,6 @@
 pub mod new;
+use std::fmt::Debug;
+
 use crate::database::prelude::*;
 use crate::red_cap::converter::case_notes::{
     OtherCaseNoteData, RedCapCaseNoteBase, RedCapHealthMeasures,
@@ -8,9 +10,12 @@ use crate::{
     red_cap::VisitType,
 };
 use chrono::{DateTime, FixedOffset, NaiveDate};
+use new::NewBloodPressure;
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
+use strum::EnumIter;
 use tracing::error;
+use utoipa::ToSchema;
 pub mod questions;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow, Columns)]
 pub struct CaseNote {
@@ -37,7 +42,7 @@ pub struct CaseNote {
     /// Whether the case note is completed
     pub completed: bool,
     /// DATABASE ONLY
-    pub pushed_to_redcap: bool,
+    pub pushed_to_red_cap: bool,
     /// Instance Number of the case note
     pub red_cap_instance: Option<i32>,
     /// DATABASE ONLY
@@ -133,22 +138,6 @@ pub struct CaseNoteHealthMeasures {
     pub id: i32,
     /// 1:1 with [CaseNote]
     pub case_note_id: i32,
-    /// Red Cap ID bp_sit_syst
-    ///
-    /// Must Exist if blood_pressure_sit_diastolic exists
-    pub blood_pressure_sit_systolic: Option<i16>,
-    ///Red Cap ID bp_sit_dia
-    ///
-    /// Must Exist if blood_pressure_sit_systolic exists
-    pub blood_pressure_sit_diastolic: Option<i16>,
-    /// Red Cap ID bp_stand_syst
-    ///
-    /// Must Exist if blood_pressure_stand_diastolic exists
-    pub blood_pressure_stand_systolic: Option<i16>,
-    /// Red Cap ID bp_stand_dia
-    ///
-    /// Must Exist if blood_pressure_stand_systolic exists
-    pub blood_pressure_stand_diastolic: Option<i16>,
     /// Weight Taken RED Cap ID: weight_yn
     /// Weight Red Cap: weight
     pub weight: Option<f32>,
@@ -157,10 +146,30 @@ pub struct CaseNoteHealthMeasures {
     /// Redcap ID: glucose
     pub glucose_result: Option<f32>,
     /// Redcap ID: glucose_fasting
-    pub fasted_atleast_2_hours: bool,
+    ///
+    /// ## RedCap Values
+    /// - 2: Yes
+    /// - 1: No
+    pub fasted_atleast_2_hours: Option<bool>,
     ///Function, Assistive Devices, and/or Limitations to ADLs/IADLs
     /// Redcap ID: visit_function
     pub other: Option<String>,
+}
+impl CaseNoteHealthMeasures {
+    pub async fn add_bp(&self, bp: NewBloodPressure, db: &PgPool) -> DBResult<()> {
+        SimpleInsertQueryBuilder::new(HealthMeasureBloodPressure::table_name())
+            .insert(HealthMeasureBloodPressureColumn::HealthMeasureId, self.id)
+            .insert(
+                HealthMeasureBloodPressureColumn::BloodPressureType,
+                bp.blood_pressure_type,
+            )
+            .insert(HealthMeasureBloodPressureColumn::Systolic, bp.systolic)
+            .insert(HealthMeasureBloodPressureColumn::Diastolic, bp.diastolic)
+            .query()
+            .execute(db)
+            .await?;
+        Ok(())
+    }
 }
 impl TableType for CaseNoteHealthMeasures {
     type Columns = CaseNoteHealthMeasuresColumn;
@@ -191,5 +200,82 @@ impl CaseNoteHealthMeasures {
             .fetch_optional(database)
             .await
             .map_err(DBError::from)
+    }
+}
+#[derive(Clone, PartialEq, Serialize, Deserialize, Type, ToSchema, EnumIter)]
+#[sqlx(type_name = "VARCHAR")]
+pub enum BloodPressureType {
+    Sit,
+    /// Orthostatic Blood Pressure
+    Stand,
+    /// Only Used if HealthOverview is marked as person having a blood pressure cuff
+    Personal,
+}
+impl Debug for BloodPressureType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let value = match self {
+            BloodPressureType::Sit => "Sit",
+            BloodPressureType::Stand => "Stand",
+            BloodPressureType::Personal => "Personal",
+        };
+        write!(
+            f,
+            "{}{{systolic = {}, diastolic ={}, yn = {}}}",
+            value,
+            self.systolic(),
+            self.diastolic(),
+            self.yes_or_no_question()
+        )
+    }
+}
+impl BloodPressureType {
+    /// The systolic value for the blood pressure
+    pub fn systolic(&self) -> &'static str {
+        match self {
+            BloodPressureType::Sit => "bp_sit_syst",
+            BloodPressureType::Stand => "bp_stand_syst",
+            BloodPressureType::Personal => "cuff_systolic",
+        }
+    }
+    /// The diasolic value for the blood pressure
+    pub fn diastolic(&self) -> &'static str {
+        match self {
+            BloodPressureType::Sit => "bp_sit_dia",
+            BloodPressureType::Stand => "bp_stand_dia",
+            BloodPressureType::Personal => "cuff_diastolic",
+        }
+    }
+    /// The was read question id in red_cap
+    ///
+    /// We ignore this when retrieving the data
+    /// because it is not needed
+    ///
+    /// However, it is needed when pushing data to red_cap
+    pub fn yes_or_no_question(&self) -> &'static str {
+        match self {
+            BloodPressureType::Sit => "bp_sit",
+            BloodPressureType::Stand => "bp_stand",
+            BloodPressureType::Personal => "cuff_systolic",
+        }
+    }
+}
+/// Blood Pressure gets its own table because it happens between 0-3 different ways
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromRow, Columns)]
+pub struct HealthMeasureBloodPressure {
+    pub id: i32,
+    /// Each [CaseNote] can have at most 3 blood pressures
+    pub health_measure_id: i32,
+    /// The Type of Blood Pressure
+    pub blood_pressure_type: BloodPressureType,
+    /// Possible Red CAP IDs: bp_sit_syst, bp_stand_syst
+    pub systolic: i16,
+    /// Possible Red CAP IDs: bp_sit_dia, bp_stand_dia
+    pub diastolic: i16,
+}
+
+impl TableType for HealthMeasureBloodPressure {
+    type Columns = HealthMeasureBloodPressureColumn;
+    fn table_name() -> &'static str {
+        "health_measure_blood_pressure"
     }
 }

@@ -245,11 +245,42 @@ run_sql_and_return_df( sql,cnx )
 ```{python}
 #| echo: true
 sql = f"""
-SELECT participants.id, participants.first_name, participants.last_name, case_note_health_measures.blood_pressure_sit_systolic, case_note_health_measures.blood_pressure_sit_diastolic FROM case_note_health_measures
+SELECT participants.id, participants.first_name, participants.last_name,
+       BP.systolic,
+       BP.diastolic
+FROM health_measure_blood_pressure AS BP
+    INNER JOIN case_note_health_measures ON BP.health_measure_id = case_note_health_measures.id
     INNER JOIN case_notes  on case_notes.id = case_note_health_measures.case_note_id
     INNER JOIN participants ON case_notes.participant_id = participants.id
-    WHERE case_note_health_measures.blood_pressure_sit_systolic >= 130 AND case_note_health_measures.blood_pressure_sit_diastolic >= 80;
+    WHERE BP.systolic >= 130 AND BP.diastolic >= 80 AND BP.blood_pressure_type = 'Sit';
+"""
+run_sql_and_return_df( sql,cnx )
 
+```
+
+### Listing Extra Questions For Case Note 1
+
+```{python}
+#| echo: true
+sql = f"""
+SELECT
+            questions.question,
+            case_note_question_answers.response_type as response_type,
+            case_note_question_answers.value_text as value_text,
+            case_note_question_answers.value_number as value_number,
+            case_note_question_answers.value_float as value_float,
+
+            case_note_question_answers.value_boolean as value_boolean,
+            (question_options.id, question_options.name) as value_radio,
+            array(
+                SELECT (mcb.option_id, qo.name, qo.string_id) FROM case_note_question_answer_mcb as mcb
+                                JOIN public.question_options qo on qo.id = mcb.option_id
+                                WHERE question_answers_id = case_note_question_answers.id
+            ) as options
+        FROM case_note_question_answers
+            JOIN questions  on case_note_question_answers.question_id = questions.id
+            LEFT JOIN question_options on case_note_question_answers.value_radio = question_options.id
+        WHERE case_note_question_answers.case_note_id = 1;
 """
 run_sql_and_return_df( sql,cnx )
 

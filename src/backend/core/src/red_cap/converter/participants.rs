@@ -4,7 +4,7 @@ use tracing::info;
 
 use crate::{
     database::red_cap::{
-        locations::RedCapLocationConnectionRules,
+        locations::{RedCapLocationConnectionRules, RedCapLocationRules},
         participants::{
             health_overview::HealthOverview, NewDemographics, NewHealthOverview, NewParticipant,
             ParticipantDemograhics, Participants,
@@ -155,7 +155,7 @@ impl RedCapParticipant {
             if let Some(location) = location {
                 location
                     .red_cap_connection_rules
-                    .non_visit_rules()
+                    .participant_rules()
                     .write(data);
             }
         }
@@ -182,7 +182,7 @@ impl RedCapParticipant {
             .get_number("record_id")
             .ok_or(RedCapConverterError::RequiredFieldMissing("record_id"))?;
 
-        let location = if let Some(location) = RedCapLocationConnectionRules::read(data) {
+        let location = if let Some(location) = RedCapLocationRules::read(data) {
             let location = converter.find_location_from_connection_rules(&location);
             info!("Location: {:?}", location);
             location.map(|x| x.id)

@@ -1,3 +1,4 @@
+use ahash::{HashMap, HashMapExt};
 use serde::{Deserialize, Serialize};
 use sqlx::{prelude::FromRow, types::Json};
 
@@ -97,81 +98,59 @@ impl Locations {
 /// Each field corresponds to the field name in Red Cap.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub struct RedCapLocationConnectionRules {
-    pub rhwp_location: Option<usize>,
-    pub rhwp_location_visit: Option<usize>,
-    pub mhwp_location: Option<usize>,
-    pub mhwp_location_visit: Option<usize>,
-    pub mhwp_location_petersburg: Option<usize>,
-    pub mhwp_location_visit_petersburg: Option<usize>,
+    pub visit: HashMap<String, i32>,
+    pub participant: HashMap<String, i32>,
 }
 impl RedCapLocationConnectionRules {
-    pub fn does_match_no_visit(&self, location: &RedCapLocationConnectionRules) -> bool {
-        self.rhwp_location == location.rhwp_location
-            && self.mhwp_location == location.mhwp_location
-            && self.mhwp_location_petersburg == location.mhwp_location_petersburg
+    pub fn does_match_participant(&self, location: &RedCapLocationRules) -> bool {
+        self.participant == location.rules
     }
-    pub fn does_match_visit(&self, location: &RedCapLocationConnectionRules) -> bool {
-        self.rhwp_location_visit == location.rhwp_location_visit
-            && self.mhwp_location_visit == location.mhwp_location_visit
-            && self.mhwp_location_visit_petersburg == location.mhwp_location_visit_petersburg
+    pub fn does_match_visit(&self, location: &RedCapLocationRules) -> bool {
+        self.visit == location.rules
     }
-    pub fn non_visit_rules(&self) -> RedCapLocationConnectionRules {
-        RedCapLocationConnectionRules {
-            rhwp_location: self.rhwp_location,
-            rhwp_location_visit: None,
-            mhwp_location: self.mhwp_location,
-            mhwp_location_visit: None,
-            mhwp_location_petersburg: self.mhwp_location_petersburg,
-            mhwp_location_visit_petersburg: None,
+    pub fn participant_rules(&self) -> RedCapLocationRules {
+        RedCapLocationRules {
+            rules: self.participant.clone(),
         }
     }
-    pub fn visit_rules(&self) -> RedCapLocationConnectionRules {
-        RedCapLocationConnectionRules {
-            rhwp_location: None,
-            rhwp_location_visit: self.rhwp_location_visit,
-            mhwp_location: None,
-            mhwp_location_visit: self.mhwp_location_visit,
-            mhwp_location_petersburg: None,
-            mhwp_location_visit_petersburg: self.mhwp_location_visit_petersburg,
+    pub fn visit_rules(&self) -> RedCapLocationRules {
+        RedCapLocationRules {
+            rules: self.visit.clone(),
         }
     }
 }
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RedCapLocationRules {
+    pub rules: HashMap<String, i32>,
+}
 
-impl RedCapType for RedCapLocationConnectionRules {
+impl RedCapType for RedCapLocationRules {
     fn read<D: RedCapDataSet>(data: &D) -> Option<Self>
     where
         Self: Sized,
     {
-        let value = Self {
-            rhwp_location: data.get_number("rhwp_location"),
-            rhwp_location_visit: data.get_number("rhwp_location_visit"),
-            mhwp_location: data.get_number("mhwp_location"),
-            mhwp_location_visit: data.get_number("mhwp_location_visit"),
-            mhwp_location_petersburg: data.get_number("mhwp_location_petersburg"),
-            mhwp_location_visit_petersburg: data.get_number("mhwp_location_visit_petersburg"),
-        };
+        let mut rules = HashMap::new();
+        for (key, value) in data.iter() {
+            if key.starts_with("rhwp_location") {
+                let value = value.to_number();
+                if let Some(value) = value {
+                    rules.insert(key.clone(), value as i32);
+                }
+            }
+            if key.starts_with("mhwp_location") {
+                let value = value.to_number();
+                if let Some(value) = value {
+                    rules.insert(key.clone(), value as i32);
+                }
+            }
+        }
 
-        Some(value)
+        Some(Self { rules })
     }
 
     fn write<D: RedCapDataSet>(&self, data: &mut D) {
-        if let Some(value) = self.rhwp_location {
-            data.insert("rhwp_location".to_string(), value.into());
-        }
-        if let Some(value) = self.rhwp_location_visit {
-            data.insert("rhwp_location_visit".to_string(), value.into());
-        }
-        if let Some(value) = self.mhwp_location {
-            data.insert("mhwp_location".to_string(), value.into());
-        }
-        if let Some(value) = self.mhwp_location_visit {
-            data.insert("mhwp_location_visit".to_string(), value.into());
-        }
-        if let Some(value) = self.mhwp_location_petersburg {
-            data.insert("mhwp_location_petersburg".to_string(), value.into());
-        }
-        if let Some(value) = self.mhwp_location_visit_petersburg {
-            data.insert("mhwp_location_visit_petersburg".to_string(), value.into());
+        for (key, value) in &self.rules {
+            data.insert(key, (*value).into());
         }
     }
 }

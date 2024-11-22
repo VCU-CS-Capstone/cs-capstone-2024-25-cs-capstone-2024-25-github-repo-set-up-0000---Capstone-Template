@@ -1,6 +1,6 @@
 {
     "category": {
-        "string_id": "falls_ccreening",
+        "string_id": "falls_screening",
         "name": "Falls Screening",
         "form": "CaseNotes"
     },

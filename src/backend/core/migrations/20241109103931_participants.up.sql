@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS participant_medications(
             FOREIGN KEY (participant_id)
             REFERENCES participants(id)
             ON DELETE CASCADE,
-    name VARCHAR(255),
+    name VARCHAR(255) NOT NULL,
     dosage VARCHAR(255),
     frequency TEXT,
     date_prescribed DATE,
@@ -141,6 +141,8 @@ CREATE TABLE IF NOT EXISTS participant_question_answers(
             REFERENCES questions(id)
             ON UPDATE CASCADE
             ON DELETE CASCADE,
+    -- Ensure that the combination of participant_id and question_id is unique
+    UNIQUE (participant_id, question_id),
     value_radio INTEGER,
         CONSTRAINT FK_case_note_question_answers_value_radio
             FOREIGN KEY (value_radio)

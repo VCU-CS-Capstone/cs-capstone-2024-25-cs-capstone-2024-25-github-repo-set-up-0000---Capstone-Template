@@ -155,16 +155,14 @@ async fn generate_random_case_note_on(
     let case_note = new_case_note
         .insert_return_case_note(participant.id, database)
         .await?;
-    let (sit, stand) = random.random_blood_pressure(participant.id);
-    let new_health_measures = NewCaseNoteHealthMeasures {
-        sit,
-        stand,
-        ..Default::default()
-    };
-
-    new_health_measures
-        .insert_return_none(case_note.id, database)
+    let bps = random.random_blood_pressure(participant.id);
+    let new_health_measures = NewCaseNoteHealthMeasures::default();
+    let health_measure = new_health_measures
+        .insert_return_measure(case_note.id, database)
         .await?;
+    for bp in bps {
+        health_measure.add_bp(bp, database).await?;
+    }
 
     Ok(())
 }
