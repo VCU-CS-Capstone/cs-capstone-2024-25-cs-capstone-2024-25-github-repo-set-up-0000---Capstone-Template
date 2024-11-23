@@ -13,7 +13,7 @@
 | Week 7 Status Report | Continue refining SDR data collection and start analyzing data | Focused on refining the SDR data collection process. Continued research on algorithms for RF signal classification. | No major issues |
 | Week 8 Status Report | Conduct further research on machine learning algorithms | Began exploring machine learning models for RF signal classification. Continued data collection with SDR. | No major issues |
 | Week 9 Status Report | Start preparing RF data for integration with machine learning models | Started data preprocessing for machine learning models and began analyzing the collected RF data. | Data quality improvement needed |
-| Week 10 Status Report | | | |
+| Week 10 Status Report | Continue refining data preprocessing and implement regularization techniques in the CNN model. | Implemented dropout and L2 regularization to address overfitting in the CNN. Started initial GUI integration for PSD data input and prediction display. | Validation accuracy needs improvement; further tuning of hyperparameters is required. |
 | Week 11 Status Report | | | |
 | Week 12 Status Report | | | |
 | Week 13 Status Report | | | |
