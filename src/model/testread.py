@@ -23,8 +23,8 @@ def iq_to_psd(iq_data, num_fft, sample_rate):
     """
     # Compute the PSD of the input IQ data
     """
-    freq, psd = signal.welch(iq_data, fs=sample_rate, nperseg=num_fft)
-    return freq, psd
+    freq, psd = signal.welch(iq_data, fs=sample_rate, nperseg=num_fft, return_onesided=False)
+    return psd
 
 
 def read_labels(file_path):
@@ -83,6 +83,29 @@ device = (
     else "mps" if torch.backends.mps.is_available() else "cpu"
 )
 print(f"Using {device} device")
+
+class NeuralNetwork(nn.Module):
+    def __init__(self):
+        super(NeuralNetwork, self).__init__()
+        self.flatten = nn.Flatten()
+        self.linear_relu_stack = nn.Sequential(
+            nn.Linear(2048, 1024),
+            nn.ReLU(),
+            nn.Linear(1024, 512),
+            nn.ReLU(),
+            nn.Linear(512, 256),
+            nn.ReLU(),
+            nn.Linear(256, 2)
+        )
+
+    def forward(self, x):
+        x = self.flatten(x)
+        logits = self.linear_relu_stack(x)
+        return logits
+
+model = NeuralNetwork().to(device)
+loss_fn = nn.CrossEntropyLoss()
+optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
 
 
 def train(dataloader, model, loss_fn, optimizer):
