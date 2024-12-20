@@ -1,14 +1,15 @@
+// frontend/src/App.jsx
 import React from "react";
+import Header from "./components/Header";
 import Spectrogram from "./components/Spectrogram";
-import "./index.css";
 
-function App() {
+const App = () => {
   return (
     <div>
-      <h1 style={{ textAlign: "center" }}>Spectrogram Viewer</h1>
+      <Header />
       <Spectrogram />
     </div>
   );
-}
+};
 
 export default App;
